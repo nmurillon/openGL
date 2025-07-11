@@ -72,9 +72,10 @@ int main() {
   glDeleteShader(fragementShader);
 
   // SETUP VERTEX DATA
-  std::vector<double> vertices{
-      -0.5f, -0.5f, 0.f, 0.f, 0.5f, 0.f, 0.5f, -0.5f, 0.f,
-  };
+  std::vector<double> vertices{-0.5f, -0.5f, 0.f,  0.f,  0.5f, 0.f, 0.5f,
+                               -0.5f, 0.f,   -1.f, 1.f,  0.f,  0.f, 1.f,
+                               0.f,   -0.5f, 0.f,  0.f,  0.f,  1.f, 0.f,
+                               1.f,   1.f,   0.f,  0.5f, 0.f,  0.f};
 
   // VAO & VBO
   uint VAO, VBO;
@@ -107,7 +108,7 @@ int main() {
 
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
