@@ -63,21 +63,33 @@ int main() {
   glShaderSource(vertexShader, 1, &vertexShaderSrc, NULL);
   glCompileShader(vertexShader);
 
-  const uint fragementShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragementShader, 1, &fragmentShaderSrc, NULL);
-  glCompileShader(fragementShader);
+  const uint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
+  glCompileShader(fragmentShader);
+
+  const uint fragmentShaderYellow = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragmentShaderYellow, 1, &fragmentShaderYellowSrc, NULL);
+  glCompileShader(fragmentShaderYellow);
 
   const uint shaderProgram = glCreateProgram();
+  const uint shaderProgramYellow = glCreateProgram();
+
+  const std::vector<uint> shaderPrograms{shaderProgram, shaderProgramYellow};
 
   // Beware to the order
   glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragementShader);
+  glAttachShader(shaderProgram, fragmentShader);
+
+  glAttachShader(shaderProgramYellow, vertexShader);
+  glAttachShader(shaderProgramYellow, fragmentShaderYellow);
 
   glLinkProgram(shaderProgram);
+  glLinkProgram(shaderProgramYellow);
 
   // Once linked, shaders can be deleted
   glDeleteShader(vertexShader);
-  glDeleteShader(fragementShader);
+  glDeleteShader(fragmentShader);
+  glDeleteShader(fragmentShaderYellow);
 
   // SETUP VERTEX DATA
   // clang-format off
@@ -125,9 +137,8 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shaderProgram);
-
     for (int i = 0; i < 2; ++i) {
+      glUseProgram(shaderPrograms.at(i));
       glBindVertexArray(VAO.at(i));
       glDrawArrays(GL_TRIANGLES, 0, vertices.at(i).size() / 3);
     }
