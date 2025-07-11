@@ -19,6 +19,14 @@ const char *fragmentShaderSrc = "#version 330 core\n"
                                 "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
                                 "}\0";
 
+const char *fragmentShaderYellowSrc =
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "FragColor = vec4(1.0f, 1.f, 0.f, 1.0f);\n"
+    "}\0";
+
 // Callback to resize the window if user resizes it
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -72,29 +80,40 @@ int main() {
   glDeleteShader(fragementShader);
 
   // SETUP VERTEX DATA
-  std::vector<double> vertices{-0.5f, -0.5f, 0.f,  0.f,  0.5f, 0.f, 0.5f,
-                               -0.5f, 0.f,   -1.f, 1.f,  0.f,  0.f, 1.f,
-                               0.f,   -0.5f, 0.f,  0.f,  0.f,  1.f, 0.f,
-                               1.f,   1.f,   0.f,  0.5f, 0.f,  0.f};
+  // clang-format off
+  std::vector<std::vector<double>> vertices = {{-0.5f, -0.5f, 0.f,
+                                                   0.f, 0.5f, 0.f,
+                                                   0.5f, -0.5f, 0.f},
+                                               {-1.f, 1.f, 0.f,
+                                                    0.f, 1.f, 0.f,
+                                                    -0.5f, 0.f, 0.f,
+                                                    // Second triangle
+                                                    0.f, 1.f, 0.f,
+                                                    1.f, 1.f, 0.f,
+                                                    0.5f, 0.f, 0.f}};
+
+  // clang-format on
 
   // VAO & VBO
-  uint VAO, VBO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
+  std::vector<uint> VAO(2), VBO(2);
+  glGenVertexArrays(2, VAO.data());
+  glGenBuffers(2, VBO.data());
 
-  glBindVertexArray(VAO);
+  for (int i = 0; i < 2; ++i) {
+    glBindVertexArray(VAO.at(i));
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(double),
-               vertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO.at(i));
+    glBufferData(GL_ARRAY_BUFFER, vertices.at(i).size() * sizeof(double),
+                 vertices.at(i).data(), GL_STATIC_DRAW);
 
-  // Link Vertex attributes
-  glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double),
-                        (void *)0);
-  glEnableVertexAttribArray(0);
+    // Link Vertex attributes
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double),
+                          (void *)0);
+    glEnableVertexAttribArray(0);
+  }
 
   // Unbind VBO & VAO to prevent further operations to modify them
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
   glViewport(0, 0, 800, 600);
@@ -107,8 +126,11 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
+
+    for (int i = 0; i < 2; ++i) {
+      glBindVertexArray(VAO.at(i));
+      glDrawArrays(GL_TRIANGLES, 0, vertices.at(i).size() / 3);
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
