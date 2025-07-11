@@ -100,16 +100,22 @@ int main() {
                                                     0.f, 1.f, 0.f,
                                                     -0.5f, 0.f, 0.f,
                                                     // Second triangle
-                                                    0.f, 1.f, 0.f,
                                                     1.f, 1.f, 0.f,
                                                     0.5f, 0.f, 0.f}};
 
+
+std::vector<std::vector<uint>> indices = {
+    {0,1,2},
+    {0,1,2,
+        1,3,4}
+};
   // clang-format on
 
   // VAO & VBO
-  std::vector<uint> VAO(2), VBO(2);
+  std::vector<uint> VAO(2), EBO(2), VBO(2);
   glGenVertexArrays(2, VAO.data());
   glGenBuffers(2, VBO.data());
+  glGenBuffers(2, EBO.data());
 
   for (int i = 0; i < 2; ++i) {
     glBindVertexArray(VAO.at(i));
@@ -117,6 +123,10 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO.at(i));
     glBufferData(GL_ARRAY_BUFFER, vertices.at(i).size() * sizeof(double),
                  vertices.at(i).data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO.at(i));
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.at(i).size() * sizeof(uint),
+                 indices.at(i).data(), GL_STATIC_DRAW);
 
     // Link Vertex attributes
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double),
@@ -127,6 +137,7 @@ int main() {
   // Unbind VBO & VAO to prevent further operations to modify them
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   glViewport(0, 0, 800, 600);
 
@@ -140,7 +151,7 @@ int main() {
     for (int i = 0; i < 2; ++i) {
       glUseProgram(shaderPrograms.at(i));
       glBindVertexArray(VAO.at(i));
-      glDrawArrays(GL_TRIANGLES, 0, vertices.at(i).size() / 3);
+      glDrawElements(GL_TRIANGLES, indices.at(i).size(), GL_UNSIGNED_INT, 0);
     }
 
     glfwSwapBuffers(window);
