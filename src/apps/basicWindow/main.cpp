@@ -4,28 +4,25 @@
 #include <iostream>
 #include <vector>
 
-const char *vertexShaderSrc =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
+const char *vertexShaderSrc = "#version 330 core\n"
+                              "layout (location = 0) in vec3 aPos;\n"
+                              "void main()\n"
+                              "{\n"
+                              "   gl_Position = vec4(aPos, 1.0);\n"
+                              "}\0";
 
 const char *fragmentShaderSrc = "#version 330 core\n"
                                 "out vec4 FragColor;\n"
+                                "uniform vec4 vertexColor;\n"
                                 "void main()\n"
                                 "{\n"
-                                "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                "FragColor = vertexColor;\n"
                                 "}\0";
 
-const char *fragmentShaderYellowSrc =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "FragColor = vec4(1.0f, 1.f, 0.f, 1.0f);\n"
-    "}\0";
+const std::vector<std::vector<float>> colors{
+    {1.f, 0.5f, 0.2f, 1.f}, // Orange
+    {1.f, 1.f, 0.f, 1.f}    // Yellow
+};
 
 // Callback to resize the window if user resizes it
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -67,29 +64,17 @@ int main() {
   glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
   glCompileShader(fragmentShader);
 
-  const uint fragmentShaderYellow = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShaderYellow, 1, &fragmentShaderYellowSrc, NULL);
-  glCompileShader(fragmentShaderYellow);
-
   const uint shaderProgram = glCreateProgram();
-  const uint shaderProgramYellow = glCreateProgram();
-
-  const std::vector<uint> shaderPrograms{shaderProgram, shaderProgramYellow};
 
   // Beware to the order
   glAttachShader(shaderProgram, vertexShader);
   glAttachShader(shaderProgram, fragmentShader);
 
-  glAttachShader(shaderProgramYellow, vertexShader);
-  glAttachShader(shaderProgramYellow, fragmentShaderYellow);
-
   glLinkProgram(shaderProgram);
-  glLinkProgram(shaderProgramYellow);
 
   // Once linked, shaders can be deleted
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
-  glDeleteShader(fragmentShaderYellow);
 
   // SETUP VERTEX DATA
   // clang-format off
@@ -144,6 +129,9 @@ std::vector<std::vector<uint>> indices = {
   // To draw in wireframe mode, use GL_LINE
   std::vector<int> modes{GL_LINE, GL_FILL};
 
+  glUseProgram(shaderProgram);
+  int vertexColorLocation = glGetUniformLocation(shaderProgram, "vertexColor");
+
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
@@ -153,8 +141,10 @@ std::vector<std::vector<uint>> indices = {
 
     for (int i = 0; i < 2; ++i) {
       glPolygonMode(GL_FRONT_AND_BACK, modes.at(i));
-      glUseProgram(shaderPrograms.at(i));
       glBindVertexArray(VAO.at(i));
+      auto color = colors.at(i);
+      glUniform4f(vertexColorLocation, color.at(0), color.at(1), color.at(2),
+                  color.at(3));
       glDrawElements(GL_TRIANGLES, indices.at(i).size(), GL_UNSIGNED_INT, 0);
     }
 
