@@ -6,17 +6,20 @@
 
 const char *vertexShaderSrc = "#version 330 core\n"
                               "layout (location = 0) in vec3 aPos;\n"
+                              "layout (location = 1) in vec3 aColor;\n"
+                              "out vec3 vertexColor;\n"
                               "void main()\n"
                               "{\n"
                               "   gl_Position = vec4(aPos, 1.0);\n"
+                              "   vertexColor = aColor;\n"
                               "}\0";
 
 const char *fragmentShaderSrc = "#version 330 core\n"
                                 "out vec4 FragColor;\n"
-                                "uniform vec4 vertexColor;\n"
+                                "in vec3 vertexColor;\n"
                                 "void main()\n"
                                 "{\n"
-                                "FragColor = vertexColor;\n"
+                                "FragColor = vec4(vertexColor, 1.f);\n"
                                 "}\0";
 
 const std::vector<std::vector<float>> colors{
@@ -78,15 +81,17 @@ int main() {
 
   // SETUP VERTEX DATA
   // clang-format off
-  std::vector<std::vector<double>> vertices = {{-0.5f, -0.5f, 0.f,
-                                                   0.f, 0.5f, 0.f,
-                                                   0.5f, -0.5f, 0.f},
-                                               {-1.f, 1.f, 0.f,
-                                                    0.f, 1.f, 0.f,
-                                                    -0.5f, 0.f, 0.f,
+
+  // Position as a vec3 and color as a vec3
+  std::vector<std::vector<double>> vertices = {{-0.5f, -0.5f, 0.f, 1.0f, 0.f, 0.f,
+                                                   0.f, 0.5f, 0.f, 0.0f, 1.f, 0.f,
+                                                   0.5f, -0.5f, 0.f, 0.0f, 0.f, 1.f,},
+                                               {-1.f, 1.f, 0.f, 1.f, 1.f, 0.f,
+                                                    0.f, 1.f, 0.f, 1.f, 1.f, 0.f,
+                                                    -0.5f, 0.f, 0.f, 1.f, 1.f, 0.f,
                                                     // Second triangle
-                                                    1.f, 1.f, 0.f,
-                                                    0.5f, 0.f, 0.f}};
+                                                    1.f, 1.f, 0.f, 1.f, 1.f, 0.f,
+                                                    0.5f, 0.f, 0.f, 1.f, 1.f, 0.f}};
 
 
 std::vector<std::vector<uint>> indices = {
@@ -114,9 +119,13 @@ std::vector<std::vector<uint>> indices = {
                  indices.at(i).data(), GL_STATIC_DRAW);
 
     // Link Vertex attributes
-    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double),
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 2 * 3 * sizeof(double),
                           (void *)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 2 * 3 * sizeof(double),
+                          (void *)(3 * sizeof(double)));
+    glEnableVertexAttribArray(1);
   }
 
   // Unbind VBO & VAO to prevent further operations to modify them
