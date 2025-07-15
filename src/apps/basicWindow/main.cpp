@@ -4,23 +4,9 @@
 #include <iostream>
 #include <vector>
 
-const char *vertexShaderSrc = "#version 330 core\n"
-                              "layout (location = 0) in vec3 aPos;\n"
-                              "layout (location = 1) in vec3 aColor;\n"
-                              "out vec3 vertexColor;\n"
-                              "void main()\n"
-                              "{\n"
-                              "   gl_Position = vec4(aPos, 1.0);\n"
-                              "   vertexColor = aColor;\n"
-                              "}\0";
+#include <filesystem>
 
-const char *fragmentShaderSrc = "#version 330 core\n"
-                                "out vec4 FragColor;\n"
-                                "in vec3 vertexColor;\n"
-                                "void main()\n"
-                                "{\n"
-                                "FragColor = vec4(vertexColor, 1.f);\n"
-                                "}\0";
+#include <libs/core/Shader.hpp>
 
 const std::vector<std::vector<float>> colors{
     {1.f, 0.5f, 0.2f, 1.f}, // Orange
@@ -59,25 +45,11 @@ int main() {
   }
 
   // SETUP SHADERS
-  const uint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSrc, NULL);
-  glCompileShader(vertexShader);
+  const std::filesystem::path shaderDir{SHADER_DIR};
 
-  const uint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
-  glCompileShader(fragmentShader);
-
-  const uint shaderProgram = glCreateProgram();
-
-  // Beware to the order
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-
-  glLinkProgram(shaderProgram);
-
-  // Once linked, shaders can be deleted
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  const libs::core::Shader shaderProgram(
+      (shaderDir / "basicShader.vert").string(),
+      (shaderDir / "basicShader.frag").string());
 
   // SETUP VERTEX DATA
   // clang-format off
@@ -138,8 +110,7 @@ std::vector<std::vector<uint>> indices = {
   // To draw in wireframe mode, use GL_LINE
   std::vector<int> modes{GL_LINE, GL_FILL};
 
-  glUseProgram(shaderProgram);
-  int vertexColorLocation = glGetUniformLocation(shaderProgram, "vertexColor");
+  shaderProgram.use();
 
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
@@ -152,8 +123,8 @@ std::vector<std::vector<uint>> indices = {
       glPolygonMode(GL_FRONT_AND_BACK, modes.at(i));
       glBindVertexArray(VAO.at(i));
       auto color = colors.at(i);
-      glUniform4f(vertexColorLocation, color.at(0), color.at(1), color.at(2),
-                  color.at(3));
+
+      shaderProgram.setVec4f("vertexColor", color);
       glDrawElements(GL_TRIANGLES, indices.at(i).size(), GL_UNSIGNED_INT, 0);
     }
 

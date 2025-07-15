@@ -1,0 +1,31 @@
+#pragma once
+
+#include <glad/glad.h>
+
+#include <string>
+#include <vector>
+
+namespace libs::core {
+class Shader {
+public:
+  Shader(const std::string &vertexSrcFile, const std::string &fragmentSrcFile);
+  void use() const;
+
+  // Utility functions to help set uniform values;
+  void setBool(const std::string &name, bool value) const;
+  void setInt(const std::string &name, int value) const;
+  void setFloat(const std::string &name, float value) const;
+  void setVec4f(const std::string &name, std::vector<float> value) const;
+
+private:
+  uint m_shaderId;
+
+  /**
+   * @brief Create and compile a shader given a source file
+   * @param [in] srcFile The path to the file containing the shader's code
+   * @param [in] type The type of shader to create
+   * @return The id of the shader
+   */
+  uint readShaderFile(const std::string &srcFile, uint type);
+};
+} // namespace libs::core
