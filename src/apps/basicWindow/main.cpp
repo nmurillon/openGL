@@ -141,6 +141,9 @@ std::vector<std::vector<uint>> indices = {
 
   glViewport(0, 0, 800, 600);
 
+  // To draw in wireframe mode, use GL_LINE
+  std::vector<int> modes{GL_LINE, GL_FILL};
+
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
@@ -149,6 +152,7 @@ std::vector<std::vector<uint>> indices = {
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (int i = 0; i < 2; ++i) {
+      glPolygonMode(GL_FRONT_AND_BACK, modes.at(i));
       glUseProgram(shaderPrograms.at(i));
       glBindVertexArray(VAO.at(i));
       glDrawElements(GL_TRIANGLES, indices.at(i).size(), GL_UNSIGNED_INT, 0);
