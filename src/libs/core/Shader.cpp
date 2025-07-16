@@ -1,5 +1,8 @@
 #include "libs/core/Shader.hpp"
 
+#include <libs/io/ProgramPath.hpp>
+
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -39,7 +42,8 @@ Shader::Shader(const std::string &vertexSrcFile,
 void Shader::use() const { glUseProgram(m_shaderId); }
 
 void Shader::setBool(const std::string &name, bool value) const {
-  glUniform1i(glGetUniformLocation(m_shaderId, name.c_str()), (int)value);
+  glUniform1i(glGetUniformLocation(m_shaderId, name.c_str()),
+              static_cast<int>(value));
 }
 
 void Shader::setInt(const std::string &name, int value) const {
@@ -61,10 +65,16 @@ void Shader::setVec4f(const std::string &name, std::vector<float> value) const {
 }
 
 uint Shader::readShaderFile(const std::string &src, uint type) {
-  std::ifstream srcStream{src};
+  const std::filesystem::path shaderDir{RESOURCES_FOLDER};
+
+  std::ifstream srcStream{
+      (libs::io::ProgramPath::getInstance().getProgramDir() / RESOURCES_FOLDER /
+       src)
+          .string()};
   if (!srcStream.is_open() || !srcStream.good()) {
     throw std::runtime_error(
-        std::string("Failed to open vertex shader file: ") + src);
+        std::string("Failed to open vertex shader file: ") +
+        (shaderDir / src).string());
   }
 
   std::stringstream srcSS;

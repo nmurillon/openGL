@@ -4,8 +4,6 @@
 #include <iostream>
 #include <vector>
 
-#include <filesystem>
-
 #include <libs/core/Shader.hpp>
 
 const std::vector<std::vector<float>> colors{
@@ -24,7 +22,7 @@ void processInput(GLFWwindow *window) {
     glfwSetWindowShouldClose(window, true);
 }
 
-int main() {
+int main(int argc, char **argv) {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -39,25 +37,22 @@ int main() {
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     std::cout << "Failed to initialize GLAD" << std::endl;
     return -1;
   }
 
   // SETUP SHADERS
-  const std::filesystem::path shaderDir{SHADER_DIR};
-
-  const libs::core::Shader shaderProgram(
-      (shaderDir / "basicShader.vert").string(),
-      (shaderDir / "basicShader.frag").string());
+  const libs::core::Shader shaderProgram("shaders/basicShader.vert",
+                                         "shaders/basicShader.frag");
 
   // SETUP VERTEX DATA
   // clang-format off
 
   // Position as a vec3 and color as a vec3
-  std::vector<std::vector<double>> vertices = {{-0.5f, -0.5f, 0.f, 1.0f, 0.f, 0.f,
+  std::vector<std::vector<float>> vertices = {{-0.5f, -0.5f, 0.f, 1.0f, 0.f, 0.f,
                                                    0.f, 0.5f, 0.f, 0.0f, 1.f, 0.f,
-                                                   0.5f, -0.5f, 0.f, 0.0f, 0.f, 1.f,},
+                                                   0.5f, -0.5f, 0.f, 0.0f, 0.f, 1.f},
                                                {-1.f, 1.f, 0.f, 1.f, 1.f, 0.f,
                                                     0.f, 1.f, 0.f, 1.f, 1.f, 0.f,
                                                     -0.5f, 0.f, 0.f, 1.f, 1.f, 0.f,
@@ -79,24 +74,26 @@ std::vector<std::vector<uint>> indices = {
   glGenBuffers(2, VBO.data());
   glGenBuffers(2, EBO.data());
 
-  for (int i = 0; i < 2; ++i) {
+  for (size_t i = 0; i < 2; ++i) {
     glBindVertexArray(VAO.at(i));
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO.at(i));
-    glBufferData(GL_ARRAY_BUFFER, vertices.at(i).size() * sizeof(double),
+    glBufferData(GL_ARRAY_BUFFER,
+                 static_cast<GLsizeiptr>(vertices.at(i).size() * sizeof(float)),
                  vertices.at(i).data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO.at(i));
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.at(i).size() * sizeof(uint),
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 static_cast<GLsizeiptr>(indices.at(i).size() * sizeof(uint)),
                  indices.at(i).data(), GL_STATIC_DRAW);
 
     // Link Vertex attributes
-    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 2 * 3 * sizeof(double),
-                          (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * 3 * sizeof(float),
+                          reinterpret_cast<void *>(0));
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 2 * 3 * sizeof(double),
-                          (void *)(3 * sizeof(double)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * 3 * sizeof(float),
+                          reinterpret_cast<void *>(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
   }
 
@@ -108,7 +105,7 @@ std::vector<std::vector<uint>> indices = {
   glViewport(0, 0, 800, 600);
 
   // To draw in wireframe mode, use GL_LINE
-  std::vector<int> modes{GL_LINE, GL_FILL};
+  std::vector<GLenum> modes{GL_LINE, GL_FILL};
 
   shaderProgram.use();
 
@@ -119,13 +116,14 @@ std::vector<std::vector<uint>> indices = {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for (int i = 0; i < 2; ++i) {
+    for (size_t i = 0; i < 2; ++i) {
       glPolygonMode(GL_FRONT_AND_BACK, modes.at(i));
       glBindVertexArray(VAO.at(i));
       auto color = colors.at(i);
 
       shaderProgram.setVec4f("vertexColor", color);
-      glDrawElements(GL_TRIANGLES, indices.at(i).size(), GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.at(i).size()),
+                     GL_UNSIGNED_INT, 0);
     }
 
     glfwSwapBuffers(window);
