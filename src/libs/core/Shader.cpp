@@ -65,16 +65,15 @@ void Shader::setVec4f(const std::string &name, std::vector<float> value) const {
 }
 
 uint Shader::readShaderFile(const std::string &src, uint type) {
-  const std::filesystem::path shaderDir{RESOURCES_FOLDER};
-
-  std::ifstream srcStream{
-      (libs::io::ProgramPath::getInstance().getProgramDir() / RESOURCES_FOLDER /
-       src)
+  const std::string shaderPath{
+      (libs::io::ProgramPath::getInstance().getProgramDir() /
+       LOGL_CORE_RESOURCES_FOLDER / src)
           .string()};
+
+  std::ifstream srcStream{shaderPath};
   if (!srcStream.is_open() || !srcStream.good()) {
     throw std::runtime_error(
-        std::string("Failed to open vertex shader file: ") +
-        (shaderDir / src).string());
+        std::string("Failed to open vertex shader file: ") + shaderPath);
   }
 
   std::stringstream srcSS;

@@ -1,8 +1,55 @@
 #
+# Function for managing the resources (create the correct folder, copy, intall)
+#
+# Usage:
+#   logl_manage_resources(
+#            target_name name
+#            resources [item1...])
+#
+# target_name the name of the target
+# resources the list of resources
+#
+function(logl_manage_resources target_name resources)
+    list(LENGTH resources _len)
+    
+    if(${_len} GREATER 0)
+        get_property(GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+
+        string(TOUPPER ${target_name} target_name_upper)
+        set(RESOURCES_FOLDER ${target_name}_resources)
+        set(resources_folder_definition "${target_name_upper}_RESOURCES_FOLDER")
+
+        message("Resources folder for target ${target_name} : ${resources_folder_definition}")
+
+        target_compile_definitions(${target_name} PRIVATE ${resources_folder_definition}="${RESOURCES_FOLDER}")
+
+        set(COPY_TO "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$<$<BOOL:${GENERATOR_IS_MULTI_CONFIG}>:/$<CONFIG>>/${RESOURCES_FOLDER}")
+        foreach(RESOURCE ${_params_RESOURCES})
+            set(DEST_FILE "${COPY_TO}/${RESOURCE}")
+
+            add_custom_command(
+                OUTPUT "${DEST_FILE}"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCE}" "${DEST_FILE}"
+                COMMENT "Copying resource: ${RESOURCE} for ${target_name}"
+                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCE}"
+            )
+            list(APPEND RESOURCE_OUTPUTS "${DEST_FILE}")
+        endforeach()
+
+        add_custom_target(${target_name}_resources
+            DEPENDS ${RESOURCE_OUTPUTS}
+        )
+        add_dependencies(${target_name} ${target_name}_resources)
+
+    endif()
+endfunction()
+
+#
 # Create a new library
 #
 # Usage:
-#   me_tracker_add_library(
+#   logl_add_library(
 #                SOURCES [item1...]
 #                HEADERS [item1...]
 #                [PUBLIC_INCLUDES [item1...] ]
@@ -77,38 +124,14 @@ function(logl_add_library target_name)
 
     target_compile_definitions(${target_name} PUBLIC ${_params_PUBLIC_DEFINITIONS} PRIVATE ${_params_PRIVATE_DEFINITIONS})
 
-    if(_params_RESOURCES)
-        get_property(GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-
-        set(RESOURCES_FOLDER ${target_name}_resources)
-        target_compile_definitions(${target_name} PRIVATE RESOURCES_FOLDER="${RESOURCES_FOLDER}")
-
-        set(COPY_TO "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$<$<BOOL:${GENERATOR_IS_MULTI_CONFIG}>:/$<CONFIG>>/${RESOURCES_FOLDER}")
-        foreach(RESOURCE ${_params_RESOURCES})
-            set(DEST_FILE "${COPY_TO}/${RESOURCE}")
-
-            add_custom_command(
-                OUTPUT "${DEST_FILE}"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                        "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCE}" "${DEST_FILE}"
-                COMMENT "Copying resource: ${RESOURCE} for ${target_name}"
-                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCE}"
-            )
-            list(APPEND RESOURCE_OUTPUTS "${DEST_FILE}")
-        endforeach()
-
-        add_custom_target(${target_name}_resources
-            DEPENDS ${RESOURCE_OUTPUTS}
-        )
-        add_dependencies(${target_name} ${target_name}_resources)
-    endif()
+    logl_manage_resources(${target_name} "${_params_RESOURCES}")
 endfunction()
 
 #
 # Create a new executable
 #
 # Usage:
-#   me_tracker_add_executable(
+#   logl_add_executable(
 #                SOURCES [item1...]
 #                HEADERS [item1...]
 #                [INCLUDE_DIRS [item1...] ]
@@ -126,7 +149,7 @@ endfunction()
 function(logl_add_executable target_name)
     set(options "")
     set(oneValueArgs "")
-    set(multiValueArgs SOURCES HEADERS INCLUDE_DIRS LINKS DEFINITIONS)
+    set(multiValueArgs SOURCES HEADERS INCLUDE_DIRS LINKS DEFINITIONS RESOURCES)
 
     cmake_parse_arguments(_params "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -165,4 +188,6 @@ function(logl_add_executable target_name)
     )
 
     target_compile_definitions(${target_name} PRIVATE ${_params_DEFINITIONS} "-D${PROJECT_NAME_UPPERCASE}_EXPORTS")
+
+    logl_manage_resources(${target_name} "${_params_RESOURCES}")
 endfunction()
