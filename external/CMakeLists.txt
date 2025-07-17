@@ -13,3 +13,4 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glfw)
 
 add_subdirectory(glad)
+add_subdirectory(stb_image)

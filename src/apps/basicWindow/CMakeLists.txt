@@ -6,5 +6,6 @@ logl_add_executable(basic_window
     LINKS
         glad
         glfw
+        stb_image
         logl_core
 )
