@@ -8,4 +8,8 @@ logl_add_executable(basic_window
         glfw
         stb_image
         logl_core
+        logl_io
+    RESOURCES
+        textures/kaamelott.jpg
+        textures/totk.jpg
 )
