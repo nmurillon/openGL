@@ -64,14 +64,6 @@ void Shader::setVec4f(const std::string &name, std::vector<float> value) const {
               value.at(1), value.at(2), value.at(3));
 }
 
-float Shader::getFloat(const std::string &name) const {
-  float value;
-  glGetUniformfv(m_shaderId, glGetUniformLocation(m_shaderId, name.c_str()),
-                 &value);
-
-  return value;
-}
-
 uint Shader::readShaderFile(const std::string &src, uint type) {
   const std::string shaderPath{
       (libs::io::ProgramPath::getInstance().getProgramDir() /

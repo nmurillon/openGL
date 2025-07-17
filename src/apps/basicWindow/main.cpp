@@ -13,26 +13,25 @@ const std::vector<std::vector<float>> colors{
     {1.f, 1.f, 0.f, 1.f}    // Yellow
 };
 
+float textureMixingOpacity = 0.5f;
+
 // Callback to resize the window if user resizes it
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
 // Handle user inputs to close window if escaped is pressed
-void processInput(GLFWwindow *window, const libs::core::Shader &shader) {
+void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
 
   if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-    float currentValue = shader.getFloat("TextureMixingOpacity");
-    shader.setFloat("TextureMixingOpacity",
-                    std::min(1.0f, currentValue + 0.1f));
+    textureMixingOpacity = std::min(1.0f, textureMixingOpacity + 0.1f);
   }
 
   if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-    float currentValue = shader.getFloat("TextureMixingOpacity");
-    shader.setFloat("TextureMixingOpacity", std::max(0.f, currentValue - 0.1f));
+    textureMixingOpacity = std::max(0.f, textureMixingOpacity - 0.1f);
   }
 }
 
@@ -167,11 +166,11 @@ std::vector<std::vector<uint>> indices = {
   shaderProgram.use();
   shaderProgram.setInt("Texture1", 0);
   shaderProgram.setInt("Texture2", 1);
-  shaderProgram.setFloat("TextureMixingOpacity", 0.35f);
 
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
-    processInput(window, shaderProgram);
+    processInput(window);
+    shaderProgram.setFloat("TextureMixingOpacity", textureMixingOpacity);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
