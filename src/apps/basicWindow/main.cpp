@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
+#include <algorithm>
 #include <iostream>
 #include <libs/core/Shader.hpp>
 #include <libs/io/ProgramPath.hpp>
@@ -18,13 +19,25 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 // Handle user inputs to close window if escaped is pressed
-void processInput(GLFWwindow *window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+void processInput(GLFWwindow *window, const libs::core::Shader &shader) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    float currentValue = shader.getFloat("TextureMixingOpacity");
+    shader.setFloat("TextureMixingOpacity",
+                    std::min(1.0f, currentValue + 0.1f));
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    float currentValue = shader.getFloat("TextureMixingOpacity");
+    shader.setFloat("TextureMixingOpacity", std::max(0.f, currentValue - 0.1f));
+  }
 }
 
 uint loadTexture(const std::string &textureFile,
-                 GLenum textureUnit = GL_TEXTURE0) {
+                 GLenum textureUnit = GL_TEXTURE0, GLint wrapping = GL_REPEAT) {
   int width, height, nChannels;
   const std::string texturePath{
       (libs::io::ProgramPath::getInstance().getProgramDir() /
@@ -42,11 +55,10 @@ uint loadTexture(const std::string &textureFile,
   glBindTexture(GL_TEXTURE_2D, texture);
 
   // Set texture wrapping
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   if (data) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
@@ -93,11 +105,11 @@ int main(int argc, char **argv) {
                                                    0.f, 0.5f, 0.f, 0.0f, 1.f, 0.f, 0.5f, 0.5f,
                                                    0.5f, -0.5f, 0.f, 0.0f, 0.f, 1.f, 1.f, 0.f},
                                                {-1.f, 1.f, 0.f, 1.f, 1.f, 0.f, 0.f, 0.f,
-                                                    0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f, 0.f,
-                                                    -0.5f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.5f, 1.f,
+                                                    0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 0.5f*1.f, 0.f,
+                                                    -0.5f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.5f*0.5f, 0.5f*1.f,
                                                     // Second triangle
                                                     1.f, 1.f, 0.f, 1.f, 1.f, 0.f, 0.f, 0.f,
-                                                    0.5f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.5f, 1.f}};
+                                                    0.5f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.5f*0.5f, 0.5f*1.f}};
 
 
 std::vector<std::vector<uint>> indices = {
@@ -113,7 +125,7 @@ std::vector<std::vector<uint>> indices = {
   glGenBuffers(2, VBO.data());
   glGenBuffers(2, EBO.data());
 
-  loadTexture("textures/totk.jpg");
+  loadTexture("textures/totk.jpg", GL_TEXTURE0, GL_CLAMP_TO_EDGE);
   loadTexture("textures/kaamelott.jpg", GL_TEXTURE1);
   for (size_t i = 0; i < 2; ++i) {
     glBindVertexArray(VAO.at(i));
@@ -155,10 +167,11 @@ std::vector<std::vector<uint>> indices = {
   shaderProgram.use();
   shaderProgram.setInt("Texture1", 0);
   shaderProgram.setInt("Texture2", 1);
+  shaderProgram.setFloat("TextureMixingOpacity", 0.35f);
 
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
-    processInput(window);
+    processInput(window, shaderProgram);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);

@@ -11,11 +11,13 @@ public:
   Shader(const std::string &vertexSrcFile, const std::string &fragmentSrcFile);
   void use() const;
 
-  // Utility functions to help set uniform values;
+  // Utility functions to help set/get uniform values;
   void setBool(const std::string &name, bool value) const;
   void setInt(const std::string &name, int value) const;
   void setFloat(const std::string &name, float value) const;
   void setVec4f(const std::string &name, std::vector<float> value) const;
+
+  float getFloat(const std::string &name) const;
 
 private:
   uint m_shaderId;
