@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 namespace libs::core {
 class Shader {
 public:
@@ -16,6 +18,7 @@ public:
   void setInt(const std::string &name, int value) const;
   void setFloat(const std::string &name, float value) const;
   void setVec4f(const std::string &name, std::vector<float> value) const;
+  void setMat4f(const std::string &name, const glm::mat4 &mat) const;
 
 private:
   uint m_shaderId;

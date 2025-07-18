@@ -8,6 +8,8 @@
 #include <stb_image/stb_image.h>
 #include <vector>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 const std::vector<std::vector<float>> colors{
     {1.f, 0.5f, 0.2f, 1.f}, // Orange
     {1.f, 1.f, 0.f, 1.f}    // Yellow
@@ -166,6 +168,14 @@ std::vector<std::vector<uint>> indices = {
   shaderProgram.use();
   shaderProgram.setInt("Texture1", 0);
   shaderProgram.setInt("Texture2", 1);
+
+  // Create a transformation matrix
+  glm::mat4 transformation = glm::mat4(1.0f);
+  transformation =
+      glm::rotate(transformation, glm::radians(90.f), glm::vec3(0.f, 0.f, 1.f));
+  transformation = glm::scale(transformation, glm::vec3(0.25f, 0.25f, 0.f));
+
+  shaderProgram.setMat4f("transform", transformation);
 
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {

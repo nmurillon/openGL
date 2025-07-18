@@ -11,6 +11,8 @@ logl_add_library(logl_core
         ${PROJECT_SOURCE_DIR}/src
     PUBLIC_LINKS
         glad
+        glm
+    PRIVATE_LINKS
         logl_io
     RESOURCES
         shaders/basicShader.frag

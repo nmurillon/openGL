@@ -2,8 +2,8 @@
 
 #include <libs/io/ProgramPath.hpp>
 
-#include <filesystem>
 #include <fstream>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -62,6 +62,11 @@ void Shader::setVec4f(const std::string &name, std::vector<float> value) const {
   }
   glUniform4f(glGetUniformLocation(m_shaderId, name.c_str()), value.at(0),
               value.at(1), value.at(2), value.at(3));
+}
+
+void Shader::setMat4f(const std::string &name, const glm::mat4 &mat) const {
+  glUniformMatrix4fv(glGetUniformLocation(m_shaderId, name.c_str()), 1,
+                     GL_FALSE, glm::value_ptr(mat));
 }
 
 uint Shader::readShaderFile(const std::string &src, uint type) {
