@@ -12,5 +12,20 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glfw)
 
+############
+## GLM
+############
+
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY	https://github.com/g-truc/glm.git
+	GIT_TAG 1.0.1
+    OVERRIDE_FIND_PACKAGE
+)
+
+FetchContent_MakeAvailable(glm)
+# Set compile options explicitly to build the project later with more restricitve build options
+target_compile_options(glm PUBLIC -w)
+
 add_subdirectory(glad)
 add_subdirectory(stb_image)
