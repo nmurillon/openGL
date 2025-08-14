@@ -170,12 +170,21 @@ std::vector<std::vector<uint>> indices = {
   shaderProgram.setInt("Texture2", 1);
 
   // Create a transformation matrix
-  glm::mat4 transformation = glm::mat4(1.0f);
-  transformation =
-      glm::rotate(transformation, glm::radians(90.f), glm::vec3(0.f, 0.f, 1.f));
-  transformation = glm::scale(transformation, glm::vec3(0.25f, 0.25f, 0.f));
+  glm::mat4 model = glm::mat4(1.0f);
+  model = glm::rotate(model, glm::radians(-55.f), glm::vec3(1.f, 0.f, 0.f));
+  // transformation = glm::scale(transformation, glm::vec3(0.25f, 0.25f, 0.f));
 
-  shaderProgram.setMat4f("transform", transformation);
+  glm::mat4 view = glm::mat4(1.0f);
+  view = glm::translate(view, glm::vec3(0.f, 0.f, -3.0f));
+
+  glm::mat4 projection;
+  projection = glm::perspective(glm::radians(45.f), 800.f / 600.f, 0.1f, 100.f);
+
+  // In real case: the following will be done in the while loop as the different
+  // matrices can change
+  shaderProgram.setMat4f("model", model);
+  shaderProgram.setMat4f("view", view);
+  shaderProgram.setMat4f("projection", projection);
 
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
