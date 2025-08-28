@@ -97,42 +97,64 @@ int main(int argc, char **argv) {
   // clang-format off
 
   // Position as a vec3 and color as a vec3 and texture as vec2
+  // For the texture, we need to duplicate the vertices
   std::vector<float> vertices = {
+    // Up face
   -0.5f,    0.5f,  0.5f,  1.f,  1.f,  0.f,  0.f,  1.f, // TOP-LEFT-UP
    0.5f,    0.5f, 0.5f, 1.f, 1.f, 0.f, 1.f, 1.f, // TOP-RIGHT-UP
   -0.5f, -0.5f, 0.5f, 1.f, 1.f, 0.f, 0.f, 0.f, // BOTTOM-LEFT-UP
   0.5f,  -0.5f, 0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// BOTTOM-RIGHT-UP
-
+  // Left face
+  -0.5f,  0.5f, 0.5f, 1.f, 1.f, 0.f, 0.f, 1.f, // TOP-LEFT-UP
+  -0.5f, -0.5f, 0.5f, 1.f, 1.f, 0.f, 1.f, 1.f, // BOTTOM-LEFT-UP
+  -0.5f,  0.5f,-0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// TOP-LEFT-DOWN
+  -0.5f, -0.5f,-0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// BOTTOM-LEFT-DOWN
+  // Far face 
+  -0.5f,  0.5f, 0.5f, 1.f, 1.f, 0.f, 1.f, 1.f, // TOP-LEFT-UP
+   0.5f,  0.5f, 0.5f, 1.f, 1.f, 0.f, 0.f, 1.f, // TOP-RIGHT-UP
+  -0.5f,  0.5f,-0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// TOP-LEFT-DOWN
+   0.5f,  0.5f,-0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// TOP-RIGHT-DOWN
+  // Right face
+  0.5f,   0.5f,   0.5f,  1.f, 1.f, 0.f, 1.f, 1.f, // TOP-RIGHT-UP
+ 0.5f, -0.5f,  0.5f, 1.f, 1.f, 0.f, 0.f, 1.f,// BOTTOM-RIGHT-UP
+ 0.5f,  0.5f, -0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// TOP-RIGHT-DOWN
+ 0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// BOTTOM-RIGHT-DOWN
+  // Near face
+  -0.5f, -0.5f,  0.5f, 1.f, 1.f, 0.f, 0.f, 1.f, // BOTTOM-LEFT-UP
+   0.5f, -0.5f,  0.5f, 1.f, 1.f, 0.f, 1.f, 1.f,// BOTTOM-RIGHT-UP
+  -0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// BOTTOM-LEFT-DOWN
+   0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// BOTTOM-RIGHT-DOWN
+  // Down face
   -0.5f,  0.5f, -0.5f, 1.f, 1.f, 0.f, 0.f,  1.f,// TOP-LEFT-DOWN
    0.5f,  0.5f, -0.5f, 1.f, 1.f, 0.f, 1.f, 1.f,// TOP-RIGHT-DOWN
   -0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// BOTTOM-LEFT-DOWN
    0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// BOTTOM-RIGHT-DOWN
   };
 
-  std::vector<uint> indices = {
-      // Front face
-      0,1,2,
-      1,2,3,
-      // Left face
-      0,2,6,
-      0,4,6,
-      // Up face
-      0,1,5,
-      0,4,5,
-      // Right face
-      1,3,5,
-      3,5,7,
-      // Down face
-      2,3,6,
-      3,6,7,
-      // Background face
-      4,5,6,
-      5,6,7
+  std::vector<uint32_t> indices = {
+    // Up face
+    0,1,2,
+    1,2,3,
+    // Left face
+    4,5,6,
+    5,6,7,
+    // Far face
+    8,9,10,
+    9,10,11,
+    // Right face
+    12,13,14,
+    13,14,15,
+    // Near face
+    16,17,18,
+    17,18,19,
+    // Down face
+    20,21,22,
+    21,22,23,
   };
   // clang-format on
 
   // VAO & VBO
-  uint VAO, EBO, VBO;
+  uint VAO, VBO, EBO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
@@ -171,9 +193,6 @@ int main(int argc, char **argv) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   glViewport(0, 0, 800, 600);
-
-  // To draw in wireframe mode, use GL_LINE
-  std::vector<GLenum> modes{GL_LINE, GL_FILL};
 
   shaderProgram.use();
   shaderProgram.setInt("Texture1", 0);
@@ -214,6 +233,8 @@ int main(int argc, char **argv) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shaderProgram.setFloat("TextureMixingOpacity", textureMixingOpacity);
 
+    glBindVertexArray(VAO);
+
     for (const auto &pos : cubePositions) {
       model = glm::mat4(1.0f);
       model = glm::translate(model, pos);
@@ -224,7 +245,6 @@ int main(int argc, char **argv) {
       shaderProgram.setMat4f("model", model);
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      glBindVertexArray(VAO);
 
       glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
                      GL_UNSIGNED_INT, 0);
