@@ -198,21 +198,32 @@ int main(int argc, char **argv) {
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
 
+  // Rotations
+  std::vector<glm::vec3> cubePositions = {
+      glm::vec3(0.0f, 0.0f, 0.0f),    glm::vec3(2.0f, 5.0f, -15.0f),
+      glm::vec3(-1.5f, -2.2f, -2.5f), glm::vec3(-3.8f, -2.0f, -12.3f),
+      glm::vec3(2.4f, -0.4f, -3.5f),  glm::vec3(-1.7f, 3.0f, -7.5f),
+      glm::vec3(1.3f, -2.0f, -2.5f),  glm::vec3(1.5f, 2.0f, -2.5f),
+      glm::vec3(1.5f, 0.2f, -1.5f),   glm::vec3(-1.3f, 1.0f, -1.5f)};
+
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
-    shaderProgram.setFloat("TextureMixingOpacity", textureMixingOpacity);
-    model = glm::mat4(1.0f);
-    model = glm::rotate(model,
-                        static_cast<float>(glfwGetTime() * glm::radians(45.0f)),
-                        glm::vec3(0.5f, 1.0f, 0.0f));
-    shaderProgram.setMat4f("model", model);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shaderProgram.setFloat("TextureMixingOpacity", textureMixingOpacity);
 
-    for (size_t i = 0; i < 2; ++i) {
-      glPolygonMode(GL_FRONT_AND_BACK, modes.at(i));
+    for (const auto &pos : cubePositions) {
+      model = glm::mat4(1.0f);
+      model = glm::translate(model, pos);
+      model = glm::rotate(
+          model, static_cast<float>(glfwGetTime() * glm::radians(45.0f)),
+          glm::vec3(0.5f, 1.0f, 0.0f));
+
+      shaderProgram.setMat4f("model", model);
+
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       glBindVertexArray(VAO);
 
       glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
