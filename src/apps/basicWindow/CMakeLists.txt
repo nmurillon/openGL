@@ -14,3 +14,18 @@ logl_add_executable(basic_window
         textures/kaamelott.jpg
         textures/totk.jpg
 )
+
+logl_add_executable(cube
+    SOURCES
+        cube.cpp
+    LINKS
+        glad
+        glfw
+        glm
+        stb_image
+        logl_core
+        logl_io
+    RESOURCES
+        textures/kaamelott.jpg
+        textures/totk.jpg
+)
