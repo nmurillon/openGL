@@ -96,39 +96,39 @@ int main(int argc, char **argv) {
   // SETUP VERTEX DATA
   // clang-format off
 
-  // Position as a vec3 and color as a vec3 and texture as vec2
+  // Position as a vec3 and texture as vec2
   // For the texture, we need to duplicate the vertices
   std::vector<float> vertices = {
     // Up face
-  -0.5f,    0.5f,  0.5f,  1.f,  1.f,  0.f,  0.f,  1.f, // TOP-LEFT-UP
-   0.5f,    0.5f, 0.5f, 1.f, 1.f, 0.f, 1.f, 1.f, // TOP-RIGHT-UP
-  -0.5f, -0.5f, 0.5f, 1.f, 1.f, 0.f, 0.f, 0.f, // BOTTOM-LEFT-UP
-  0.5f,  -0.5f, 0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// BOTTOM-RIGHT-UP
+    -0.5f,  0.5f,  0.5f, 0.f, 1.f, // TOP-LEFT-UP
+     0.5f,  0.5f,  0.5f, 1.f, 1.f, // TOP-RIGHT-UP
+   -0.5f,-0.5f, 0.5f,0.f,0.f, // BOTTOM-LEFT-UP
+    0.5f,-0.5f, 0.5f,1.f,0.f,// BOTTOM-RIGHT-UP
   // Left face
-  -0.5f,  0.5f, 0.5f, 1.f, 1.f, 0.f, 0.f, 1.f, // TOP-LEFT-UP
-  -0.5f, -0.5f, 0.5f, 1.f, 1.f, 0.f, 1.f, 1.f, // BOTTOM-LEFT-UP
-  -0.5f,  0.5f,-0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// TOP-LEFT-DOWN
-  -0.5f, -0.5f,-0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// BOTTOM-LEFT-DOWN
+  -0.5f,  0.5f, 0.5f, 0.f, 1.f, // TOP-LEFT-UP
+  -0.5f, -0.5f, 0.5f, 1.f, 1.f, // BOTTOM-LEFT-UP
+  -0.5f,  0.5f,-0.5f, 0.f, 0.f,// TOP-LEFT-DOWN
+  -0.5f, -0.5f,-0.5f, 1.f, 0.f,// BOTTOM-LEFT-DOWN
   // Far face 
-  -0.5f,  0.5f, 0.5f, 1.f, 1.f, 0.f, 1.f, 1.f, // TOP-LEFT-UP
-   0.5f,  0.5f, 0.5f, 1.f, 1.f, 0.f, 0.f, 1.f, // TOP-RIGHT-UP
-  -0.5f,  0.5f,-0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// TOP-LEFT-DOWN
-   0.5f,  0.5f,-0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// TOP-RIGHT-DOWN
+  -0.5f,  0.5f, 0.5f, 1.f, 1.f, // TOP-LEFT-UP
+   0.5f,  0.5f, 0.5f, 0.f, 1.f, // TOP-RIGHT-UP
+  -0.5f,  0.5f,-0.5f, 1.f, 0.f,// TOP-LEFT-DOWN
+   0.5f,  0.5f,-0.5f, 0.f, 0.f,// TOP-RIGHT-DOWN
   // Right face
-  0.5f,   0.5f,   0.5f,  1.f, 1.f, 0.f, 1.f, 1.f, // TOP-RIGHT-UP
- 0.5f, -0.5f,  0.5f, 1.f, 1.f, 0.f, 0.f, 1.f,// BOTTOM-RIGHT-UP
- 0.5f,  0.5f, -0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// TOP-RIGHT-DOWN
- 0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// BOTTOM-RIGHT-DOWN
+ 0.5f,  0.5f,  0.5f, 1.f, 1.f, // TOP-RIGHT-UP
+ 0.5f, -0.5f,  0.5f, 0.f, 1.f,// BOTTOM-RIGHT-UP
+ 0.5f,  0.5f, -0.5f, 1.f, 0.f,// TOP-RIGHT-DOWN
+ 0.5f, -0.5f, -0.5f, 0.f, 0.f,// BOTTOM-RIGHT-DOWN
   // Near face
-  -0.5f, -0.5f,  0.5f, 1.f, 1.f, 0.f, 0.f, 1.f, // BOTTOM-LEFT-UP
-   0.5f, -0.5f,  0.5f, 1.f, 1.f, 0.f, 1.f, 1.f,// BOTTOM-RIGHT-UP
-  -0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// BOTTOM-LEFT-DOWN
-   0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// BOTTOM-RIGHT-DOWN
+  -0.5f, -0.5f,  0.5f, 0.f, 1.f, // BOTTOM-LEFT-UP
+   0.5f, -0.5f,  0.5f, 1.f, 1.f,// BOTTOM-RIGHT-UP
+  -0.5f, -0.5f, -0.5f, 0.f, 0.f,// BOTTOM-LEFT-DOWN
+   0.5f, -0.5f, -0.5f, 1.f, 0.f,// BOTTOM-RIGHT-DOWN
   // Down face
-  -0.5f,  0.5f, -0.5f, 1.f, 1.f, 0.f, 0.f,  1.f,// TOP-LEFT-DOWN
-   0.5f,  0.5f, -0.5f, 1.f, 1.f, 0.f, 1.f, 1.f,// TOP-RIGHT-DOWN
-  -0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 0.f, 0.f,// BOTTOM-LEFT-DOWN
-   0.5f, -0.5f, -0.5f, 1.f, 1.f, 0.f, 1.f, 0.f,// BOTTOM-RIGHT-DOWN
+  -0.5f,  0.5f, -0.5f, 0.f, 1.f,// TOP-LEFT-DOWN
+   0.5f,  0.5f, -0.5f, 1.f, 1.f,// TOP-RIGHT-DOWN
+  -0.5f, -0.5f, -0.5f, 0.f, 0.f,// BOTTOM-LEFT-DOWN
+   0.5f, -0.5f, -0.5f, 1.f, 0.f,// BOTTOM-RIGHT-DOWN
   };
 
   std::vector<uint32_t> indices = {
@@ -175,16 +175,12 @@ int main(int argc, char **argv) {
                indices.data(), GL_STATIC_DRAW);
 
   // Link Vertex attributes
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                         reinterpret_cast<void *>(0));
   glEnableVertexAttribArray(0);
 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                         reinterpret_cast<void *>(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                        reinterpret_cast<void *>(6 * sizeof(float)));
   glEnableVertexAttribArray(2);
 
   // Unbind VBO & VAO to prevent further operations to modify them
