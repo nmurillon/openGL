@@ -231,12 +231,15 @@ int main(int argc, char **argv) {
 
     glBindVertexArray(VAO);
 
-    for (const auto &pos : cubePositions) {
+    for (std::size_t i = 0; i < cubePositions.size(); ++i) {
       model = glm::mat4(1.0f);
-      model = glm::translate(model, pos);
-      model = glm::rotate(
-          model, static_cast<float>(glfwGetTime() * glm::radians(45.0f)),
-          glm::vec3(0.5f, 1.0f, 0.0f));
+      model = glm::translate(model, cubePositions.at(i));
+
+      if (i % 3 == 0) {
+        model = glm::rotate(
+            model, static_cast<float>(glfwGetTime() * glm::radians(45.0f)),
+            glm::vec3(0.5f, 1.0f, 0.0f));
+      }
 
       shaderProgram.setMat4f("model", model);
 
