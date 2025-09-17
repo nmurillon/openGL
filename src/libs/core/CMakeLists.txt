@@ -1,6 +1,6 @@
-set(CORE_HEADERS Shader.hpp)
+set(CORE_HEADERS Shader.hpp Camera.hpp)
 
-set(CORE_SRC Shader.cpp)
+set(CORE_SRC Shader.cpp Camera.cpp)
 
 logl_add_library(logl_core
     SOURCES
