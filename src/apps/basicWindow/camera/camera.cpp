@@ -3,27 +3,16 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <iostream>
+#include <libs/core/Camera.hpp>
 #include <libs/core/Shader.hpp>
 #include <libs/io/ProgramPath.hpp>
+#include <memory>
 #include <stb_image/stb_image.h>
 #include <vector>
 
 #include <glm/gtc/matrix_transform.hpp>
 
 float textureMixingOpacity = 0.5f;
-float yaw = -90.f;
-float pitch = 0.f;
-
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-float lastX = 400, lastY = 300;
-
-// glm::vec3 direction = glm::vec3(
-//     cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
-//     sin(glm::radians(pitch)), sin(glm::radians(yaw)) *
-//     cos(glm::radians(pitch)));
 
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -47,17 +36,24 @@ void processInput(GLFWwindow *window) {
     textureMixingOpacity = std::max(0.f, textureMixingOpacity - 0.1f);
   }
 
-  float cameraSpeed = 2.5f * deltaTime; // adjust accordingly
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    cameraPos += cameraSpeed * cameraFront;
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    cameraPos -= cameraSpeed * cameraFront;
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    cameraPos -=
-        glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    cameraPos +=
-        glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+  libs::core::CameraMovement cameraMovement;
+  auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+      glfwGetWindowUserPointer(window));
+
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    camera->processKeyboardInput(libs::core::CameraMovement::FORWARD,
+                                 deltaTime);
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    camera->processKeyboardInput(libs::core::CameraMovement::BACKWARD,
+                                 deltaTime);
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    camera->processKeyboardInput(libs::core::CameraMovement::LEFT, deltaTime);
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    camera->processKeyboardInput(libs::core::CameraMovement::RIGHT, deltaTime);
+  }
 }
 
 uint loadTexture(const std::string &textureFile,
@@ -99,6 +95,10 @@ uint loadTexture(const std::string &textureFile,
 
 bool firstMouse{true};
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+  static float lastX{0}, lastY{0};
+  auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+      glfwGetWindowUserPointer(window));
+
   if (firstMouse) {
     lastX = xpos;
     lastY = ypos;
@@ -110,30 +110,14 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 
   lastX = xpos;
   lastY = ypos;
-
-  const float sensitivity = 0.1f;
-  xOffset *= sensitivity;
-  yOffset *= sensitivity;
-
-  yaw += xOffset;
-  pitch += yOffset;
-
-  pitch = std::min(std::max(pitch, -89.f), 89.f);
-
-  glm::vec3 direction;
-  direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  direction.y = sin(glm::radians(pitch));
-  direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-  cameraFront = glm::normalize(direction);
+  camera->processMouseMovement(xOffset, yOffset);
 }
 
-float fov = 45.f;
-void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-  fov -= (float)yoffset;
-  if (fov < 1.0f)
-    fov = 1.0f;
-  if (fov > 45.0f)
-    fov = 45.0f;
+void scroll_callback(GLFWwindow *window, double xoffset, double yOffset) {
+  auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+      glfwGetWindowUserPointer(window));
+
+  camera->processMouseScroll(yOffset);
 }
 
 int main(int argc, char **argv) {
@@ -152,6 +136,9 @@ int main(int argc, char **argv) {
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+  auto camera =
+      std::make_shared<libs::core::Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
+  glfwSetWindowUserPointer(window, reinterpret_cast<void *>(&camera));
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetCursorPosCallback(window, mouse_callback);
   glfwSetScrollCallback(window, scroll_callback);
@@ -270,17 +257,7 @@ int main(int argc, char **argv) {
   glm::mat4 model = glm::mat4(1.0f);
   model = glm::rotate(model, glm::radians(-55.f), glm::vec3(1.f, 0.f, 0.f));
 
-  glm::mat4 view = glm::mat4(1.0f);
-  view = glm::lookAt(glm::vec3(0.f, 0.f, 3.0f), glm::vec3(0.f, 0.f, 0.0f),
-                     glm::vec3(0.f, 1.f, 0.0f));
-
   glm::mat4 projection;
-
-  // In real case: the following will be done in the while loop as the different
-  // matrices can change
-  shaderProgram.setMat4f("model", model);
-  shaderProgram.setMat4f("view", view);
-  shaderProgram.setMat4f("projection", projection);
 
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
@@ -302,12 +279,14 @@ int main(int argc, char **argv) {
     shaderProgram.setFloat("TextureMixingOpacity", textureMixingOpacity);
 
     glBindVertexArray(VAO);
-    view = glm::lookAt(cameraPos, cameraFront + cameraPos, cameraUp);
-    projection =
-        glm::perspective(glm::radians(fov), 800.f / 600.f, 0.1f, 100.f);
+    projection = glm::perspective(glm::radians(camera->getZoom()),
+                                  800.f / 600.f, 0.1f, 100.f);
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
+
+    shaderProgram.setMat4f("view", camera->getViewMatrix());
+    shaderProgram.setMat4f("projection", projection);
 
     for (std::size_t i = 0; i < cubePositions.size(); ++i) {
       model = glm::mat4(1.0f);
@@ -320,8 +299,6 @@ int main(int argc, char **argv) {
       }
 
       shaderProgram.setMat4f("model", model);
-      shaderProgram.setMat4f("view", view);
-      shaderProgram.setMat4f("projection", projection);
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

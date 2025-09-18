@@ -12,7 +12,7 @@ enum class CameraMovement {
   RIGHT,
 };
 
-class Camera {
+class Camera {
 public:
   Camera(const glm::vec3 &position = glm::vec3(0.0f, 0.0f, 0.0f),
          const glm::vec3 &front = glm::vec3(0.0f, 0.0f, -1.0f),
@@ -24,6 +24,8 @@ public:
                             GLboolean constraintPitch = true);
   void processKeyboardInput(const CameraMovement &direction, float deltaTime);
   void processMouseScroll(float yOffset);
+
+  const float &getZoom() const;
 
 private:
   void update();

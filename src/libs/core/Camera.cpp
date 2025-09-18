@@ -60,6 +60,8 @@ void Camera::processMouseScroll(float yOffset) {
   }
 }
 
+const float &Camera::getZoom() const { return m_zoom; }
+
 void Camera::update() {
   glm::vec3 front;
   front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
