@@ -54,6 +54,21 @@ void Shader::setFloat(const std::string &name, float value) const {
   glUniform1f(glGetUniformLocation(m_shaderId, name.c_str()), value);
 }
 
+void Shader::setVec3f(const std::string &name, std::vector<float> value) const {
+  if (3 != value.size()) {
+    throw std::runtime_error(
+        "Can not set values for uniform. Expecting 3, but " +
+        std::to_string(value.size()) + " were provided");
+  }
+  glUniform3f(glGetUniformLocation(m_shaderId, name.c_str()), value.at(0),
+              value.at(1), value.at(2));
+}
+
+void Shader::setVec3f(const std::string &name, float x, float y,
+                      float z) const {
+  glUniform3f(glGetUniformLocation(m_shaderId, name.c_str()), x, y, z);
+}
+
 void Shader::setVec4f(const std::string &name, std::vector<float> value) const {
   if (4 != value.size()) {
     throw std::runtime_error(
