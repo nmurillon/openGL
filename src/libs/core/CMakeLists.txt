@@ -1,6 +1,12 @@
-set(CORE_HEADERS Shader.hpp Camera.hpp)
+set(CORE_HEADERS
+    Camera.hpp
+    Shader.hpp
+    Window.hpp)
 
-set(CORE_SRC Shader.cpp Camera.cpp)
+set(CORE_SRC
+    Camera.cpp
+    Shader.cpp
+    Window.cpp)
 
 logl_add_library(logl_core
     SOURCES
@@ -11,6 +17,7 @@ logl_add_library(logl_core
         ${PROJECT_SOURCE_DIR}/src
     PUBLIC_LINKS
         glad
+        glfw
         glm
     PRIVATE_LINKS
         logl_io
