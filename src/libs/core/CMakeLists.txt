@@ -24,5 +24,6 @@ logl_add_library(logl_core
     RESOURCES
         shaders/basicShader.frag
         shaders/basicShader.vert
+        shaders/light.frag
         shaders/lightSource.frag
 )

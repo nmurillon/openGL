@@ -7,5 +7,6 @@ out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(objectColor * lightColor, 1.0);
+    float ambientFactor = 0.1;
+    FragColor = vec4(objectColor * lightColor * ambientFactor, 1.0);
 }

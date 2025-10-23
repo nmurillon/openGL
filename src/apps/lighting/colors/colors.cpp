@@ -12,41 +12,50 @@
 int main(int argc, char **argv) {
   libs::core::Window window{800, 600, "OpenGL - Colors chapter"};
 
-  auto camera = std::make_shared<libs::core::Camera>(
-      glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f),
-      glm::vec3(0.0f, 1.0f, 0.0f), -80.f);
+  auto camera =
+      std::make_shared<libs::core::Camera>(glm::vec3(0.f, 0.0f, 5.0f));
+
+  camera->processKeyboardInput(libs::core::CameraMovement::RIGHT, 0.5);
 
   // SETUP SHADERS
+  const libs::core::Shader shaderCube("shaders/basicShader.vert",
+                                      "shaders/lightSource.frag");
+
   const libs::core::Shader shaderLight("shaders/basicShader.vert",
-                                       "shaders/lightSource.frag");
+                                       "shaders/light.frag");
 
   // VAO & VBO
-  std::vector<unsigned int> VAOs(2);
-  unsigned int VBO, EBO;
-  glGenVertexArrays(2, VAOs.data());
+  unsigned int VaoCube, VaoLight, VBO, EBO;
+  glGenVertexArrays(1, &VaoCube);
+  glGenVertexArrays(1, &VaoLight);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
 
   // Cube data
-  for (std::size_t i = 0; i < VAOs.size(); ++i) {
-    glBindVertexArray(VAOs.at(i));
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER,
-                 static_cast<GLsizeiptr>(
-                     mesh::lighting::verticesWithColors.size() * sizeof(float)),
-                 mesh::lighting::verticesWithColors.data(), GL_STATIC_DRAW);
+  glBindVertexArray(VaoCube);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER,
+               static_cast<GLsizeiptr>(
+                   mesh::lighting::verticesWithColors.size() * sizeof(float)),
+               mesh::lighting::verticesWithColors.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 static_cast<GLsizeiptr>(
-                     mesh::lighting::indicesForColors.size() * sizeof(uint)),
-                 mesh::lighting::indicesForColors.data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+               static_cast<GLsizeiptr>(mesh::lighting::indicesForColors.size() *
+                                       sizeof(uint)),
+               mesh::lighting::indicesForColors.data(), GL_STATIC_DRAW);
 
-    // Link Vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
-                          reinterpret_cast<void *>(0));
-    glEnableVertexAttribArray(0);
-  }
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                        reinterpret_cast<void *>(0));
+  glEnableVertexAttribArray(0);
+
+  // Light data
+  glBindVertexArray(VaoLight);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                        reinterpret_cast<void *>(0));
+  glEnableVertexAttribArray(0);
 
   // Unbind VBO & VAO to prevent further operations to modify them
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -78,20 +87,41 @@ int main(int argc, char **argv) {
   window.open([&]() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    for (std::size_t i = 0; i < VAOs.size(); ++i) {
-      glBindVertexArray(VAOs.at(i));
-      shaderLight.setVec3f("objectColor", objectColors.at(i));
+    // Camera
+    projection = glm::perspective(glm::radians(camera->getZoom()),
+                                  800.f / 600.f, 0.1f, 100.f);
 
-      shaderLight.setMat4f("model", models.at(i));
+    // Cube
+    shaderCube.use();
+    shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
+    shaderCube.setVec3f("lightColor", 1.f, 1.f, 1.f);
+    shaderCube.setMat4f("projection", projection);
+    shaderCube.setMat4f("view", camera->getViewMatrix());
+    shaderCube.setMat4f("model", glm::mat4(1.0f));
 
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glBindVertexArray(VaoCube);
+    glDrawElements(
+        GL_TRIANGLES,
+        static_cast<GLsizei>(mesh::lighting::verticesWithColors.size()),
+        GL_UNSIGNED_INT, 0);
 
-      glDrawElements(
-          GL_TRIANGLES,
-          static_cast<GLsizei>(mesh::lighting::verticesWithColors.size()),
-          GL_UNSIGNED_INT, 0);
-    }
+    // Light
+    shaderLight.use();
+    shaderLight.setMat4f("projection", projection);
+    shaderLight.setMat4f("view", camera->getViewMatrix());
+
+    glm::mat4 lightModel = glm::mat4(1.0f);
+    lightModel = glm::translate(lightModel, glm::vec3(1.2f, 1.0f, 2.0f));
+    lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+
+    shaderLight.setMat4f("model", lightModel);
+    glBindVertexArray(VaoLight);
+    glDrawElements(
+        GL_TRIANGLES,
+        static_cast<GLsizei>(mesh::lighting::verticesWithColors.size()),
+        GL_UNSIGNED_INT, 0);
   });
 
   return 0;
