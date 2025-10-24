@@ -27,5 +27,17 @@ FetchContent_MakeAvailable(glm)
 # Set compile options explicitly to build the project later with more restricitve build options
 target_compile_options(glm PUBLIC -w)
 
+############
+## IMGUI
+############
+add_subdirectory(imgui)
+
+############
+## GLAD
+############
 add_subdirectory(glad)
+
+############
+## STB_IMAGE
+############
 add_subdirectory(stb_image)

@@ -21,6 +21,7 @@ logl_add_library(logl_core
         glm
     PRIVATE_LINKS
         logl_io
+        imgui
     RESOURCES
         shaders/basicShader.frag
         shaders/basicShader.vert
