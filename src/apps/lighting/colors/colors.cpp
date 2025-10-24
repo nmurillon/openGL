@@ -16,6 +16,56 @@ int main(int argc, char **argv) {
       std::make_shared<libs::core::Camera>(glm::vec3(0.f, 0.0f, 5.0f));
 
   camera->processKeyboardInput(libs::core::CameraMovement::RIGHT, 0.5);
+  window.setUserData(&camera);
+  window.setKeyboardInputCallback([](GLFWwindow *window, double deltaTime) {
+    libs::core::CameraMovement cameraMovement;
+    auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+        glfwGetWindowUserPointer(window));
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+      camera->processKeyboardInput(libs::core::CameraMovement::FORWARD,
+                                   deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+      camera->processKeyboardInput(libs::core::CameraMovement::BACKWARD,
+                                   deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+      camera->processKeyboardInput(libs::core::CameraMovement::LEFT, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+      camera->processKeyboardInput(libs::core::CameraMovement::RIGHT,
+                                   deltaTime);
+    }
+  });
+
+  window.setCursorPosCallback([](GLFWwindow *window, double xpos, double ypos) {
+    static float lastX{0}, lastY{0};
+    static bool firstMouse{true};
+    auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+        glfwGetWindowUserPointer(window));
+
+    if (firstMouse) {
+      lastX = xpos;
+      lastY = ypos;
+      firstMouse = false;
+    }
+
+    float xOffset = xpos - lastX;
+    float yOffset = lastY - ypos;
+
+    lastX = xpos;
+    lastY = ypos;
+    camera->processMouseMovement(xOffset, yOffset);
+  });
+
+  window.setScrollCallback(
+      [](GLFWwindow *window, double xoffset, double yOffset) {
+        auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+            glfwGetWindowUserPointer(window));
+
+        camera->processMouseScroll(yOffset);
+      });
 
   // SETUP SHADERS
   const libs::core::Shader shaderCube("shaders/basicShader.vert",
