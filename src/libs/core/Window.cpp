@@ -41,10 +41,6 @@ Window::Window(int width, int height, std::string title)
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
-  // Setup Platform/Renderer backends
-  ImGui_ImplGlfw_InitForOpenGL(m_window, true);
-  ImGui_ImplOpenGL3_Init();
 }
 
 Window::~Window() {
@@ -55,10 +51,18 @@ Window::~Window() {
 }
 
 void Window::open(std::function<void(void)> frameHandler) {
+  // Setup Platform/Renderer backends
+  ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+  ImGui_ImplOpenGL3_Init();
   float currentFrame = glfwGetTime();
   float lastFrame = currentFrame;
 
   while (!glfwWindowShouldClose(m_window)) {
+    glfwPollEvents();
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(m_window, true);
     }
@@ -67,22 +71,28 @@ void Window::open(std::function<void(void)> frameHandler) {
     m_deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
-
     if (m_keyboardInputCallback) {
       m_keyboardInputCallback(m_window, m_deltaTime);
     }
-    /// TODO: register input handler processInput(window);
+
     frameHandler();
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("toto");
+    ImGui::Text("FPS: %f", getFps());
+    ImGui::SeparatorText("");
+    ImGui::Text("FPS imgui: %f", ImGui::GetIO().Framerate);
+    ImGui::End();
+
+    ImGui::ShowDemoWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(m_window);
-    glfwPollEvents();
   }
 }
 

@@ -135,9 +135,9 @@ int main(int argc, char **argv) {
   glEnable(GL_DEPTH_TEST);
 
   window.open([&]() {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // Camera
     projection = glm::perspective(glm::radians(camera->getZoom()),
