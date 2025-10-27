@@ -23,7 +23,7 @@ public:
   void setMat4f(const std::string &name, const glm::mat4 &mat) const;
 
 private:
-  uint m_shaderId;
+  unsigned int m_shaderId;
 
   /**
    * @brief Create and compile a shader given a source file
@@ -31,6 +31,6 @@ private:
    * @param [in] type The type of shader to create
    * @return The id of the shader
    */
-  uint readShaderFile(const std::string &srcFile, uint type);
+  unsigned int readShaderFile(const std::string &srcFile,unsigned int type);
 };
 } // namespace libs::core

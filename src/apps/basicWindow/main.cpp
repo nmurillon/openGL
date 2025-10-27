@@ -37,7 +37,7 @@ void processInput(GLFWwindow *window) {
   }
 }
 
-uint loadTexture(const std::string &textureFile,
+unsigned int loadTexture(const std::string &textureFile,
                  GLenum textureUnit = GL_TEXTURE0, GLint wrapping = GL_REPEAT) {
   int width, height, nChannels;
   const std::string texturePath{
@@ -48,7 +48,7 @@ uint loadTexture(const std::string &textureFile,
   unsigned char *data =
       stbi_load(texturePath.c_str(), &width, &height, &nChannels, 0);
 
-  uint texture;
+  unsigned int texture;
   glGenTextures(1, &texture);
 
   // Bind the texture to work on it
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
                                                     0.5f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.5f*0.5f, 0.5f*1.f}};
 
 
-std::vector<std::vector<uint>> indices = {
+std::vector<std::vector<unsigned int>> indices = {
     {0,1,2},
     {0,1,2,
         1,3,4}
@@ -121,7 +121,7 @@ std::vector<std::vector<uint>> indices = {
   // clang-format on
 
   // VAO & VBO
-  std::vector<uint> VAO(2), EBO(2), VBO(2);
+  std::vector<unsigned int> VAO(2), EBO(2), VBO(2);
   glGenVertexArrays(2, VAO.data());
   glGenBuffers(2, VBO.data());
   glGenBuffers(2, EBO.data());
@@ -138,7 +138,7 @@ std::vector<std::vector<uint>> indices = {
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO.at(i));
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 static_cast<GLsizeiptr>(indices.at(i).size() * sizeof(uint)),
+                 static_cast<GLsizeiptr>(indices.at(i).size() * sizeof(unsigned int)),
                  indices.at(i).data(), GL_STATIC_DRAW);
 
     // Link Vertex attributes

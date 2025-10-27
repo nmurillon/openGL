@@ -12,8 +12,8 @@ namespace libs::core {
 Shader::Shader(const std::string &vertexSrcFile,
                const std::string &fragmentSrcFile) {
 
-  const uint vertexShader = readShaderFile(vertexSrcFile, GL_VERTEX_SHADER);
-  const uint fragmentShader =
+  const unsigned int vertexShader = readShaderFile(vertexSrcFile, GL_VERTEX_SHADER);
+  const unsigned int fragmentShader =
       readShaderFile(fragmentSrcFile, GL_FRAGMENT_SHADER);
 
   m_shaderId = glCreateProgram();
@@ -84,7 +84,7 @@ void Shader::setMat4f(const std::string &name, const glm::mat4 &mat) const {
                      GL_FALSE, glm::value_ptr(mat));
 }
 
-uint Shader::readShaderFile(const std::string &src, uint type) {
+unsigned int Shader::readShaderFile(const std::string &src, unsigned int type) {
   const std::string shaderPath{
       (libs::io::ProgramPath::getInstance().getProgramDir() /
        LOGL_CORE_RESOURCES_FOLDER / src)
@@ -102,7 +102,7 @@ uint Shader::readShaderFile(const std::string &src, uint type) {
   const std::string srcString = srcSS.str();
   const char *content = srcString.c_str();
 
-  const uint shader = glCreateShader(type);
+  const unsigned int shader = glCreateShader(type);
   glShaderSource(shader, 1, &content, NULL);
   glCompileShader(shader);
 
