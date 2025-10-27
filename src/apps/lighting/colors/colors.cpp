@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                static_cast<GLsizeiptr>(mesh::lighting::indicesForColors.size() *
-                                       sizeof(uint)),
+                                       sizeof(unsigned int)),
                mesh::lighting::indicesForColors.data(), GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),

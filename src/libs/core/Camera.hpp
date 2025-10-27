@@ -1,18 +1,20 @@
 #pragma once
 
+#include <logl/core/export.h>
+
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace libs::core {
 
-enum class CameraMovement {
+enum class LOGL_CORE_EXPORT CameraMovement {
   FORWARD,
   BACKWARD,
   LEFT,
   RIGHT,
 };
 
-class Camera {
+class LOGL_CORE_EXPORT Camera {
 public:
   Camera(const glm::vec3 &position = glm::vec3(0.0f, 0.0f, 0.0f),
          const glm::vec3 &front = glm::vec3(0.0f, 0.0f, -1.0f),

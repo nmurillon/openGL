@@ -1,5 +1,7 @@
 #pragma once
 
+#include <logl/core/export.h>
+
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
@@ -8,7 +10,7 @@
 #include <string>
 
 namespace libs::core {
-class Window {
+class LOGL_CORE_EXPORT Window {
 public:
   Window(int width, int height, std::string title);
   ~Window();

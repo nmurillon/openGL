@@ -12,6 +12,8 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${_outputFolderName}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${_outputFolderName}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${_outputFolderName}/bin)
 
+set(BUILD_SHARED_LIBS ON)
+
 include(cmake/CMakeHelper.cmake)
 
 add_subdirectory(external)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <logl/core/export.h>
+
 #include <glad/glad.h>
 
 #include <string>
@@ -8,7 +10,7 @@
 #include <glm/glm.hpp>
 
 namespace libs::core {
-class Shader {
+class LOGL_CORE_EXPORT Shader {
 public:
   Shader(const std::string &vertexSrcFile, const std::string &fragmentSrcFile);
   void use() const;
@@ -23,7 +25,7 @@ public:
   void setMat4f(const std::string &name, const glm::mat4 &mat) const;
 
 private:
-  uint m_shaderId;
+  unsigned int m_shaderId;
 
   /**
    * @brief Create and compile a shader given a source file
@@ -31,6 +33,6 @@ private:
    * @param [in] type The type of shader to create
    * @return The id of the shader
    */
-  uint readShaderFile(const std::string &srcFile, uint type);
+  unsigned int readShaderFile(const std::string &srcFile,unsigned int type);
 };
 } // namespace libs::core

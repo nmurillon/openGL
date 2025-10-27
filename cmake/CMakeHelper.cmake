@@ -80,10 +80,16 @@ function(logl_add_library target_name)
 
     string(REPLACE "_" "/" _projectPath ${target_name})
     string(TOUPPER ${target_name} PROJECT_NAME_UPPERCASE)
-    # TODO: configure for windows
-    # configure_file(${CMAKE_SOURCE_DIR}/cmake/export.h.in ${generated_dir}/${_projectPath}/export.h)
 
     add_library(${target_name} ${_params_SOURCES} ${_params_HEADERS})
+
+    include(GenerateExportHeader)
+    generate_export_header(${target_name}
+        EXPORT_FILE_NAME "${_projectPath}/export.h"
+        EXPORT_MACRO_NAME "${PROJECT_NAME_UPPERCASE}_EXPORT"
+        DEPRECATED_MACRO_NAME "${PROJECT_NAME_UPPERCASE}_DEPRECATED"
+            # TODO ADD OTHER MACROS
+    )
 
     target_link_libraries(${target_name}
         PUBLIC
@@ -95,6 +101,7 @@ function(logl_add_library target_name)
     target_include_directories(${target_name}
         PUBLIC
             ${_params_PUBLIC_INCLUDES}
+            ${CMAKE_CURRENT_BINARY_DIR}
         PRIVATE
             ${_params_PRIVATE_INCLUDES}
     )
@@ -155,8 +162,6 @@ function(logl_add_executable target_name)
 
     string(REPLACE "_" "/" _projectPath ${target_name})
     string(TOUPPER ${target_name} PROJECT_NAME_UPPERCASE)
-    # TODO
-    # configure_file(${CMAKE_SOURCE_DIR}/cmake/export.h.in ${generated_dir}/${_projectPath}/export.h)
 
     add_executable(${target_name} ${_params_SOURCES} ${_params_HEADERS})
 
