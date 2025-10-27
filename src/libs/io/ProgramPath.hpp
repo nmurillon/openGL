@@ -1,9 +1,11 @@
 #pragma once
 
+#include <logl/io/export.h>
+
 #include <filesystem>
 
 namespace libs::io {
-class ProgramPath {
+class LOGL_IO_EXPORT ProgramPath {
 public:
   ProgramPath(const ProgramPath &) = delete;
   ProgramPath(const ProgramPath &&) = delete;
