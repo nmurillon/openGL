@@ -1,5 +1,7 @@
 #pragma once
 
+#include <logl/core/export.h>
+
 #include <glad/glad.h>
 
 #include <string>
@@ -8,7 +10,7 @@
 #include <glm/glm.hpp>
 
 namespace libs::core {
-class Shader {
+class LOGL_CORE_EXPORT Shader {
 public:
   Shader(const std::string &vertexSrcFile, const std::string &fragmentSrcFile);
   void use() const;
