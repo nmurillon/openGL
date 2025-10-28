@@ -24,7 +24,7 @@ set(IMGUI_HEADERS
     # Misc
     imgui/imgui_stdlib.h)
 
-add_library(imgui SHARED ${IMGUI_HEADERS} ${IMGUI_SOURCES})
+add_library(imgui STATIC ${IMGUI_HEADERS} ${IMGUI_SOURCES})
 
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(imgui PUBLIC glfw)
+target_compile_options(imgui PRIVATE -fPIC)
