@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 namespace libs::core {
-Window::Window(int width, int height, std::string title)
+Window::Window(int width, int height, const std::string &title)
     : m_width(width), m_height(height) {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -41,6 +41,10 @@ Window::Window(int width, int height, std::string title)
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+  // Setup Platform/Renderer backends
+  ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+  ImGui_ImplOpenGL3_Init();
 }
 
 Window::~Window() {
@@ -50,68 +54,40 @@ Window::~Window() {
   glfwTerminate();
 }
 
-void Window::open(std::function<void(void)> frameHandler) {
-  // Setup Platform/Renderer backends
-  ImGui_ImplGlfw_InitForOpenGL(m_window, true);
-  ImGui_ImplOpenGL3_Init();
-  float currentFrame = glfwGetTime();
-  float lastFrame = currentFrame;
+void Window::onUpdate() {
+  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glfwPollEvents();
 
-  while (!glfwWindowShouldClose(m_window)) {
-    glfwPollEvents();
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-      glfwSetWindowShouldClose(m_window, true);
-    }
-
-    currentFrame = glfwGetTime();
-    m_deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
-
-    if (m_keyboardInputCallback) {
-      m_keyboardInputCallback(m_window, m_deltaTime);
-    }
-
-    frameHandler();
-
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    ImGui::Begin("toto");
-    ImGui::Text("FPS: %f", getFps());
-    ImGui::SeparatorText("");
-    ImGui::Text("FPS imgui: %f", ImGui::GetIO().Framerate);
-    ImGui::End();
-
-    ImGui::ShowDemoWindow();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    glfwSwapBuffers(m_window);
+  if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(m_window, true);
   }
+
+  static double lastFrame{glfwGetTime()};
+  double currentFrame = glfwGetTime();
+  m_deltaTime = currentFrame - lastFrame;
+  lastFrame = currentFrame;
+
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+
+  ImGui::Begin("toto");
+  ImGui::Text("FPS: %f", getFps());
+  ImGui::SeparatorText("");
+  ImGui::Text("FPS imgui: %f", ImGui::GetIO().Framerate);
+  ImGui::End();
+
+  ImGui::ShowDemoWindow();
+
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+  glfwSwapBuffers(m_window);
 }
 
-void Window::setUserData(void *data) {
-  glfwSetWindowUserPointer(m_window, data);
-}
-
-void Window::setScrollCallback(GLFWscrollfun callback) {
-  glfwSetScrollCallback(m_window, callback);
-}
-
-void Window::setCursorPosCallback(GLFWcursorposfun callback) {
-  glfwSetCursorPosCallback(m_window, callback);
-}
-
-void Window::setKeyboardInputCallback(
-    std::function<void(GLFWwindow *, double)> callback) {
-  m_keyboardInputCallback = callback;
-}
+bool Window::shouldClose() const { return glfwWindowShouldClose(m_window); }
 
 const int &Window::getWidth() const { return m_width; }
 

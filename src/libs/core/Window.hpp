@@ -12,16 +12,11 @@
 namespace libs::core {
 class LOGL_CORE_EXPORT Window {
 public:
-  Window(int width, int height, std::string title);
+  Window(int width, int height, const std::string &title);
   ~Window();
 
-  void open(std::function<void(void)> frameHandler);
-  void setUserData(void *data);
-  void setScrollCallback(GLFWscrollfun callback);
-  void setCursorPosCallback(GLFWcursorposfun callback);
-  void
-  setKeyboardInputCallback(std::function<void(GLFWwindow *, double)> callback);
-
+  void onUpdate();
+  bool shouldClose() const;
   const int &getWidth() const;
   const int &getHeight() const;
   const double &getDeltaTime() const;

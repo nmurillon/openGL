@@ -1,9 +1,11 @@
 set(CORE_HEADERS
+    Application.hpp
     Camera.hpp
     Shader.hpp
     Window.hpp)
 
 set(CORE_SRC
+    Application.cpp
     Camera.cpp
     Shader.cpp
     Window.cpp)
