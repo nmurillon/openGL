@@ -8,8 +8,19 @@ Application::~Application() {}
 
 void Application::run() {
   while (!m_mainWindow->shouldClose()) {
+    m_layerStack.onUpdate();
     m_mainWindow->onUpdate();
   }
+}
+
+void Application::onEvent(events::Event &event) { m_layerStack.onEvent(event); }
+
+void Application::addLayer(const std::shared_ptr<Layer> &layer) {
+  m_layerStack.addLayer(layer);
+}
+
+void Application::addOverlayLayer(const std::shared_ptr<Layer> &layer) {
+  m_layerStack.addOverlayLayer(layer);
 }
 
 Window &Application::getWindow() { return *m_mainWindow; }

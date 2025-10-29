@@ -1,10 +1,14 @@
 set(CORE_HEADERS
     Application.hpp
+    Layer.hpp
+    LayerStack.hpp
     Window.hpp
 )
 
 set(CORE_SRC
     Application.cpp
+    Layer.cpp
+    LayerStack.cpp
     Window.cpp
 )
 
@@ -18,6 +22,7 @@ logl_add_library(logl_core
     PUBLIC_LINKS
         glad
         glfw
+        logl_events
     PRIVATE_LINKS
         imgui
 )
