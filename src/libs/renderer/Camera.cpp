@@ -1,8 +1,10 @@
-#include "libs/core/Camera.hpp"
+#include <libs/renderer/Camera.hpp>
+
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <algorithm>
 
-namespace libs::core {
+namespace libs::renderer {
 Camera::Camera(const glm::vec3 &position, const glm::vec3 &front,
                const glm::vec3 &up, float yaw, float pitch)
     : m_position(position), m_front(front), m_up(up),
@@ -16,7 +18,7 @@ glm::mat4 Camera::getViewMatrix() const {
 }
 
 void Camera::processMouseMovement(float xOffset, float yOffset,
-                                  GLboolean constraintPitch) {
+                                  bool constraintPitch) {
   xOffset *= m_mouseSensitivity;
   yOffset *= m_mouseSensitivity;
 
@@ -72,4 +74,4 @@ void Camera::update() {
   m_right = glm::normalize(glm::cross(m_front, m_worldUp));
   m_up = glm::normalize(glm::cross(m_right, m_front));
 }
-} // namespace libs::core
+} // namespace libs::renderer

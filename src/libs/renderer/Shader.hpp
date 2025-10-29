@@ -1,16 +1,14 @@
 #pragma once
 
-#include <logl/core/export.h>
-
-#include <glad/glad.h>
+#include <logl/renderer/export.h>
 
 #include <string>
 #include <vector>
 
 #include <glm/glm.hpp>
 
-namespace libs::core {
-class LOGL_CORE_EXPORT Shader {
+namespace libs::renderer {
+class LOGL_RENDERER_EXPORT Shader {
 public:
   Shader(const std::string &vertexSrcFile, const std::string &fragmentSrcFile);
   void use() const;
@@ -33,6 +31,6 @@ private:
    * @param [in] type The type of shader to create
    * @return The id of the shader
    */
-  unsigned int readShaderFile(const std::string &srcFile,unsigned int type);
+  unsigned int readShaderFile(const std::string &srcFile, unsigned int type);
 };
-} // namespace libs::core
+} // namespace libs::renderer

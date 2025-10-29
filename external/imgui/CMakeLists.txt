@@ -27,4 +27,4 @@ set(IMGUI_HEADERS
 add_library(imgui STATIC ${IMGUI_HEADERS} ${IMGUI_SOURCES})
 
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options(imgui PRIVATE -fPIC)
+target_compile_options(imgui PRIVATE -fPIC PUBLIC -w)

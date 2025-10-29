@@ -3,9 +3,9 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <iostream>
-#include <libs/core/Camera.hpp>
-#include <libs/core/Shader.hpp>
 #include <libs/io/ProgramPath.hpp>
+#include <libs/renderer/Camera.hpp>
+#include <libs/renderer/Shader.hpp>
 #include <memory>
 #include <stb_image/stb_image.h>
 #include <vector>
@@ -36,28 +36,31 @@ void processInput(GLFWwindow *window) {
     textureMixingOpacity = std::max(0.f, textureMixingOpacity - 0.1f);
   }
 
-  libs::core::CameraMovement cameraMovement;
-  auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+  libs::renderer::CameraMovement cameraMovement;
+  auto camera = *reinterpret_cast<std::shared_ptr<libs::renderer::Camera> *>(
       glfwGetWindowUserPointer(window));
 
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera->processKeyboardInput(libs::core::CameraMovement::FORWARD,
+    camera->processKeyboardInput(libs::renderer::CameraMovement::FORWARD,
                                  deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera->processKeyboardInput(libs::core::CameraMovement::BACKWARD,
+    camera->processKeyboardInput(libs::renderer::CameraMovement::BACKWARD,
                                  deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera->processKeyboardInput(libs::core::CameraMovement::LEFT, deltaTime);
+    camera->processKeyboardInput(libs::renderer::CameraMovement::LEFT,
+                                 deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera->processKeyboardInput(libs::core::CameraMovement::RIGHT, deltaTime);
+    camera->processKeyboardInput(libs::renderer::CameraMovement::RIGHT,
+                                 deltaTime);
   }
 }
 
 unsigned int loadTexture(const std::string &textureFile,
-                 GLenum textureUnit = GL_TEXTURE0, GLint wrapping = GL_REPEAT) {
+                         GLenum textureUnit = GL_TEXTURE0,
+                         GLint wrapping = GL_REPEAT) {
   int width, height, nChannels;
   const std::string texturePath{
       (libs::io::ProgramPath::getInstance().getProgramDir() /
@@ -96,7 +99,7 @@ unsigned int loadTexture(const std::string &textureFile,
 bool firstMouse{true};
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   static float lastX{0}, lastY{0};
-  auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+  auto camera = *reinterpret_cast<std::shared_ptr<libs::renderer::Camera> *>(
       glfwGetWindowUserPointer(window));
 
   if (firstMouse) {
@@ -114,7 +117,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 }
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yOffset) {
-  auto camera = *reinterpret_cast<std::shared_ptr<libs::core::Camera> *>(
+  auto camera = *reinterpret_cast<std::shared_ptr<libs::renderer::Camera> *>(
       glfwGetWindowUserPointer(window));
 
   camera->processMouseScroll(yOffset);
@@ -137,7 +140,7 @@ int main(int argc, char **argv) {
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   auto camera =
-      std::make_shared<libs::core::Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
+      std::make_shared<libs::renderer::Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
   glfwSetWindowUserPointer(window, reinterpret_cast<void *>(&camera));
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetCursorPosCallback(window, mouse_callback);
@@ -149,8 +152,8 @@ int main(int argc, char **argv) {
   }
 
   // SETUP SHADERS
-  const libs::core::Shader shaderProgram("shaders/basicShader.vert",
-                                         "shaders/basicShader.frag");
+  const libs::renderer::Shader shaderProgram("shaders/basicShader.vert",
+                                             "shaders/basicShader.frag");
 
   // SETUP VERTEX DATA
   // clang-format off

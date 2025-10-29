@@ -1,14 +1,12 @@
 set(CORE_HEADERS
     Application.hpp
-    Camera.hpp
-    Shader.hpp
-    Window.hpp)
+    Window.hpp
+)
 
 set(CORE_SRC
     Application.cpp
-    Camera.cpp
-    Shader.cpp
-    Window.cpp)
+    Window.cpp
+)
 
 logl_add_library(logl_core
     SOURCES
@@ -20,13 +18,6 @@ logl_add_library(logl_core
     PUBLIC_LINKS
         glad
         glfw
-        glm
     PRIVATE_LINKS
-        logl_io
         imgui
-    RESOURCES
-        shaders/basicShader.frag
-        shaders/basicShader.vert
-        shaders/light.frag
-        shaders/lightSource.frag
 )

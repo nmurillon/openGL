@@ -20,7 +20,7 @@ public:
   const int &getWidth() const;
   const int &getHeight() const;
   const double &getDeltaTime() const;
-  const double getFps() const;
+  double getFps() const;
 
 private:
   std::function<void(GLFWwindow *, double)> m_keyboardInputCallback;

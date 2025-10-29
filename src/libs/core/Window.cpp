@@ -1,7 +1,5 @@
 #include <libs/core/Window.hpp>
 
-#include <libs/core/Camera.hpp>
-
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
@@ -95,9 +93,9 @@ const int &Window::getHeight() const { return m_height; }
 
 const double &Window::getDeltaTime() const { return m_deltaTime; }
 
-const double Window::getFps() const {
+double Window::getFps() const {
   double fps{0.};
-  if (m_deltaTime) {
+  if (0. != m_deltaTime) {
     fps = 1.0 / m_deltaTime;
   }
   return fps;

@@ -1,18 +1,22 @@
-#include "libs/core/Shader.hpp"
+#include <libs/renderer/Shader.hpp>
 
 #include <libs/io/ProgramPath.hpp>
 
-#include <fstream>
+#include <glad/glad.h>
+
 #include <glm/gtc/type_ptr.hpp>
+
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 
-namespace libs::core {
+namespace libs::renderer {
 Shader::Shader(const std::string &vertexSrcFile,
                const std::string &fragmentSrcFile) {
 
-  const unsigned int vertexShader = readShaderFile(vertexSrcFile, GL_VERTEX_SHADER);
+  const unsigned int vertexShader =
+      readShaderFile(vertexSrcFile, GL_VERTEX_SHADER);
   const unsigned int fragmentShader =
       readShaderFile(fragmentSrcFile, GL_FRAGMENT_SHADER);
 
@@ -87,7 +91,7 @@ void Shader::setMat4f(const std::string &name, const glm::mat4 &mat) const {
 unsigned int Shader::readShaderFile(const std::string &src, unsigned int type) {
   const std::string shaderPath{
       (libs::io::ProgramPath::getInstance().getProgramDir() /
-       LOGL_CORE_RESOURCES_FOLDER / src)
+       LOGL_RENDERER_RESOURCES_FOLDER / src)
           .string()};
 
   std::ifstream srcStream{shaderPath};
@@ -120,4 +124,4 @@ unsigned int Shader::readShaderFile(const std::string &src, unsigned int type) {
 
   return shader;
 }
-} // namespace libs::core
+} // namespace libs::renderer

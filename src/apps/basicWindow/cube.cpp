@@ -3,8 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <iostream>
-#include <libs/core/Shader.hpp>
 #include <libs/io/ProgramPath.hpp>
+#include <libs/renderer/Shader.hpp>
 #include <stb_image/stb_image.h>
 #include <vector>
 
@@ -33,7 +33,8 @@ void processInput(GLFWwindow *window) {
 }
 
 unsigned int loadTexture(const std::string &textureFile,
-                 GLenum textureUnit = GL_TEXTURE0, GLint wrapping = GL_REPEAT) {
+                         GLenum textureUnit = GL_TEXTURE0,
+                         GLint wrapping = GL_REPEAT) {
   int width, height, nChannels;
   const std::string texturePath{
       (libs::io::ProgramPath::getInstance().getProgramDir() /
@@ -90,8 +91,8 @@ int main(int argc, char **argv) {
   }
 
   // SETUP SHADERS
-  const libs::core::Shader shaderProgram("shaders/basicShader.vert",
-                                         "shaders/basicShader.frag");
+  const libs::renderer::Shader shaderProgram("shaders/basicShader.vert",
+                                             "shaders/basicShader.frag");
 
   // SETUP VERTEX DATA
   // clang-format off

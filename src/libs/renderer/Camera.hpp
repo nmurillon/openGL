@@ -1,20 +1,19 @@
 #pragma once
 
-#include <logl/core/export.h>
+#include <logl/renderer/export.h>
 
-#include <glad/glad.h>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
 
-namespace libs::core {
+namespace libs::renderer {
 
-enum class LOGL_CORE_EXPORT CameraMovement {
+enum class LOGL_RENDERER_EXPORT CameraMovement {
   FORWARD,
   BACKWARD,
   LEFT,
   RIGHT,
 };
 
-class LOGL_CORE_EXPORT Camera {
+class LOGL_RENDERER_EXPORT Camera {
 public:
   Camera(const glm::vec3 &position = glm::vec3(0.0f, 0.0f, 0.0f),
          const glm::vec3 &front = glm::vec3(0.0f, 0.0f, -1.0f),
@@ -23,7 +22,7 @@ public:
 
   glm::mat4 getViewMatrix() const;
   void processMouseMovement(float xOffset, float yOffset,
-                            GLboolean constraintPitch = true);
+                            bool constraintPitch = true);
   void processKeyboardInput(const CameraMovement &direction, float deltaTime);
   void processMouseScroll(float yOffset);
 
@@ -46,4 +45,4 @@ private:
   float m_mouseSensitivity{0.1f};
   float m_zoom{45.f};
 };
-} // namespace libs::core
+} // namespace libs::renderer

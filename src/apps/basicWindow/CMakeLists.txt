@@ -8,7 +8,7 @@ logl_add_executable(basic_window
         glfw
         glm
         stb_image
-        logl_core
+        logl_renderer
         logl_io
     RESOURCES
         textures/kaamelott.jpg
@@ -23,7 +23,7 @@ logl_add_executable(cube
         glfw
         glm
         stb_image
-        logl_core
+        logl_renderer
         logl_io
     RESOURCES
         textures/kaamelott.jpg
@@ -38,7 +38,7 @@ logl_add_executable(camera
         glfw
         glm
         stb_image
-        logl_core
+        logl_renderer
         logl_io
     RESOURCES
         textures/kaamelott.jpg

@@ -4,4 +4,5 @@ logl_add_executable(colors
         ../mesh.hpp
     LINKS
         logl_core
+        logl_renderer
 )
