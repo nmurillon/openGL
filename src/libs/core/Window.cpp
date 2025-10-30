@@ -1,10 +1,11 @@
 #include <libs/core/Window.hpp>
 
+#include <libs/events/EventDispatcher.hpp>
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
-#include <iostream>
 #include <stdexcept>
 namespace libs::core {
 Window::Window(int width, int height, const std::string &title)
@@ -95,19 +96,9 @@ void Window::onUpdate() {
 }
 
 void Window::onEvent(events::Event &event) {
-  switch (event.getEventType()) {
-  case libs::events::EventType::WindowResizeEvent: {
-    auto resizeEvent = *dynamic_cast<events::WindowResizeEvent *>(&event);
-    onWindowResized(resizeEvent);
-    break;
-  }
-
-  default: {
-    break;
-    std::cout << "Doing Nothing with the event"
-              << std::endl; /*m_eventCallback(event);*/
-  }
-  }
+  events::EventDispatcher dispatcher(event);
+  dispatcher.dispatch<events::WindowResizeEvent>(
+      LOGL_BIND_EVENT_FN(Window::onWindowResized));
 }
 
 bool Window::shouldClose() const { return glfwWindowShouldClose(m_window); }
@@ -132,5 +123,7 @@ bool Window::onWindowResized(events::WindowResizeEvent &event) {
   m_height = event.getHeight();
 
   glViewport(0, 0, m_width, m_height);
+
+  return false;
 }
 } // namespace libs::core

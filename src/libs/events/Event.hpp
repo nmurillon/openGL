@@ -22,23 +22,31 @@ enum class LOGL_EVENTS_EXPORT EventType {
   MouseScrolledEvent
 };
 
+#define EVENT_CLASS_TYPE(type)                                                 \
+  static EventType getStaticType() { return EventType::type; }                 \
+  virtual EventType getEventType() const override { return getStaticType(); }  \
+  virtual const std::string getEventName() const override { return m_name; }   \
+                                                                               \
+protected:                                                                     \
+  std::string m_name{#type};
+
 class LOGL_EVENTS_EXPORT Event {
 public:
-  Event(const EventType &type, const std::string &name);
+  Event() = default;
   virtual ~Event() = default;
 
   bool isHandled() const;
   bool handle();
-  const EventType &getEventType() const;
-  const std::string &getEventName() const;
-  virtual std::string toString() const;
+  static EventType GetStaticType() { return EventType::None; }
+  virtual EventType getEventType() const = 0;
+  virtual const std::string getEventName() const = 0;
+  virtual const std::string toString() const = 0;
 
 protected:
   bool m_handled{false};
-  EventType m_type;
 
   // Debug info
-  std::string m_name;
+  std::string m_name{"Basic Event"};
 };
 } // namespace libs::events
 

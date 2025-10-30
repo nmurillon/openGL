@@ -1,5 +1,7 @@
 # Project to learn about 3D
 
+Need gcc 13 or higher
+
 ## Linux install
 
 The following packages are required:
@@ -7,6 +9,9 @@ The following packages are required:
 ```
 sudo apt install libgl-dev libwayland-dev libxkbcommon-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 ```
+
+For gcc-13: follow [these instruction](https://doc.ubuntu-fr.org/gcc). If you encounter any error regarding gpg keys, look at [this](https://doc.ubuntu-fr.org/apt-key).
+
 
 ## Windows Setup
 
