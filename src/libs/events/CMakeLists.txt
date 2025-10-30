@@ -3,6 +3,7 @@ set(EVENTS_SOURCES
 )
 set(EVENTS_HEADERS 
     Event.hpp
+    WindowEvent.hpp
 )
 
 logl_add_library(logl_events

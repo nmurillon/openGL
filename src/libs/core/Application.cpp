@@ -2,7 +2,10 @@
 
 namespace libs::core {
 Application::Application(const std::string &name)
-    : m_mainWindow(std::make_unique<Window>(800, 600, name)) {}
+    : m_mainWindow(std::make_unique<Window>(800, 600, name)) {
+  m_mainWindow->setEventCallback(
+      std::bind(&Application::onEvent, this, std::placeholders::_1));
+}
 
 Application::~Application() {}
 
@@ -13,7 +16,10 @@ void Application::run() {
   }
 }
 
-void Application::onEvent(events::Event &event) { m_layerStack.onEvent(event); }
+void Application::onEvent(events::Event &event) {
+  m_mainWindow->onEvent(event);
+  m_layerStack.onEvent(event);
+}
 
 void Application::addLayer(const std::shared_ptr<Layer> &layer) {
   m_layerStack.addLayer(layer);

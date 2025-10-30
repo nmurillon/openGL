@@ -4,8 +4,8 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include <iostream>
 #include <stdexcept>
-
 namespace libs::core {
 Window::Window(int width, int height, const std::string &title)
     : m_width(width), m_height(height) {
@@ -24,10 +24,15 @@ Window::Window(int width, int height, const std::string &title)
 
   glfwMakeContextCurrent(m_window);
 
-  glfwSetFramebufferSizeCallback(m_window,
-                                 [](GLFWwindow *window, int width, int height) {
-                                   glViewport(0, 0, width, height);
-                                 });
+  glfwSetWindowUserPointer(m_window, &m_eventCallback);
+
+  glfwSetFramebufferSizeCallback(
+      m_window, [](GLFWwindow *window, int width, int height) {
+        events::WindowResizeEvent event{width, height};
+        auto callback =
+            *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
+        callback(event);
+      });
 
   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     throw std::runtime_error("Failed to initialize GLAD");
@@ -50,6 +55,10 @@ Window::~Window() {
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
   glfwTerminate();
+}
+
+void Window::setEventCallback(const EventCallbackFn &eventCallback) {
+  m_eventCallback = eventCallback;
 }
 
 void Window::onUpdate() {
@@ -85,6 +94,22 @@ void Window::onUpdate() {
   glfwSwapBuffers(m_window);
 }
 
+void Window::onEvent(events::Event &event) {
+  switch (event.getEventType()) {
+  case libs::events::EventType::WindowResizeEvent: {
+    auto resizeEvent = *dynamic_cast<events::WindowResizeEvent *>(&event);
+    onWindowResized(resizeEvent);
+    break;
+  }
+
+  default: {
+    break;
+    std::cout << "Doing Nothing with the event"
+              << std::endl; /*m_eventCallback(event);*/
+  }
+  }
+}
+
 bool Window::shouldClose() const { return glfwWindowShouldClose(m_window); }
 
 const int &Window::getWidth() const { return m_width; }
@@ -99,5 +124,13 @@ double Window::getFps() const {
     fps = 1.0 / m_deltaTime;
   }
   return fps;
+}
+
+// This fails on reldeb but works on debug
+bool Window::onWindowResized(events::WindowResizeEvent &event) {
+  m_width = event.getWidth();
+  m_height = event.getHeight();
+
+  glViewport(0, 0, m_width, m_height);
 }
 } // namespace libs::core
