@@ -3,6 +3,7 @@
 #include <libs/core/Layer.hpp>
 #include <libs/events/KeyEvent.hpp>
 #include <libs/events/MouseEvent.hpp>
+#include <libs/events/WindowEvent.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Shader.hpp>
 
@@ -18,6 +19,7 @@ public:
   virtual void onEvent(libs::events::Event &event) override;
 
 private:
+  bool onWindowResized(libs::events::WindowResizeEvent &event);
   bool onKeyPressed(libs::events::KeyPressedEvent &event);
   bool onMouseMoved(libs::events::MouseMouvedEvent &event);
   bool onMouseScrolled(libs::events::MouseScrolledEvent &event);
@@ -28,4 +30,5 @@ private:
 
   unsigned int m_vaoCube, m_vaoLight, m_vbo, m_ebo;
   double m_deltaTime;
+  float m_aspectRatio{800.0 / 600.0};
 };

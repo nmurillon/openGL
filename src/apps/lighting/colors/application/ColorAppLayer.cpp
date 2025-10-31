@@ -63,7 +63,9 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
   m_shaderLight.setMat4f("model", lightModel);
 
   // Setup cube shader data
-  m_shaderCube.setVec3f("lightColor", 1.f, 1.f, 1.f);
+  glm::mat4 cubeModel = glm::mat4(1.0f);
+  cubeModel = glm::translate(cubeModel, glm::vec3(1.2f, 1.0f, 2.0f));
+  cubeModel = glm::scale(cubeModel, glm::vec3(0.2f));
   m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
   m_shaderCube.setMat4f("model", glm::mat4(1.0f));
 }
@@ -76,13 +78,16 @@ void ColorAppLayer::onUpdate() {
 
   // TODO: update aspect ratio with window resize
   glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
-                                          800.f / 600.f, 0.1f, 100.f);
+                                          m_aspectRatio, 0.1f, 100.f);
 
   m_shaderLight.setMat4f("view", m_camera->getViewMatrix());
   m_shaderLight.setMat4f("projection", projection);
 
   // Cube
   m_shaderCube.use();
+  m_shaderCube.setVec3f("lightColor", 1.f, 1.f, 1.f);
+  m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
+  m_shaderCube.setMat4f("model", glm::mat4(1.0f));
   m_shaderCube.setMat4f("projection", projection);
   m_shaderCube.setMat4f("view", m_camera->getViewMatrix());
 
@@ -94,6 +99,11 @@ void ColorAppLayer::onUpdate() {
 
   // Light
   m_shaderLight.use();
+  glm::mat4 lightModel = glm::mat4(1.0f);
+  lightModel = glm::translate(lightModel, glm::vec3(1.2f, 1.0f, 2.0f));
+  lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+  m_shaderLight.setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
+  m_shaderLight.setMat4f("model", lightModel);
   m_shaderLight.setMat4f("projection", projection);
   m_shaderLight.setMat4f("view", m_camera->getViewMatrix());
 
@@ -106,6 +116,9 @@ void ColorAppLayer::onUpdate() {
 
 void ColorAppLayer::onEvent(libs::events::Event &event) {
   libs::events::EventDispatcher dispatcher(event);
+  dispatcher.dispatch<libs::events::WindowResizeEvent>(
+      LOGL_BIND_EVENT_FN(ColorAppLayer::onWindowResized));
+
   dispatcher.dispatch<libs::events::KeyPressedEvent>(
       LOGL_BIND_EVENT_FN(ColorAppLayer::onKeyPressed));
 
@@ -115,6 +128,12 @@ void ColorAppLayer::onEvent(libs::events::Event &event) {
   dispatcher.dispatch<libs::events::MouseScrolledEvent>(
       LOGL_BIND_EVENT_FN(ColorAppLayer::onMouseScrolled));
   // Handle events here
+}
+
+bool ColorAppLayer::onWindowResized(libs::events::WindowResizeEvent &event) {
+  m_aspectRatio = static_cast<float>(event.getWidth()) /
+                  static_cast<float>(event.getHeight());
+  return event.handle();
 }
 
 bool ColorAppLayer::onKeyPressed(libs::events::KeyPressedEvent &event) {
