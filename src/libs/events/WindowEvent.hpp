@@ -1,3 +1,5 @@
+#pragma once
+
 #include <logl/events/export.h>
 
 #include <libs/events/Event.hpp>
