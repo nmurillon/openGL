@@ -5,6 +5,7 @@ set(EVENTS_HEADERS
     Event.hpp
     EventDispatcher.hpp
     KeyEvent.hpp
+    MouseEvent.hpp
     WindowEvent.hpp
 )
 

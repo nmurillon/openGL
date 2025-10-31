@@ -2,6 +2,7 @@
 
 #include <libs/events/EventDispatcher.hpp>
 #include <libs/events/KeyEvent.hpp>
+#include <libs/events/MouseEvent.hpp>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -60,6 +61,22 @@ Window::Window(int width, int height, const std::string &title)
       break;
     }
   });
+
+  glfwSetCursorPosCallback(
+      m_window, [](GLFWwindow *window, double xpos, double ypos) {
+        auto callback =
+            *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
+        events::MouseMouvedEvent event{xpos, ypos};
+        callback(event);
+      });
+
+  glfwSetScrollCallback(
+      m_window, [](GLFWwindow *window, double xoffset, double yoffset) {
+        auto callback =
+            *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
+        events::MouseScrolledEvent event{xoffset, yoffset};
+        callback(event);
+      });
 
   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     throw std::runtime_error("Failed to initialize GLAD");
