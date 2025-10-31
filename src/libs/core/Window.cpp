@@ -63,9 +63,6 @@ void Window::setEventCallback(const EventCallbackFn &eventCallback) {
 }
 
 void Window::onUpdate() {
-  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glfwPollEvents();
 
   if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -93,6 +90,10 @@ void Window::onUpdate() {
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
   glfwSwapBuffers(m_window);
+
+  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void Window::onEvent(events::Event &event) {
