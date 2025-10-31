@@ -1,6 +1,7 @@
 #include <libs/core/Window.hpp>
 
 #include <libs/events/EventDispatcher.hpp>
+#include <libs/events/KeyEvent.hpp>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -34,6 +35,31 @@ Window::Window(int width, int height, const std::string &title)
             *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
         callback(event);
       });
+
+  glfwSetKeyCallback(m_window, [](GLFWwindow *window, int key, int scancode,
+                                  int action, int mods) {
+    auto callback =
+        *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
+    switch (action) {
+    case GLFW_PRESS: {
+      events::KeyPressedEvent event{key, false};
+      callback(event);
+      break;
+    }
+    case GLFW_RELEASE: {
+      events::KeyReleasedEvent event{key};
+      callback(event);
+      break;
+    }
+    case GLFW_REPEAT: {
+      events::KeyPressedEvent event{key, true};
+      callback(event);
+      break;
+    }
+    default:
+      break;
+    }
+  });
 
   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     throw std::runtime_error("Failed to initialize GLAD");

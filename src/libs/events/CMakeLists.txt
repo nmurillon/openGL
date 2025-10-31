@@ -4,6 +4,7 @@ set(EVENTS_SOURCES
 set(EVENTS_HEADERS 
     Event.hpp
     EventDispatcher.hpp
+    KeyEvent.hpp
     WindowEvent.hpp
 )
 
