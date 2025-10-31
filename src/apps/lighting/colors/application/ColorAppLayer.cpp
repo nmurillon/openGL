@@ -108,6 +108,12 @@ void ColorAppLayer::onEvent(libs::events::Event &event) {
   libs::events::EventDispatcher dispatcher(event);
   dispatcher.dispatch<libs::events::KeyPressedEvent>(
       LOGL_BIND_EVENT_FN(ColorAppLayer::onKeyPressed));
+
+  dispatcher.dispatch<libs::events::MouseMouvedEvent>(
+      LOGL_BIND_EVENT_FN(ColorAppLayer::onMouseMoved));
+
+  dispatcher.dispatch<libs::events::MouseScrolledEvent>(
+      LOGL_BIND_EVENT_FN(ColorAppLayer::onMouseScrolled));
   // Handle events here
 }
 
@@ -116,24 +122,46 @@ bool ColorAppLayer::onKeyPressed(libs::events::KeyPressedEvent &event) {
   case GLFW_KEY_W:
     m_camera->processKeyboardInput(libs::renderer::CameraMovement::FORWARD,
                                    m_deltaTime);
-    event.handle();
-    return true;
+    return event.handle();
   case GLFW_KEY_S:
     m_camera->processKeyboardInput(libs::renderer::CameraMovement::BACKWARD,
                                    m_deltaTime);
-    event.handle();
-    return true;
+    return event.handle();
   case GLFW_KEY_A:
     m_camera->processKeyboardInput(libs::renderer::CameraMovement::LEFT,
                                    m_deltaTime);
-    event.handle();
-    return true;
+    return event.handle();
   case GLFW_KEY_D:
     m_camera->processKeyboardInput(libs::renderer::CameraMovement::RIGHT,
                                    m_deltaTime);
-    event.handle();
-    return true;
+    return event.handle();
   default:
     return false;
   }
+}
+
+bool ColorAppLayer::onMouseMoved(libs::events::MouseMouvedEvent &event) {
+  static bool firstMouse{true};
+  static float lastX{0.f}, lastY{0.f};
+
+  if (firstMouse) {
+    lastX = static_cast<float>(event.getXPos());
+    lastY = static_cast<float>(event.getYPos());
+    firstMouse = false;
+  }
+
+  float xOffset = static_cast<float>(event.getXPos()) - lastX;
+  float yOffset = lastY - static_cast<float>(event.getYPos());
+
+  lastX = static_cast<float>(event.getXPos());
+  lastY = static_cast<float>(event.getYPos());
+
+  m_camera->processMouseMovement(xOffset, yOffset);
+  return event.handle();
+}
+
+bool ColorAppLayer::onMouseScrolled(libs::events::MouseScrolledEvent &event) {
+
+  m_camera->processMouseScroll(event.getYOffset());
+  return event.handle();
 }
