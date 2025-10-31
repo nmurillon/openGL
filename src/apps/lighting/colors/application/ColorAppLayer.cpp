@@ -2,6 +2,7 @@
 
 #include "../../mesh.hpp"
 
+#include <libs/events/EventDispatcher.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Shader.hpp>
 
@@ -68,6 +69,11 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
 }
 
 void ColorAppLayer::onUpdate() {
+  static double lastFrame{glfwGetTime()};
+  double currentFrame = glfwGetTime();
+  m_deltaTime = currentFrame - lastFrame;
+  lastFrame = currentFrame;
+
   // TODO: update aspect ratio with window resize
   glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
                                           800.f / 600.f, 0.1f, 100.f);
@@ -99,5 +105,35 @@ void ColorAppLayer::onUpdate() {
 }
 
 void ColorAppLayer::onEvent(libs::events::Event &event) {
+  libs::events::EventDispatcher dispatcher(event);
+  dispatcher.dispatch<libs::events::KeyPressedEvent>(
+      LOGL_BIND_EVENT_FN(ColorAppLayer::onKeyPressed));
   // Handle events here
+}
+
+bool ColorAppLayer::onKeyPressed(libs::events::KeyPressedEvent &event) {
+  switch (event.getKeyCode()) {
+  case GLFW_KEY_W:
+    m_camera->processKeyboardInput(libs::renderer::CameraMovement::FORWARD,
+                                   m_deltaTime);
+    event.handle();
+    return true;
+  case GLFW_KEY_S:
+    m_camera->processKeyboardInput(libs::renderer::CameraMovement::BACKWARD,
+                                   m_deltaTime);
+    event.handle();
+    return true;
+  case GLFW_KEY_A:
+    m_camera->processKeyboardInput(libs::renderer::CameraMovement::LEFT,
+                                   m_deltaTime);
+    event.handle();
+    return true;
+  case GLFW_KEY_D:
+    m_camera->processKeyboardInput(libs::renderer::CameraMovement::RIGHT,
+                                   m_deltaTime);
+    event.handle();
+    return true;
+  default:
+    return false;
+  }
 }

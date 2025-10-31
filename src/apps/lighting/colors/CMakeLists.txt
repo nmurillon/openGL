@@ -7,5 +7,6 @@ logl_add_executable(colors
         application/ColorAppLayer.hpp
     LINKS
         logl_core
+        logl_events
         logl_renderer
 )
