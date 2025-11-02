@@ -31,7 +31,7 @@ Window::Window(int width, int height, const std::string &title)
 
   glfwSetFramebufferSizeCallback(
       m_window, [](GLFWwindow *window, int width, int height) {
-        events::WindowResizeEvent event{width, height};
+        libs::events::WindowResizeEvent event{width, height};
         auto callback =
             *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
         callback(event);
@@ -43,17 +43,17 @@ Window::Window(int width, int height, const std::string &title)
         *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
     switch (action) {
     case GLFW_PRESS: {
-      events::KeyPressedEvent event{key, false};
+      libs::events::KeyPressedEvent event{key, false};
       callback(event);
       break;
     }
     case GLFW_RELEASE: {
-      events::KeyReleasedEvent event{key};
+      libs::events::KeyReleasedEvent event{key};
       callback(event);
       break;
     }
     case GLFW_REPEAT: {
-      events::KeyPressedEvent event{key, true};
+      libs::events::KeyPressedEvent event{key, true};
       callback(event);
       break;
     }
@@ -66,7 +66,7 @@ Window::Window(int width, int height, const std::string &title)
       m_window, [](GLFWwindow *window, double xpos, double ypos) {
         auto callback =
             *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
-        events::MouseMouvedEvent event{xpos, ypos};
+        libs::events::MouseMouvedEvent event{xpos, ypos};
         callback(event);
       });
 
@@ -74,7 +74,7 @@ Window::Window(int width, int height, const std::string &title)
       m_window, [](GLFWwindow *window, double xoffset, double yoffset) {
         auto callback =
             *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
-        events::MouseScrolledEvent event{xoffset, yoffset};
+        libs::events::MouseScrolledEvent event{xoffset, yoffset};
         callback(event);
       });
 
@@ -139,9 +139,9 @@ void Window::onUpdate() {
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void Window::onEvent(events::Event &event) {
-  events::EventDispatcher dispatcher(event);
-  dispatcher.dispatch<events::WindowResizeEvent>(
+void Window::onEvent(libs::events::Event &event) {
+  libs::events::EventDispatcher dispatcher(event);
+  dispatcher.dispatch<libs::events::WindowResizeEvent>(
       LOGL_BIND_EVENT_FN(Window::onWindowResized));
 }
 
@@ -162,7 +162,7 @@ double Window::getFps() const {
 }
 
 // This fails on reldeb but works on debug
-bool Window::onWindowResized(events::WindowResizeEvent &event) {
+bool Window::onWindowResized(libs::events::WindowResizeEvent &event) {
   m_width = event.getWidth();
   m_height = event.getHeight();
 

@@ -1,15 +1,14 @@
 #pragma once
 
-#include <logl/events/export.h>
-
 #include <libs/events/Event.hpp>
 
 #include <format>
 
 namespace libs::events {
-class LOGL_EVENTS_EXPORT MouseMouvedEvent : public Event {
+class MouseMouvedEvent : public Event {
 public:
-  MouseMouvedEvent(double xPos, double yPos) : m_xPos(xPos), m_yPos(yPos){};
+  MouseMouvedEvent(double xPos, double yPos) : m_xPos(xPos), m_yPos(yPos){}
+  ~MouseMouvedEvent() = default;
   double getXPos() const { return m_xPos; }
   double getYPos() const { return m_yPos; }
   virtual const std::string toString() const override {
@@ -23,10 +22,11 @@ private:
   double m_yPos;
 };
 
-class LOGL_EVENTS_EXPORT MouseScrolledEvent : public Event {
+class MouseScrolledEvent : public Event {
 public:
   MouseScrolledEvent(double xOffset, double yOffset)
       : m_xOffset(xOffset), m_yOffset(yOffset){};
+  ~MouseScrolledEvent() = default;
   double getXOffset() const { return m_xOffset; }
   double getYOffset() const { return m_yOffset; }
   virtual const std::string toString() const override {
@@ -41,18 +41,20 @@ private:
   double m_yOffset;
 };
 
-class LOGL_EVENTS_EXPORT MouseButtonEvent : public Event {
+class MouseButtonEvent : public Event {
 public:
   MouseButtonEvent(int mouseButton) : m_mouseButton(mouseButton){};
+  ~MouseButtonEvent() = default;
   double getMouseButton() const { return m_mouseButton; }
 
 protected:
   int m_mouseButton;
 };
 
-class LOGL_EVENTS_EXPORT MouseButtonPressedEvent : public MouseButtonEvent {
+class MouseButtonPressedEvent : public MouseButtonEvent {
 public:
   MouseButtonPressedEvent(int mouseButton) : MouseButtonEvent(mouseButton){};
+  ~MouseButtonPressedEvent() = default;
 
   virtual const std::string toString() const override {
     return std::format("{} : {}", getEventName(), m_mouseButton);
@@ -61,9 +63,10 @@ public:
   EVENT_CLASS_TYPE(MouseButtonPressedEvent)
 };
 
-class LOGL_EVENTS_EXPORT MouseButtonReleasedEvent : public MouseButtonEvent {
+class MouseButtonReleasedEvent : public MouseButtonEvent {
 public:
   MouseButtonReleasedEvent(int mouseButton) : MouseButtonEvent(mouseButton){};
+  ~MouseButtonReleasedEvent() = default;
 
   virtual const std::string toString() const override {
     return std::format("{} : {}", getEventName(), m_mouseButton);

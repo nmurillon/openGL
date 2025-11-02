@@ -1,11 +1,10 @@
 #pragma once
 
-#include <logl/events/export.h>
-
 #include <ostream>
 #include <string>
+
 namespace libs::events {
-enum class LOGL_EVENTS_EXPORT EventType {
+enum class EventType {
   None,
   // Window Events
   WindowCloseEvent,
@@ -23,6 +22,7 @@ enum class LOGL_EVENTS_EXPORT EventType {
 };
 
 #define EVENT_CLASS_TYPE(type)                                                 \
+public:                                                                        \
   static EventType getStaticType() { return EventType::type; }                 \
   virtual EventType getEventType() const override { return getStaticType(); }  \
   virtual const std::string getEventName() const override { return m_name; }   \
@@ -30,16 +30,21 @@ enum class LOGL_EVENTS_EXPORT EventType {
 protected:                                                                     \
   std::string m_name{#type};
 
-class LOGL_EVENTS_EXPORT Event {
+class Event {
 public:
   Event() = default;
   virtual ~Event() = default;
 
-  bool isHandled() const;
-  bool handle();
-  static EventType GetStaticType() { return EventType::None; }
-  virtual EventType getEventType() const = 0;
-  virtual const std::string getEventName() const = 0;
+  bool isHandled() const { return m_handled; }
+  bool handle() {
+    m_handled = true;
+
+    return m_handled;
+  }
+
+  static EventType getStaticType() { return EventType::None; }
+  virtual EventType getEventType() const { return getStaticType(); }
+  virtual const std::string getEventName() const { return m_name; }
   virtual const std::string toString() const = 0;
 
 protected:
@@ -48,6 +53,11 @@ protected:
   // Debug info
   std::string m_name{"Basic Event"};
 };
-} // namespace libs::events
 
-std::ostream &operator<<(std::ostream &o, const libs::events::Event &event);
+inline std::ostream &operator<<(std::ostream &o, const libs::events::Event &event) {
+  o << event.toString();
+  
+  return o;
+}
+
+} // namespace libs::events

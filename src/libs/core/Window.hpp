@@ -30,7 +30,7 @@ public:
 
 private:
   EventCallbackFn m_eventCallback;
-  bool onWindowResized(events::WindowResizeEvent &event);
+  bool onWindowResized(libs::events::WindowResizeEvent &event);
 
   GLFWwindow *m_window;
   int m_width;

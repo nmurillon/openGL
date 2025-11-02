@@ -1,29 +1,27 @@
 #pragma once
 
-#include <logl/events/export.h>
-
 #include <libs/events/Event.hpp>
 
 #include <format>
 
 namespace libs::events {
-class LOGL_EVENTS_EXPORT WindowCloseEvent : public Event {
+class WindowCloseEvent : public Event {
 public:
   WindowCloseEvent() = default;
+  ~WindowCloseEvent() = default;
 
-  EVENT_CLASS_TYPE(WindowCloseEvent);
+  EVENT_CLASS_TYPE(WindowCloseEvent)
 
 public:
   virtual const std::string toString() const override { return getEventName(); }
 };
 
-class LOGL_EVENTS_EXPORT WindowResizeEvent : public Event {
+class WindowResizeEvent : public Event {
 public:
   WindowResizeEvent(int width, int height) : m_width(width), m_height(height) {}
-
   ~WindowResizeEvent() = default;
 
-  EVENT_CLASS_TYPE(WindowResizeEvent);
+  EVENT_CLASS_TYPE(WindowResizeEvent)
 
 public:
   virtual const std::string toString() const override {

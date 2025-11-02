@@ -1,6 +1,4 @@
-set(EVENTS_SOURCES 
-    Event.cpp
-)
+set(EVENTS_SOURCES "")
 set(EVENTS_HEADERS 
     Event.hpp
     EventDispatcher.hpp

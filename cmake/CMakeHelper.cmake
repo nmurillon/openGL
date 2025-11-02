@@ -81,7 +81,20 @@ function(logl_add_library target_name)
     string(REPLACE "_" "/" _projectPath ${target_name})
     string(TOUPPER ${target_name} PROJECT_NAME_UPPERCASE)
 
-    add_library(${target_name} ${_params_SOURCES} ${_params_HEADERS})
+    if(NOT _params_SOURCES)
+        add_library(${target_name} INTERFACE ${_params_SOURCES} ${_params_HEADERS} ${_params_RESOURCES})
+        target_link_libraries(${target_name} INTERFACE ${_params_PUBLIC_LINKS} ${_params_PRIVATE_LINKS})
+        target_include_directories(${target_name} INTERFACE ${_params_PUBLIC_INCLUDES} ${_params_PRIVATE_INCLUDES})
+        set(compile_option_visibility INTERFACE)
+    else()
+        add_library(${target_name} ${_params_SOURCES} ${_params_HEADERS} ${_params_RESOURCES})
+        target_link_libraries(${target_name} PUBLIC  ${_params_PUBLIC_LINKS} PRIVATE ${_params_PRIVATE_LINKS})
+        target_include_directories(${target_name} PUBLIC ${_params_PUBLIC_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR} PRIVATE ${_params_PRIVATE_INCLUDES})
+        target_compile_definitions(${target_name} PUBLIC ${_params_PUBLIC_DEFINITIONS} PRIVATE ${_params_PRIVATE_DEFINITIONS})
+        set(compile_option_visibility PRIVATE)
+    endif()
+
+    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
 
     include(GenerateExportHeader)
     generate_export_header(${target_name}
@@ -91,22 +104,7 @@ function(logl_add_library target_name)
             # TODO ADD OTHER MACROS
     )
 
-    target_link_libraries(${target_name}
-        PUBLIC
-            ${_params_PUBLIC_LINKS}
-        PRIVATE
-            ${_params_PRIVATE_LINKS}
-    )
-
-    target_include_directories(${target_name}
-        PUBLIC
-            ${_params_PUBLIC_INCLUDES}
-            ${CMAKE_CURRENT_BINARY_DIR}
-        PRIVATE
-            ${_params_PRIVATE_INCLUDES}
-    )
-
-    target_compile_options(${target_name} PRIVATE
+    target_compile_options(${target_name} ${compile_option_visibility}
         -Wall
         -Wextra
         -Wshadow
@@ -128,8 +126,6 @@ function(logl_add_library target_name)
         -Wduplicated-branches
         -Wlogical-op
     )
-
-    target_compile_definitions(${target_name} PUBLIC ${_params_PUBLIC_DEFINITIONS} PRIVATE ${_params_PRIVATE_DEFINITIONS})
 
     logl_manage_resources(${target_name} "${_params_RESOURCES}")
 endfunction()

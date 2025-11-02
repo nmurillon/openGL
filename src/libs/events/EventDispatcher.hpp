@@ -1,7 +1,5 @@
 #pragma once
 
-#include <logl/events/export.h>
-
 #include <libs/events/Event.hpp>
 
 #include <functional>
@@ -12,7 +10,7 @@
   }
 
 namespace libs::events {
-class LOGL_EVENTS_EXPORT EventDispatcher {
+class EventDispatcher {
 public:
   EventDispatcher(Event &event) : m_event(event){};
   EventDispatcher() = delete;
