@@ -21,8 +21,9 @@ logl_add_library(logl_renderer
     PRIVATE_LINKS
         logl_io
     RESOURCES
+        shaders/ambientLightSource.frag
         shaders/basicShader.frag
         shaders/basicShader.vert
+        shaders/diffuseLightSource.frag
         shaders/light.frag
-        shaders/lightSource.frag
 )

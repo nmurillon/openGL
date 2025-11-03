@@ -94,6 +94,64 @@ namespace mesh::lighting {
     4,5,6,
     5,6,7,
   };
+
+  namespace withNormals {
+  // TODO: Normals for lighting calculations --> need to duplicate indices again
+  // Position as a vec3 and normals as vec3
+  const std::vector<float> vertices = {
+    // Up face
+    -0.5f,  0.5f,  0.5f, 0.f, 0.f, 1.f, // TOP-LEFT-UP
+     0.5f,  0.5f,  0.5f, 0.f, 0.f, 1.f, // TOP-RIGHT-UP
+   -0.5f,-0.5f, 0.5f,0.f, 0.f, 1.f, // BOTTOM-LEFT-UP
+    0.5f,-0.5f, 0.5f,0.f, 0.f, 1.f,// BOTTOM-RIGHT-UP
+  // Left face
+  -0.5f,  0.5f, 0.5f, -1.f, 0.f, 0.f, // TOP-LEFT-UP
+  -0.5f, -0.5f, 0.5f, -1.f, 0.f, 0.f, // BOTTOM-LEFT-UP
+  -0.5f,  0.5f,-0.5f, -1.f, 0.f, 0.f,// TOP-LEFT-DOWN
+  -0.5f, -0.5f,-0.5f, -1.f, 0.f, 0.f,// BOTTOM-LEFT-DOWN
+  // Far face 
+  -0.5f,  0.5f, 0.5f, 0.f, 1.f, 0.f, // TOP-LEFT-UP
+   0.5f,  0.5f, 0.5f, 0.f, 1.f, 0.f, // TOP-RIGHT-UP
+  -0.5f,  0.5f,-0.5f, 0.f, 1.f, 0.f,// TOP-LEFT-DOWN
+   0.5f,  0.5f,-0.5f, 0.f, 1.f, 0.f,// TOP-RIGHT-DOWN
+  // Right face
+ 0.5f,  0.5f,  0.5f, 1.f, 0.f, 0.f, // TOP-RIGHT-UP
+ 0.5f, -0.5f,  0.5f, 1.f, 0.f, 0.f,// BOTTOM-RIGHT-UP
+ 0.5f,  0.5f, -0.5f, 1.f, 0.f, 0.f,// TOP-RIGHT-DOWN
+ 0.5f, -0.5f, -0.5f, 1.f, 0.f, 0.f,// BOTTOM-RIGHT-DOWN
+  // Near face
+  -0.5f, -0.5f,  0.5f, 0.f, -1.f, 0.f, // BOTTOM-LEFT-UP
+   0.5f, -0.5f,  0.5f, 0.f, -1.f, 0.f,// BOTTOM-RIGHT-UP
+  -0.5f, -0.5f, -0.5f, 0.f, -1.f, 0.f,// BOTTOM-LEFT-DOWN
+   0.5f, -0.5f, -0.5f, 0.f, -1.f, 0.f,// BOTTOM-RIGHT-DOWN
+  // Down face
+  -0.5f,  0.5f, -0.5f, 0.f, 0.f, -1.f,// TOP-LEFT-DOWN
+   0.5f,  0.5f, -0.5f, 0.f, 0.f, -1.f,// TOP-RIGHT-DOWN
+  -0.5f, -0.5f, -0.5f, 0.f, 0.f, -1.f,// BOTTOM-LEFT-DOWN
+   0.5f, -0.5f, -0.5f, 0.f, 0.f, -1.f,// BOTTOM-RIGHT-DOWN
+  };
+
+  const std::vector<unsigned int> indices = {
+    // Up face
+    0,1,2,
+    1,2,3,
+    // Left face
+    4,5,6,
+    5,6,7,
+    // Far face
+    8,9,10,
+    9,10,11,
+    // Right face
+    12,13,14,
+    13,14,15,
+    // Near face
+    16,17,18,
+    17,18,19,
+    // Down face
+    20,21,22,
+    21,22,23,
+  };
+} // namespace withNormals
 // clang-format on
 
 } // namespace mesh::lighting

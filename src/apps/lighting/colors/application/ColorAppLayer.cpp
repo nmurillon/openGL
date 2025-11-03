@@ -15,7 +15,8 @@
 ColorAppLayer::ColorAppLayer(const std::string &name)
     : Layer(name), m_camera(std::make_shared<libs::renderer::Camera>(
                        glm::vec3(0.f, 0.0f, 5.0f))),
-      m_shaderCube("shaders/basicShader.vert", "shaders/lightSource.frag"),
+      m_shaderCube("shaders/basicShader.vert",
+                   "shaders/diffuseLightSource.frag"),
       m_shaderLight("shaders/basicShader.vert", "shaders/light.frag") {
 
   glGenVertexArrays(1, &m_vaoCube);
@@ -26,20 +27,26 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
   // Cube data
   glBindVertexArray(m_vaoCube);
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-  glBufferData(GL_ARRAY_BUFFER,
-               static_cast<GLsizeiptr>(
-                   mesh::lighting::verticesWithColors.size() * sizeof(float)),
-               mesh::lighting::verticesWithColors.data(), GL_STATIC_DRAW);
+  glBufferData(
+      GL_ARRAY_BUFFER,
+      static_cast<GLsizeiptr>(mesh::lighting::withNormals::vertices.size() *
+                              sizeof(float)),
+      mesh::lighting::withNormals::vertices.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               static_cast<GLsizeiptr>(mesh::lighting::indicesForColors.size() *
-                                       sizeof(unsigned int)),
-               mesh::lighting::indicesForColors.data(), GL_STATIC_DRAW);
+  glBufferData(
+      GL_ELEMENT_ARRAY_BUFFER,
+      static_cast<GLsizeiptr>(mesh::lighting::withNormals::indices.size() *
+                              sizeof(unsigned int)),
+      mesh::lighting::withNormals::indices.data(), GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                         reinterpret_cast<void *>(0));
+
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                        reinterpret_cast<void *>(3 * sizeof(float)));
   glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(3);
 
   // Light data
   glBindVertexArray(m_vaoLight);
@@ -56,7 +63,8 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
 
   // Setup light shader data
   glm::mat4 lightModel = glm::mat4(1.0f);
-  lightModel = glm::translate(lightModel, glm::vec3(1.2f, 1.0f, 2.0f));
+  glm::vec3 lightPos = glm::vec3(0.f, 0.0f, 2.0f);
+  lightModel = glm::translate(lightModel, lightPos);
   lightModel = glm::scale(lightModel, glm::vec3(0.2f));
   m_shaderLight.use();
   m_shaderLight.setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
@@ -67,7 +75,10 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
   cubeModel = glm::translate(cubeModel, glm::vec3(1.2f, 1.0f, 2.0f));
   cubeModel = glm::scale(cubeModel, glm::vec3(0.2f));
   m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
+  m_shaderCube.setVec3f("lightPos", lightPos.x, lightPos.y, lightPos.z);
   m_shaderCube.setMat4f("model", glm::mat4(1.0f));
+
+  glEnable(GL_DEPTH_TEST);
 }
 
 void ColorAppLayer::onUpdate() {
@@ -80,6 +91,8 @@ void ColorAppLayer::onUpdate() {
   glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
                                           m_aspectRatio, 0.1f, 100.f);
 
+  glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+
   m_shaderLight.setMat4f("view", m_camera->getViewMatrix());
   m_shaderLight.setMat4f("projection", projection);
 
@@ -89,18 +102,20 @@ void ColorAppLayer::onUpdate() {
   m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
   m_shaderCube.setMat4f("model", glm::mat4(1.0f));
   m_shaderCube.setMat4f("projection", projection);
+  m_shaderCube.setVec3f("lightPos", lightPos.x, lightPos.y, lightPos.z);
+
   m_shaderCube.setMat4f("view", m_camera->getViewMatrix());
 
   glBindVertexArray(m_vaoCube);
   glDrawElements(
       GL_TRIANGLES,
-      static_cast<GLsizei>(mesh::lighting::verticesWithColors.size()),
+      static_cast<GLsizei>(mesh::lighting::withNormals::vertices.size()),
       GL_UNSIGNED_INT, 0);
 
   // Light
   m_shaderLight.use();
   glm::mat4 lightModel = glm::mat4(1.0f);
-  lightModel = glm::translate(lightModel, glm::vec3(1.2f, 1.0f, 2.0f));
+  lightModel = glm::translate(lightModel, lightPos);
   lightModel = glm::scale(lightModel, glm::vec3(0.2f));
   m_shaderLight.setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
   m_shaderLight.setMat4f("model", lightModel);
@@ -110,7 +125,7 @@ void ColorAppLayer::onUpdate() {
   glBindVertexArray(m_vaoLight);
   glDrawElements(
       GL_TRIANGLES,
-      static_cast<GLsizei>(mesh::lighting::verticesWithColors.size()),
+      static_cast<GLsizei>(mesh::lighting::withNormals::vertices.size()),
       GL_UNSIGNED_INT, 0);
 }
 
