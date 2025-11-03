@@ -92,17 +92,17 @@ function(logl_add_library target_name)
         target_include_directories(${target_name} PUBLIC ${_params_PUBLIC_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR} PRIVATE ${_params_PRIVATE_INCLUDES})
         target_compile_definitions(${target_name} PUBLIC ${_params_PUBLIC_DEFINITIONS} PRIVATE ${_params_PRIVATE_DEFINITIONS})
         set(compile_option_visibility PRIVATE)
+
+        include(GenerateExportHeader)
+        generate_export_header(${target_name}
+            EXPORT_FILE_NAME "${_projectPath}/export.h"
+            EXPORT_MACRO_NAME "${PROJECT_NAME_UPPERCASE}_EXPORT"
+            DEPRECATED_MACRO_NAME "${PROJECT_NAME_UPPERCASE}_DEPRECATED"
+                # TODO ADD OTHER MACROS
+        )
     endif()
 
     set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
-
-    include(GenerateExportHeader)
-    generate_export_header(${target_name}
-        EXPORT_FILE_NAME "${_projectPath}/export.h"
-        EXPORT_MACRO_NAME "${PROJECT_NAME_UPPERCASE}_EXPORT"
-        DEPRECATED_MACRO_NAME "${PROJECT_NAME_UPPERCASE}_DEPRECATED"
-            # TODO ADD OTHER MACROS
-    )
 
     target_compile_options(${target_name} ${compile_option_visibility}
         -Wall

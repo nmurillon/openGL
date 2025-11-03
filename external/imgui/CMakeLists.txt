@@ -28,4 +28,12 @@ add_library(imgui STATIC ${IMGUI_HEADERS} ${IMGUI_SOURCES})
 
 target_include_directories(imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(imgui PRIVATE glfw)
+
+if(NOT WIN32)
+    find_package(X11)
+    if(X11_FOUND)
+        target_link_libraries(imgui PRIVATE X11::X11)
+    endif()
+endif()
+
 target_compile_options(imgui PRIVATE -fPIC PUBLIC -w)
