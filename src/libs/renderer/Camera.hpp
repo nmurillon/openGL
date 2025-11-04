@@ -21,6 +21,7 @@ public:
          float pitch = 0.f);
 
   glm::mat4 getViewMatrix() const;
+  const glm::vec3 &getPosition() const;
   void processMouseMovement(float xOffset, float yOffset,
                             bool constraintPitch = true);
   void processKeyboardInput(const CameraMovement &direction, float deltaTime);

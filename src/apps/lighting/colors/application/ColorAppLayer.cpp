@@ -16,7 +16,7 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
     : Layer(name), m_camera(std::make_shared<libs::renderer::Camera>(
                        glm::vec3(0.f, 0.0f, 5.0f))),
       m_shaderCube("shaders/basicShader.vert",
-                   "shaders/diffuseLightSource.frag"),
+                   "shaders/specularLightSource.frag"),
       m_shaderLight("shaders/basicShader.vert", "shaders/light.frag") {
 
   glGenVertexArrays(1, &m_vaoCube);
@@ -103,6 +103,9 @@ void ColorAppLayer::onUpdate() {
   m_shaderCube.setMat4f("model", glm::mat4(1.0f));
   m_shaderCube.setMat4f("projection", projection);
   m_shaderCube.setVec3f("lightPos", lightPos.x, lightPos.y, lightPos.z);
+
+  const auto cameraPos = m_camera->getPosition();
+  m_shaderCube.setVec3f("viewPos", cameraPos.x, cameraPos.y, cameraPos.z);
 
   m_shaderCube.setMat4f("view", m_camera->getViewMatrix());
 

@@ -17,6 +17,8 @@ glm::mat4 Camera::getViewMatrix() const {
   return glm::lookAt(m_position, m_position + m_front, m_up);
 }
 
+const glm::vec3 &Camera::getPosition() const { return m_position; }
+
 void Camera::processMouseMovement(float xOffset, float yOffset,
                                   bool constraintPitch) {
   xOffset *= m_mouseSensitivity;
