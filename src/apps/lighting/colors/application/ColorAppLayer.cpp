@@ -12,6 +12,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <cmath>
+
 ColorAppLayer::ColorAppLayer(const std::string &name)
     : Layer(name), m_camera(std::make_shared<libs::renderer::Camera>(
                        glm::vec3(0.f, 0.0f, 5.0f))),
@@ -63,7 +65,7 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
 
   // Setup light shader data
   glm::mat4 lightModel = glm::mat4(1.0f);
-  glm::vec3 lightPos = glm::vec3(0.f, 0.0f, 2.0f);
+  glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
   lightModel = glm::translate(lightModel, lightPos);
   lightModel = glm::scale(lightModel, glm::vec3(0.2f));
   m_shaderLight.use();
@@ -87,11 +89,11 @@ void ColorAppLayer::onUpdate() {
   m_deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
 
-  // TODO: update aspect ratio with window resize
   glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
                                           m_aspectRatio, 0.1f, 100.f);
 
-  glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+  glm::vec3 lightPos = glm::vec3(1.2f * cos(currentFrame), sin(currentFrame),
+                                 2.0f * cos(currentFrame));
 
   m_shaderLight.setMat4f("view", m_camera->getViewMatrix());
   m_shaderLight.setMat4f("projection", projection);
