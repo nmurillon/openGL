@@ -9,4 +9,5 @@ logl_add_executable(colors
         logl_core
         logl_events
         logl_renderer
+        glm
 )

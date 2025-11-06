@@ -7,7 +7,14 @@
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Shader.hpp>
 
+#include <glm/glm.hpp>
+
 #include <memory>
+#include <string>
+
+enum class LightType { Ambient, Diffuse, Specular, SpecularViewSpace, Gouraud };
+
+std::string lightTypeToString(LightType type);
 
 class ColorAppLayer : public libs::core::Layer {
 public:
@@ -24,7 +31,12 @@ private:
   bool onMouseMoved(libs::events::MouseMouvedEvent &event);
   bool onMouseScrolled(libs::events::MouseScrolledEvent &event);
 
+  void updateShaderCube();
+  void updateShaderLight();
+
   std::shared_ptr<libs::renderer::Camera> m_camera;
+  glm::vec3 m_lightPos;
+  LightType m_lightType{LightType::Specular};
   libs::renderer::Shader m_shaderCube;
   libs::renderer::Shader m_shaderLight;
 

@@ -13,13 +13,37 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <cmath>
+#include <format>
+#include <iostream>
+
+std::string lightTypeToString(LightType type) {
+  switch (type) {
+  case LightType::Ambient:
+    return "ambientLightSource";
+  case LightType::Diffuse:
+    return "diffuseLightSource";
+  case LightType::Specular:
+    return "specularLightSource";
+  case LightType::SpecularViewSpace:
+    return "specularLightSourceViewSpace";
+  case LightType::Gouraud:
+    return "gouraudLighting";
+  default:
+    return "Unknown";
+  }
+}
 
 ColorAppLayer::ColorAppLayer(const std::string &name)
     : Layer(name), m_camera(std::make_shared<libs::renderer::Camera>(
                        glm::vec3(0.f, 0.0f, 5.0f))),
-      m_shaderCube("shaders/basicShader.vert",
-                   "shaders/specularLightSourceViewSpace.frag"),
+      // TODO: fix this for ambient and diffuse
+      m_shaderCube("shaders/" + lightTypeToString(m_lightType) + ".vert",
+                   "shaders/" + lightTypeToString(m_lightType) + ".frag"),
       m_shaderLight("shaders/basicShader.vert", "shaders/light.frag") {
+
+  std::cout << std::format("Using light type: {}\n",
+                           lightTypeToString(m_lightType))
+            << std::endl;
 
   glGenVertexArrays(1, &m_vaoCube);
   glGenVertexArrays(1, &m_vaoLight);
@@ -72,24 +96,11 @@ void ColorAppLayer::onUpdate() {
   m_deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
 
-  glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
-                                          m_aspectRatio, 0.1f, 100.f);
-
-  glm::vec3 lightPos = glm::vec3(1.2f * cos(currentFrame), sin(currentFrame),
-                                 2.0f * cos(currentFrame));
+  m_lightPos = glm::vec3(1.2f * cos(currentFrame), sin(currentFrame),
+                         2.0f * cos(currentFrame));
 
   // Cube
-  m_shaderCube.use();
-  m_shaderCube.setVec3f("lightColor", 1.f, 1.f, 1.f);
-  m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
-  m_shaderCube.setMat4f("model", glm::mat4(1.0f));
-  m_shaderCube.setMat4f("projection", projection);
-  m_shaderCube.setVec3f("lightPosition", lightPos.x, lightPos.y, lightPos.z);
-
-  const auto cameraPos = m_camera->getPosition();
-  m_shaderCube.setVec3f("viewPos", cameraPos.x, cameraPos.y, cameraPos.z);
-
-  m_shaderCube.setMat4f("view", m_camera->getViewMatrix());
+  updateShaderCube();
 
   glBindVertexArray(m_vaoCube);
   glDrawElements(
@@ -98,14 +109,7 @@ void ColorAppLayer::onUpdate() {
       GL_UNSIGNED_INT, 0);
 
   // Light
-  m_shaderLight.use();
-  glm::mat4 lightModel = glm::mat4(1.0f);
-  lightModel = glm::translate(lightModel, lightPos);
-  lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-  m_shaderLight.setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
-  m_shaderLight.setMat4f("model", lightModel);
-  m_shaderLight.setMat4f("projection", projection);
-  m_shaderLight.setMat4f("view", m_camera->getViewMatrix());
+  updateShaderLight();
 
   glBindVertexArray(m_vaoLight);
   glDrawElements(
@@ -183,4 +187,49 @@ bool ColorAppLayer::onMouseScrolled(libs::events::MouseScrolledEvent &event) {
 
   m_camera->processMouseScroll(event.getYOffset());
   return event.handle();
+}
+
+void ColorAppLayer::updateShaderCube() {
+  glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
+                                          m_aspectRatio, 0.1f, 100.f);
+  m_shaderCube.use();
+  m_shaderCube.setMat4f("model", glm::mat4(1.0f));
+  m_shaderCube.setMat4f("view", m_camera->getViewMatrix());
+  m_shaderCube.setMat4f("projection", projection);
+  m_shaderCube.setVec3f("lightColor", 1.f, 1.f, 1.f);
+  m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
+
+  if (m_lightType == LightType::Diffuse) {
+    m_shaderCube.setVec3f("lightPos", m_lightPos.x, m_lightPos.y, m_lightPos.z);
+  }
+
+  if (m_lightType == LightType::Specular) {
+    m_shaderCube.setVec3f("lightPos", m_lightPos.x, m_lightPos.y, m_lightPos.z);
+  }
+
+  if (m_lightType == LightType::SpecularViewSpace) {
+    m_shaderCube.setVec3f("lightPosition", m_lightPos.x, m_lightPos.y,
+                          m_lightPos.z);
+  }
+
+  if (m_lightType == LightType::Gouraud) {
+    m_shaderCube.setVec3f("lightPos", m_lightPos.x, m_lightPos.y, m_lightPos.z);
+  }
+
+  const auto cameraPos = m_camera->getPosition();
+  m_shaderCube.setVec3f("viewPos", cameraPos.x, cameraPos.y, cameraPos.z);
+}
+
+void ColorAppLayer::updateShaderLight() {
+  glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
+                                          m_aspectRatio, 0.1f, 100.f);
+
+  m_shaderLight.use();
+  glm::mat4 lightModel = glm::mat4(1.0f);
+  lightModel = glm::translate(lightModel, m_lightPos);
+  lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+  m_shaderLight.setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
+  m_shaderLight.setMat4f("model", lightModel);
+  m_shaderLight.setMat4f("projection", projection);
+  m_shaderLight.setMat4f("view", m_camera->getViewMatrix());
 }

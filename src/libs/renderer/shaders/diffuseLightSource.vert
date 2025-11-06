@@ -7,6 +7,7 @@ layout (location = 3) in vec3 aNormal;
 
 out vec3 vertexColor;
 out vec2 TexCoord;
+out vec3 normal;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -16,5 +17,7 @@ void main()
 {
     vertexColor = aColor;
     TexCoord = aTexCoord;
+    normal = aNormal;
+
     gl_Position = projection * view * model * vec4(aPos, 1.0);
 }
