@@ -18,7 +18,7 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
     : Layer(name), m_camera(std::make_shared<libs::renderer::Camera>(
                        glm::vec3(0.f, 0.0f, 5.0f))),
       m_shaderCube("shaders/basicShader.vert",
-                   "shaders/specularLightSource.frag"),
+                   "shaders/specularLightSourceViewSpace.frag"),
       m_shaderLight("shaders/basicShader.vert", "shaders/light.frag") {
 
   glGenVertexArrays(1, &m_vaoCube);
@@ -63,23 +63,6 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
   glBindVertexArray(0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  // Setup light shader data
-  glm::mat4 lightModel = glm::mat4(1.0f);
-  glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
-  lightModel = glm::translate(lightModel, lightPos);
-  lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-  m_shaderLight.use();
-  m_shaderLight.setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
-  m_shaderLight.setMat4f("model", lightModel);
-
-  // Setup cube shader data
-  glm::mat4 cubeModel = glm::mat4(1.0f);
-  cubeModel = glm::translate(cubeModel, glm::vec3(1.2f, 1.0f, 2.0f));
-  cubeModel = glm::scale(cubeModel, glm::vec3(0.2f));
-  m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
-  m_shaderCube.setVec3f("lightPos", lightPos.x, lightPos.y, lightPos.z);
-  m_shaderCube.setMat4f("model", glm::mat4(1.0f));
-
   glEnable(GL_DEPTH_TEST);
 }
 
@@ -95,16 +78,13 @@ void ColorAppLayer::onUpdate() {
   glm::vec3 lightPos = glm::vec3(1.2f * cos(currentFrame), sin(currentFrame),
                                  2.0f * cos(currentFrame));
 
-  m_shaderLight.setMat4f("view", m_camera->getViewMatrix());
-  m_shaderLight.setMat4f("projection", projection);
-
   // Cube
   m_shaderCube.use();
   m_shaderCube.setVec3f("lightColor", 1.f, 1.f, 1.f);
   m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
   m_shaderCube.setMat4f("model", glm::mat4(1.0f));
   m_shaderCube.setMat4f("projection", projection);
-  m_shaderCube.setVec3f("lightPos", lightPos.x, lightPos.y, lightPos.z);
+  m_shaderCube.setVec3f("lightPosition", lightPos.x, lightPos.y, lightPos.z);
 
   const auto cameraPos = m_camera->getPosition();
   m_shaderCube.setVec3f("viewPos", cameraPos.x, cameraPos.y, cameraPos.z);

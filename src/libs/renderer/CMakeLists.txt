@@ -27,4 +27,5 @@ logl_add_library(logl_renderer
         shaders/diffuseLightSource.frag
         shaders/light.frag
         shaders/specularLightSource.frag
+        shaders/specularLightSourceViewSpace.frag
 )
