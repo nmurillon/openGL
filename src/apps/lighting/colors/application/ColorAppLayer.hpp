@@ -36,7 +36,7 @@ private:
 
   std::shared_ptr<libs::renderer::Camera> m_camera;
   glm::vec3 m_lightPos;
-  LightType m_lightType{LightType::Specular};
+  LightType m_lightType{LightType::Gouraud};
   libs::renderer::Shader m_shaderCube;
   libs::renderer::Shader m_shaderLight;
 

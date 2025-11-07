@@ -25,5 +25,5 @@ void main()
     float specularFactor = 0.5 * pow(max(dot(viewDir, reflected), 0.0), 32);
     
     vertexColorFactor = ambientFactor + diffuseFactor + specularFactor;
-    gl_Position = projection * view * vec4(fragPos, 1.0);
+    gl_Position = projection * view * vec4(pos, 1.0);
 }
