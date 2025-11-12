@@ -23,16 +23,6 @@ logl_add_library(logl_renderer
     PRIVATE_LINKS
         logl_io
     RESOURCES
-        shaders/ambientLightSource.frag
         shaders/basicShader.frag
         shaders/basicShader.vert
-        shaders/diffuseLightSource.frag
-        shaders/diffuseLightSource.vert
-        shaders/gouraudLighting.frag
-        shaders/gouraudLighting.vert
-        shaders/light.frag
-        shaders/specularLightSource.frag
-        shaders/specularLightSource.vert
-        shaders/specularLightSourceViewSpace.frag
-        shaders/specularLightSourceViewSpace.vert
 )

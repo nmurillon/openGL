@@ -3,8 +3,8 @@
 #include "../../mesh.hpp"
 
 #include <libs/events/EventDispatcher.hpp>
+#include <libs/io/ProgramPath.hpp>
 #include <libs/renderer/Camera.hpp>
-#include <libs/renderer/Shader.hpp>
 
 #include <glad/glad.h>
 
@@ -35,11 +35,18 @@ std::string lightTypeToString(LightType type) {
 
 ColorAppLayer::ColorAppLayer(const std::string &name)
     : Layer(name), m_camera(std::make_shared<libs::renderer::Camera>(
-                       glm::vec3(0.f, 0.0f, 5.0f))),
-      // TODO: fix this for ambient and diffuse
-      m_shaderCube("shaders/" + lightTypeToString(m_lightType) + ".vert",
-                   "shaders/" + lightTypeToString(m_lightType) + ".frag"),
-      m_shaderLight("shaders/basicShader.vert", "shaders/light.frag") {
+                       glm::vec3(0.f, 0.0f, 5.0f))) {
+
+  // TODO: fix this for ambient and diffuse
+  m_shaderManager.addSearchPath(
+      libs::io::ProgramPath::getInstance().getProgramDir() /
+      COLORS_RESOURCES_FOLDER);
+
+  m_shaderManager.addShader(
+      "cube", std::format("shaders/{}.vert", lightTypeToString(m_lightType)),
+      std::format("shaders/{}.frag", lightTypeToString(m_lightType)));
+
+  m_shaderManager.addShader("light", "basicShader.vert", "shaders/light.frag");
 
   std::cout << std::format("Using light type: {}\n",
                            lightTypeToString(m_lightType))
@@ -192,44 +199,46 @@ bool ColorAppLayer::onMouseScrolled(libs::events::MouseScrolledEvent &event) {
 void ColorAppLayer::updateShaderCube() {
   glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
                                           m_aspectRatio, 0.1f, 100.f);
-  m_shaderCube.use();
-  m_shaderCube.setMat4f("model", glm::mat4(1.0f));
-  m_shaderCube.setMat4f("view", m_camera->getViewMatrix());
-  m_shaderCube.setMat4f("projection", projection);
-  m_shaderCube.setVec3f("lightColor", 1.f, 1.f, 1.f);
-  m_shaderCube.setVec3f("objectColor", 1.f, 0.5f, 0.31f);
+
+  auto shader = m_shaderManager.getShader("cube");
+  shader->use();
+  shader->setMat4f("model", glm::mat4(1.0f));
+  shader->setMat4f("view", m_camera->getViewMatrix());
+  shader->setMat4f("projection", projection);
+  shader->setVec3f("lightColor", 1.f, 1.f, 1.f);
+  shader->setVec3f("objectColor", 1.f, 0.5f, 0.31f);
 
   if (m_lightType == LightType::Diffuse) {
-    m_shaderCube.setVec3f("lightPos", m_lightPos.x, m_lightPos.y, m_lightPos.z);
+    shader->setVec3f("lightPos", m_lightPos);
   }
 
   if (m_lightType == LightType::Specular) {
-    m_shaderCube.setVec3f("lightPos", m_lightPos.x, m_lightPos.y, m_lightPos.z);
+    shader->setVec3f("lightPos", m_lightPos);
   }
 
   if (m_lightType == LightType::SpecularViewSpace) {
-    m_shaderCube.setVec3f("lightPosition", m_lightPos.x, m_lightPos.y,
-                          m_lightPos.z);
+    shader->setVec3f("lightPosition", m_lightPos);
   }
 
   if (m_lightType == LightType::Gouraud) {
-    m_shaderCube.setVec3f("lightPos", m_lightPos.x, m_lightPos.y, m_lightPos.z);
+    shader->setVec3f("lightPos", m_lightPos);
   }
 
-  const auto cameraPos = m_camera->getPosition();
-  m_shaderCube.setVec3f("viewPos", cameraPos.x, cameraPos.y, cameraPos.z);
+  shader->setVec3f("viewPos", m_camera->getPosition());
 }
 
 void ColorAppLayer::updateShaderLight() {
   glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
                                           m_aspectRatio, 0.1f, 100.f);
 
-  m_shaderLight.use();
+  auto shader = m_shaderManager.getShader("light");
+
+  shader->use();
   glm::mat4 lightModel = glm::mat4(1.0f);
   lightModel = glm::translate(lightModel, m_lightPos);
   lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-  m_shaderLight.setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
-  m_shaderLight.setMat4f("model", lightModel);
-  m_shaderLight.setMat4f("projection", projection);
-  m_shaderLight.setMat4f("view", m_camera->getViewMatrix());
+  shader->setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
+  shader->setMat4f("model", lightModel);
+  shader->setMat4f("projection", projection);
+  shader->setMat4f("view", m_camera->getViewMatrix());
 }

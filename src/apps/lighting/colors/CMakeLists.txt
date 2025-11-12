@@ -7,7 +7,19 @@ logl_add_executable(colors
         application/ColorAppLayer.hpp
     LINKS
         logl_core
+        logl_io
         logl_events
         logl_renderer
         glm
+    RESOURCES
+        shaders/ambientLightSource.frag
+        shaders/diffuseLightSource.frag
+        shaders/diffuseLightSource.vert
+        shaders/gouraudLighting.frag
+        shaders/gouraudLighting.vert
+        shaders/light.frag
+        shaders/specularLightSource.frag
+        shaders/specularLightSource.vert
+        shaders/specularLightSourceViewSpace.frag
+        shaders/specularLightSourceViewSpace.vert
 )

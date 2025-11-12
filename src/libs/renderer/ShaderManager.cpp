@@ -7,13 +7,23 @@
 
 namespace libs::renderer {
 ShaderManager::ShaderManager() {
-  const std::string shaderBasePath{
-      (libs::io::ProgramPath::getInstance().getProgramDir() /
-       LOGL_RENDERER_RESOURCES_FOLDER / "shaders" / "basicShader")
-          .string()};
+  m_searchPaths.emplace_back(
+      libs::io::ProgramPath::getInstance().getProgramDir() /
+      LOGL_RENDERER_RESOURCES_FOLDER / "shaders");
 
-  addShader("loglBasicShader", std::format("{}.vert", shaderBasePath),
-            std::format("{}.frag", shaderBasePath));
+  addShader("loglBasicShader", "basicShader.vert", "basicShader.frag");
+}
+
+std::shared_ptr<Shader>
+ShaderManager::getShader(const std::string &name) const {
+  if (!m_shaders.contains(name)) {
+    std::cout << std::format("No shader with name {} exists", name)
+              << std::endl;
+
+    return {};
+  }
+
+  return m_shaders.at(name);
 }
 
 void ShaderManager::addShader(const std::string &name,
@@ -34,19 +44,35 @@ void ShaderManager::addShader(const std::string &name,
         std::format("A shader with name {} already exists", name));
   }
 
-  m_shaders[name] = std::make_shared<Shader>(vertexSrcFile, fragmentSrcFile);
+  const auto vertexPath = getFirstMatchingPath(vertexSrcFile).string();
+  const auto fragmentPath = getFirstMatchingPath(fragmentSrcFile).string();
+
+  m_shaders[name] = std::make_shared<Shader>(vertexPath, fragmentPath);
 }
 
-std::shared_ptr<Shader>
-ShaderManager::getShader(const std::string &name) const {
-  if (!m_shaders.contains(name)) {
-    std::cout << std::format("No shader with name {} exists", name)
-              << std::endl;
+void ShaderManager::addSearchPath(const std::string &path) {
+  m_searchPaths.emplace_back(path);
+}
 
-    return {};
+void ShaderManager::addSearchPath(const std::filesystem::path &path) {
+  m_searchPaths.emplace_back(path);
+}
+
+std::filesystem::path
+ShaderManager::getFirstMatchingPath(const std::string &filePath) const {
+
+  if (std::filesystem::exists(filePath)) {
+    return {filePath};
   }
 
-  return m_shaders.at(name);
+  for (const auto &searchPath : m_searchPaths) {
+    const std::filesystem::path fullPath = searchPath / filePath;
+    if (std::filesystem::exists(fullPath)) {
+      return fullPath;
+    }
+  }
+
+  return {filePath};
 }
 
 } // namespace libs::renderer

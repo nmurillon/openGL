@@ -5,7 +5,7 @@
 #include <libs/events/MouseEvent.hpp>
 #include <libs/events/WindowEvent.hpp>
 #include <libs/renderer/Camera.hpp>
-#include <libs/renderer/Shader.hpp>
+#include <libs/renderer/ShaderManager.hpp>
 
 #include <glm/glm.hpp>
 
@@ -37,8 +37,7 @@ private:
   std::shared_ptr<libs::renderer::Camera> m_camera;
   glm::vec3 m_lightPos;
   LightType m_lightType{LightType::Gouraud};
-  libs::renderer::Shader m_shaderCube;
-  libs::renderer::Shader m_shaderLight;
+  libs::renderer::ShaderManager m_shaderManager{};
 
   unsigned int m_vaoCube, m_vaoLight, m_vbo, m_ebo;
   double m_deltaTime;
