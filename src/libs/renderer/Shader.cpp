@@ -2,6 +2,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -31,7 +32,8 @@ Shader::Shader(const std::string &vertexSrcFile,
   glGetProgramiv(m_shaderId, GL_LINK_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(m_shaderId, 512, NULL, error);
-    std::cout << "ERROR::SHADER::LINKING_FAILED\n" << error << std::endl;
+    std::cout << std::format("ERROR::SHADER::LINKING_FAILED\n{}", error)
+              << std::endl;
   };
 
   // Once linked, shaders can be deleted
@@ -53,11 +55,16 @@ void Shader::setFloat(const std::string &name, float value) const {
   glUniform1f(getLocation(name), value);
 }
 
-void Shader::setVec3f(const std::string &name, std::vector<float> value) const {
+void Shader::setVec3f(const std::string &name, const glm::vec3 &value) const {
+  glUniform3f(getLocation(name), value.x, value.y, value.z);
+}
+
+void Shader::setVec3f(const std::string &name,
+                      const std::vector<float> &value) const {
   if (3 != value.size()) {
-    throw std::runtime_error(
-        "Can not set values for uniform. Expecting 3, but " +
-        std::to_string(value.size()) + " were provided");
+    throw std::runtime_error(std::format(
+        "Can not set values for uniform. Expecting 3, but {} were provided",
+        value.size()));
   }
   glUniform3f(getLocation(name), value.at(0), value.at(1), value.at(2));
 }
@@ -67,11 +74,17 @@ void Shader::setVec3f(const std::string &name, float x, float y,
   glUniform3f(getLocation(name), x, y, z);
 }
 
-void Shader::setVec4f(const std::string &name, std::vector<float> value) const {
+void Shader::setVec4f(const std::string &name, const glm::vec4 &value) const {
+
+  glUniform4f(getLocation(name), value.x, value.y, value.z, value.w);
+}
+
+void Shader::setVec4f(const std::string &name,
+                      const std::vector<float> &value) const {
   if (4 != value.size()) {
-    throw std::runtime_error(
-        "Can not set values for uniform. Expecting 4, but " +
-        std::to_string(value.size()) + " were provided");
+    throw std::runtime_error(std::format(
+        "Can not set values for uniform. Expecting 4, but {} were provided",
+        value.size()));
   }
   glUniform4f(getLocation(name), value.at(0), value.at(1), value.at(2),
               value.at(3));
@@ -85,7 +98,7 @@ unsigned int Shader::readShaderFile(const std::string &src, unsigned int type) {
   std::ifstream srcStream{src};
   if (!srcStream.is_open() || !srcStream.good()) {
     throw std::runtime_error(
-        std::string("Failed to open vertex shader file: ") + src);
+        std::format("Failed to open vertex shader file: {}", src));
   }
 
   std::stringstream srcSS;
@@ -105,9 +118,11 @@ unsigned int Shader::readShaderFile(const std::string &src, unsigned int type) {
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader, 512, NULL, error);
-    std::cout << "ERROR::SHADER::COMPILATION_FAILED\n"
-              << "Source file: " << src << "\n"
-              << error << std::endl;
+    std::cout << std::format("ERROR::SHADER::COMPILATION_FAILED\n"
+                             "Source file: {}\n"
+                             "{}",
+                             src, error)
+              << std::endl;
   };
 
   return shader;
