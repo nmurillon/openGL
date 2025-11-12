@@ -38,17 +38,20 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
                        glm::vec3(0.f, 0.0f, 5.0f))) {
 
   // TODO: fix this for ambient and diffuse
-  m_shaderManager.addSearchPath(
-      libs::io::ProgramPath::getInstance().getProgramDir() /
-      COLORS_RESOURCES_FOLDER);
+  const auto shaderDir = (libs::io::ProgramPath::getInstance().getProgramDir() /
+                          COLORS_RESOURCES_FOLDER / "shaders")
+                             .string();
 
   m_shaderManager.addShader(
-      "cube", std::format("shaders/{}.vert", lightTypeToString(m_lightType)),
-      std::format("shaders/{}.frag", lightTypeToString(m_lightType)));
+      "cube",
+      std::format("{}/{}.vert", shaderDir, lightTypeToString(m_lightType)),
+      std::format("{}/{}.frag", shaderDir, lightTypeToString(m_lightType)));
 
-  m_shaderManager.addShader("light", "basicShader.vert", "shaders/light.frag");
+  m_shaderManager.addShader(
+      "light", m_shaderManager.getCommonShaderDirectory() / "basicShader.vert",
+      std::format("{}/light.frag", shaderDir));
 
-  std::cout << std::format("Using light type: {}\n",
+  std::cout << std::format("Using light type: {}",
                            lightTypeToString(m_lightType))
             << std::endl;
 

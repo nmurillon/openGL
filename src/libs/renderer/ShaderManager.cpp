@@ -1,17 +1,16 @@
 #include <libs/renderer/ShaderManager.hpp>
 
-#include <libs/io/ProgramPath.hpp>
-
 #include <format>
 #include <iostream>
 
 namespace libs::renderer {
-ShaderManager::ShaderManager() {
-  m_searchPaths.emplace_back(
-      libs::io::ProgramPath::getInstance().getProgramDir() /
-      LOGL_RENDERER_RESOURCES_FOLDER / "shaders");
+ShaderManager::ShaderManager()
+    : m_commonShaderDirectory(
+          libs::io::ProgramPath::getInstance().getProgramDir() /
+          LOGL_RENDERER_RESOURCES_FOLDER / "shaders") {
 
-  addShader("loglBasicShader", "basicShader.vert", "basicShader.frag");
+  addShader("loglBasicShader", m_commonShaderDirectory / "basicShader.vert",
+            m_commonShaderDirectory / "basicShader.frag");
 }
 
 std::shared_ptr<Shader>
@@ -44,35 +43,11 @@ void ShaderManager::addShader(const std::string &name,
         std::format("A shader with name {} already exists", name));
   }
 
-  const auto vertexPath = getFirstMatchingPath(vertexSrcFile).string();
-  const auto fragmentPath = getFirstMatchingPath(fragmentSrcFile).string();
-
-  m_shaders[name] = std::make_shared<Shader>(vertexPath, fragmentPath);
+  m_shaders[name] = std::make_shared<Shader>(vertexSrcFile, fragmentSrcFile);
 }
 
-void ShaderManager::addSearchPath(const std::string &path) {
-  m_searchPaths.emplace_back(path);
-}
-
-void ShaderManager::addSearchPath(const std::filesystem::path &path) {
-  m_searchPaths.emplace_back(path);
-}
-
-std::filesystem::path
-ShaderManager::getFirstMatchingPath(const std::string &filePath) const {
-
-  if (std::filesystem::exists(filePath)) {
-    return {filePath};
-  }
-
-  for (const auto &searchPath : m_searchPaths) {
-    const std::filesystem::path fullPath = searchPath / filePath;
-    if (std::filesystem::exists(fullPath)) {
-      return fullPath;
-    }
-  }
-
-  return {filePath};
+std::filesystem::path ShaderManager::getCommonShaderDirectory() const {
+  return m_commonShaderDirectory;
 }
 
 } // namespace libs::renderer

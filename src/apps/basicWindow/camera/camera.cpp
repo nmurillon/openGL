@@ -5,7 +5,7 @@
 #include <iostream>
 #include <libs/io/ProgramPath.hpp>
 #include <libs/renderer/Camera.hpp>
-#include <libs/renderer/Shader.hpp>
+#include <libs/renderer/ShaderManager.hpp>
 #include <memory>
 #include <stb_image/stb_image.h>
 #include <vector>
@@ -152,8 +152,8 @@ int main(int argc, char **argv) {
   }
 
   // SETUP SHADERS
-  const libs::renderer::Shader shaderProgram("shaders/basicShader.vert",
-                                             "shaders/basicShader.frag");
+  const libs::renderer::ShaderManager shaderManager{};
+  const auto shaderProgram = shaderManager.getShader("loglBasicShader");
 
   // SETUP VERTEX DATA
   // clang-format off
@@ -252,9 +252,9 @@ int main(int argc, char **argv) {
 
   glViewport(0, 0, 800, 600);
 
-  shaderProgram.use();
-  shaderProgram.setInt("Texture1", 0);
-  shaderProgram.setInt("Texture2", 1);
+  shaderProgram->use();
+  shaderProgram->setInt("Texture1", 0);
+  shaderProgram->setInt("Texture2", 1);
 
   // Create a transformation matrix
   glm::mat4 model = glm::mat4(1.0f);
@@ -279,7 +279,7 @@ int main(int argc, char **argv) {
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shaderProgram.setFloat("TextureMixingOpacity", textureMixingOpacity);
+    shaderProgram->setFloat("TextureMixingOpacity", textureMixingOpacity);
 
     glBindVertexArray(VAO);
     projection = glm::perspective(glm::radians(camera->getZoom()),
@@ -288,8 +288,8 @@ int main(int argc, char **argv) {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    shaderProgram.setMat4f("view", camera->getViewMatrix());
-    shaderProgram.setMat4f("projection", projection);
+    shaderProgram->setMat4f("view", camera->getViewMatrix());
+    shaderProgram->setMat4f("projection", projection);
 
     for (std::size_t i = 0; i < cubePositions.size(); ++i) {
       model = glm::mat4(1.0f);
@@ -301,7 +301,7 @@ int main(int argc, char **argv) {
             glm::vec3(0.5f, 1.0f, 0.0f));
       }
 
-      shaderProgram.setMat4f("model", model);
+      shaderProgram->setMat4f("model", model);
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
