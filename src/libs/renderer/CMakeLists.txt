@@ -1,11 +1,13 @@
 set(RENDERER_HEADERS
     Camera.hpp
     Shader.hpp
+    ShaderManager.hpp
 )
 
 set(RENDERER_SRC
     Camera.cpp
     Shader.cpp
+    ShaderManager.cpp
 )
 
 logl_add_library(logl_renderer

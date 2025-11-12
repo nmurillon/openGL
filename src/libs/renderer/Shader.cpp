@@ -1,9 +1,5 @@
 #include <libs/renderer/Shader.hpp>
 
-#include <libs/io/ProgramPath.hpp>
-
-#include <glad/glad.h>
-
 #include <glm/gtc/type_ptr.hpp>
 
 #include <fstream>
@@ -46,16 +42,15 @@ Shader::Shader(const std::string &vertexSrcFile,
 void Shader::use() const { glUseProgram(m_shaderId); }
 
 void Shader::setBool(const std::string &name, bool value) const {
-  glUniform1i(glGetUniformLocation(m_shaderId, name.c_str()),
-              static_cast<int>(value));
+  glUniform1i(getLocation(name), static_cast<int>(value));
 }
 
 void Shader::setInt(const std::string &name, int value) const {
-  glUniform1i(glGetUniformLocation(m_shaderId, name.c_str()), value);
+  glUniform1i(getLocation(name), value);
 }
 
 void Shader::setFloat(const std::string &name, float value) const {
-  glUniform1f(glGetUniformLocation(m_shaderId, name.c_str()), value);
+  glUniform1f(getLocation(name), value);
 }
 
 void Shader::setVec3f(const std::string &name, std::vector<float> value) const {
@@ -64,13 +59,12 @@ void Shader::setVec3f(const std::string &name, std::vector<float> value) const {
         "Can not set values for uniform. Expecting 3, but " +
         std::to_string(value.size()) + " were provided");
   }
-  glUniform3f(glGetUniformLocation(m_shaderId, name.c_str()), value.at(0),
-              value.at(1), value.at(2));
+  glUniform3f(getLocation(name), value.at(0), value.at(1), value.at(2));
 }
 
 void Shader::setVec3f(const std::string &name, float x, float y,
                       float z) const {
-  glUniform3f(glGetUniformLocation(m_shaderId, name.c_str()), x, y, z);
+  glUniform3f(getLocation(name), x, y, z);
 }
 
 void Shader::setVec4f(const std::string &name, std::vector<float> value) const {
@@ -79,25 +73,19 @@ void Shader::setVec4f(const std::string &name, std::vector<float> value) const {
         "Can not set values for uniform. Expecting 4, but " +
         std::to_string(value.size()) + " were provided");
   }
-  glUniform4f(glGetUniformLocation(m_shaderId, name.c_str()), value.at(0),
-              value.at(1), value.at(2), value.at(3));
+  glUniform4f(getLocation(name), value.at(0), value.at(1), value.at(2),
+              value.at(3));
 }
 
 void Shader::setMat4f(const std::string &name, const glm::mat4 &mat) const {
-  glUniformMatrix4fv(glGetUniformLocation(m_shaderId, name.c_str()), 1,
-                     GL_FALSE, glm::value_ptr(mat));
+  glUniformMatrix4fv(getLocation(name), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 unsigned int Shader::readShaderFile(const std::string &src, unsigned int type) {
-  const std::string shaderPath{
-      (libs::io::ProgramPath::getInstance().getProgramDir() /
-       LOGL_RENDERER_RESOURCES_FOLDER / src)
-          .string()};
-
-  std::ifstream srcStream{shaderPath};
+  std::ifstream srcStream{src};
   if (!srcStream.is_open() || !srcStream.good()) {
     throw std::runtime_error(
-        std::string("Failed to open vertex shader file: ") + shaderPath);
+        std::string("Failed to open vertex shader file: ") + src);
   }
 
   std::stringstream srcSS;
@@ -123,5 +111,9 @@ unsigned int Shader::readShaderFile(const std::string &src, unsigned int type) {
   };
 
   return shader;
+}
+
+GLint Shader::getLocation(const std::string &name) const {
+  return glGetUniformLocation(m_shaderId, name.c_str());
 }
 } // namespace libs::renderer

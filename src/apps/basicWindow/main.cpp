@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <libs/io/ProgramPath.hpp>
-#include <libs/renderer/Shader.hpp>
+#include <libs/renderer/ShaderManager.hpp>
 #include <stb_image/stb_image.h>
 #include <vector>
 
@@ -96,8 +96,8 @@ int main(int argc, char **argv) {
   }
 
   // SETUP SHADERS
-  const libs::renderer::Shader shaderProgram("shaders/basicShader.vert",
-                                             "shaders/basicShader.frag");
+  libs::renderer::ShaderManager shaderManager{};
+  const auto shader = shaderManager.getShader("loglBasicShader");
 
   // SETUP VERTEX DATA
   // clang-format off
@@ -167,9 +167,9 @@ std::vector<std::vector<unsigned int>> indices = {
   // To draw in wireframe mode, use GL_LINE
   std::vector<GLenum> modes{GL_LINE, GL_FILL};
 
-  shaderProgram.use();
-  shaderProgram.setInt("Texture1", 0);
-  shaderProgram.setInt("Texture2", 1);
+  shader->use();
+  shader->setInt("Texture1", 0);
+  shader->setInt("Texture2", 1);
 
   // Create a transformation matrix
   glm::mat4 model = glm::mat4(1.0f);
@@ -184,14 +184,14 @@ std::vector<std::vector<unsigned int>> indices = {
 
   // In real case: the following will be done in the while loop as the different
   // matrices can change
-  shaderProgram.setMat4f("model", model);
-  shaderProgram.setMat4f("view", view);
-  shaderProgram.setMat4f("projection", projection);
+  shader->setMat4f("model", model);
+  shader->setMat4f("view", view);
+  shader->setMat4f("projection", projection);
 
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
-    shaderProgram.setFloat("TextureMixingOpacity", textureMixingOpacity);
+    shader->setFloat("TextureMixingOpacity", textureMixingOpacity);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -201,7 +201,7 @@ std::vector<std::vector<unsigned int>> indices = {
       glBindVertexArray(VAO.at(i));
       auto color = colors.at(i);
 
-      shaderProgram.setVec4f("vertexColor", color);
+      shader->setVec4f("vertexColor", color);
       glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.at(i).size()),
                      GL_UNSIGNED_INT, 0);
     }

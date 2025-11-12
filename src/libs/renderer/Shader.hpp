@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 namespace libs::renderer {
@@ -32,5 +33,7 @@ private:
    * @return The id of the shader
    */
   unsigned int readShaderFile(const std::string &srcFile, unsigned int type);
+
+  GLint getLocation(const std::string &name) const;
 };
 } // namespace libs::renderer
