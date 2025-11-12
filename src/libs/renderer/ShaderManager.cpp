@@ -12,9 +12,8 @@ ShaderManager::ShaderManager() {
        LOGL_RENDERER_RESOURCES_FOLDER / "shaders" / "basicShader")
           .string()};
 
-  addShader("loglBasicShader", std::make_shared<libs::renderer::Shader>(
-                                   std::format("{}.vert", shaderBasePath),
-                                   std::format("{}.frag", shaderBasePath)));
+  addShader("loglBasicShader", std::format("{}.vert", shaderBasePath),
+            std::format("{}.frag", shaderBasePath));
 }
 
 void ShaderManager::addShader(const std::string &name,
@@ -25,6 +24,17 @@ void ShaderManager::addShader(const std::string &name,
   }
 
   m_shaders[name] = std::move(shader);
+}
+
+void ShaderManager::addShader(const std::string &name,
+                              const std::string &vertexSrcFile,
+                              const std::string &fragmentSrcFile) {
+  if (m_shaders.contains(name)) {
+    throw std::runtime_error(
+        std::format("A shader with name {} already exists", name));
+  }
+
+  m_shaders[name] = std::make_shared<Shader>(vertexSrcFile, fragmentSrcFile);
 }
 
 std::shared_ptr<Shader>
