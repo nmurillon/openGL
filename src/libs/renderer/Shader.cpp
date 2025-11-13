@@ -55,6 +55,24 @@ void Shader::setFloat(const std::string &name, float value) const {
   glUniform1f(getLocation(name), value);
 }
 
+void Shader::setVec2f(const std::string &name, const glm::vec2 &value) const {
+  glUniform2f(getLocation(name), value.x, value.y);
+}
+
+void Shader::setVec2f(const std::string &name,
+                      const std::vector<float> &value) const {
+  if (2 != value.size()) {
+    throw std::runtime_error(std::format(
+        "Can not set values for uniform. Expecting 2, but {} were provided",
+        value.size()));
+  }
+  glUniform2f(getLocation(name), value.at(0), value.at(1));
+}
+
+void Shader::setVec2f(const std::string &name, float x, float y) const {
+  glUniform2f(getLocation(name), x, y);
+}
+
 void Shader::setVec3f(const std::string &name, const glm::vec3 &value) const {
   glUniform3f(getLocation(name), value.x, value.y, value.z);
 }
