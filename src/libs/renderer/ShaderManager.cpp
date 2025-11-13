@@ -1,5 +1,7 @@
 #include <libs/renderer/ShaderManager.hpp>
 
+#include <libs/io/ProgramPath.hpp>
+
 #include <format>
 #include <iostream>
 

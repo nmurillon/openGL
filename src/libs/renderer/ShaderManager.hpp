@@ -2,7 +2,6 @@
 
 #include <logl/renderer/export.h>
 
-#include <libs/io/ProgramPath.hpp>
 #include <libs/renderer/Shader.hpp>
 
 #include <filesystem>
