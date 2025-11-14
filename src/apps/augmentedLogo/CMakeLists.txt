@@ -14,10 +14,13 @@ logl_add_executable(augmented_logo
         logl_renderer
         logl_io
         opencv_aruco
+        opencv_highgui
         opencv_video
     RESOURCES
         shaders/backgroundFrag.glsl
         shaders/backgroundVert.glsl
+        shaders/LogoFrag.glsl
+        shaders/LogoVert.glsl
         # Texture images
         textures/totk.jpg
         
