@@ -48,7 +48,7 @@ ColorAppLayer::ColorAppLayer(const std::string &name)
       std::format("{}/{}.frag", shaderDir, lightTypeToString(m_lightType)));
 
   m_shaderManager.addShader(
-      "light", m_shaderManager.getCommonShaderDirectory() / "basicShader.vert",
+      "light", (m_shaderManager.getCommonShaderDirectory() / "basicShader.vert").string(),
       std::format("{}/light.frag", shaderDir));
 
   std::cout << std::format("Using light type: {}",

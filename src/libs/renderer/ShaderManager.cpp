@@ -9,8 +9,8 @@ ShaderManager::ShaderManager()
           libs::io::ProgramPath::getInstance().getProgramDir() /
           LOGL_RENDERER_RESOURCES_FOLDER / "shaders") {
 
-  addShader("loglBasicShader", m_commonShaderDirectory / "basicShader.vert",
-            m_commonShaderDirectory / "basicShader.frag");
+  addShader("loglBasicShader", (m_commonShaderDirectory / "basicShader.vert").string(),
+            (m_commonShaderDirectory / "basicShader.frag").string());
 }
 
 std::shared_ptr<Shader>
