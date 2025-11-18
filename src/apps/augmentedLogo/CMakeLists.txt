@@ -16,6 +16,7 @@ logl_add_executable(augmented_logo
         opencv_aruco
         opencv_highgui
         opencv_video
+        imgui
     RESOURCES
         shaders/backgroundFrag.glsl
         shaders/backgroundVert.glsl

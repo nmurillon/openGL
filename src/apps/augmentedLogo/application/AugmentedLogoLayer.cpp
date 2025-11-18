@@ -17,6 +17,10 @@
 #include <opencv2/opencv.hpp>
 #include <stb_image/stb_image.h>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 unsigned int loadTexture(const std::string &textureFile,
                          GLenum textureUnit = GL_TEXTURE0,
                          GLint wrapping = GL_REPEAT) {
@@ -114,18 +118,6 @@ AugmentedLogoLayer::AugmentedLogoLayer(const std::string &name) : Layer{name} {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   m_inputVideo.open(0);
-  // initialize window size from the capture if available
-  if (m_inputVideo.isOpened()) {
-    int w = static_cast<int>(m_inputVideo.get(cv::CAP_PROP_FRAME_WIDTH));
-    int h = static_cast<int>(m_inputVideo.get(cv::CAP_PROP_FRAME_HEIGHT));
-    if (w > 0 && h > 0) {
-      m_windowSize.width = w;
-      m_windowSize.height = h;
-    }
-  }
-  // compute projection matrix now that we know window/frame size
-  m_projectionMatrix = projectionFromCameraMatrix();
-
   glGenTextures(1, &m_backgroundTexture);
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
@@ -134,9 +126,11 @@ AugmentedLogoLayer::AugmentedLogoLayer(const std::string &name) : Layer{name} {
 }
 
 void AugmentedLogoLayer::onUpdate() {
-  updateBackgroundTexture();
+  m_inputVideo.grab();
+  auto capture = m_inputVideo.retrieve(currentImage);
   auto model = getModelFromPos();
   auto view = glm::mat4(1.0f);
+  updateBackgroundTexture();
 
   auto shader = m_shaderManager.getShader("background");
   shader->use();
@@ -152,10 +146,23 @@ void AugmentedLogoLayer::onUpdate() {
   logo->setInt("iChannel0", 0);
   logo->setMat4f("model", model);
   logo->setMat4f("view", view);
-  logo->setMat4f("projection", glm::mat4(1.0f));
+  logo->setMat4f("projection", m_projectionMatrix);
   glBindVertexArray(m_vaoLogo);
   glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
                  GL_UNSIGNED_INT, 0);
+
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+
+  ImGui::Begin("Debug");
+  ImGui::Text("Tvec: %f %f %f", tvec[0], tvec[1], tvec[2]);
+  ImGui::End();
+
+  ImGui::EndFrame();
+
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void AugmentedLogoLayer::onEvent(libs::events::Event &event) {
@@ -165,9 +172,9 @@ void AugmentedLogoLayer::onEvent(libs::events::Event &event) {
 }
 
 void AugmentedLogoLayer::updateBackgroundTexture() {
-  cv::Mat image;
-  m_inputVideo.retrieve(image);
-  auto data = image.data;
+  cv::Mat texture;
+  cv::flip(currentImage, texture, 0);
+  auto data = texture.data;
 
   // Bind the texture to work on it
   glActiveTexture(GL_TEXTURE1);
@@ -179,41 +186,68 @@ void AugmentedLogoLayer::updateBackgroundTexture() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.cols, image.rows, 0, GL_RGB,
-               GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, currentImage.cols, currentImage.rows,
+               0, GL_RGB, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 bool AugmentedLogoLayer::onWindowResized(
     libs::events::WindowResizeEvent &event) {
-  // m_windowSize.width = event.getWidth();
-  // m_windowSize.height = event.getHeight();
+  m_windowSize.width = event.getWidth();
+  m_windowSize.height = event.getHeight();
+  m_projectionMatrix = projectionFromCameraMatrix();
   return event.handle();
 }
 
 // Build OpenGL projection matrix from camera intrinsics
 glm::mat4 AugmentedLogoLayer::projectionFromCameraMatrix(float near,
                                                          float far) {
-  double fx = m_cameraMatrix.at<double>(0, 0);
-  double fy = m_cameraMatrix.at<double>(1, 1);
-  double cx = m_cameraMatrix.at<double>(0, 2);
-  double cy = m_cameraMatrix.at<double>(1, 2);
-  // use the current window/frame size so projection matches the video/image
-  int width = m_windowSize.width;
-  int height = m_windowSize.height;
 
-  glm::mat4 proj(0.0f);
-  // Note: glm is column-major; proj[col][row]
-  // Map camera intrinsics to OpenGL projection. We flip Y to convert from
-  // image coordinates (origin top-left) to GL NDC (origin center, Y up).
-  proj[0][0] = static_cast<float>(2.0 * fx / width);
-  proj[1][1] = static_cast<float>(-2.0 * fy / height);
-  proj[0][2] = static_cast<float>(2.0 * cx / width - 1.0);
-  proj[1][2] = static_cast<float>(1.0 - 2.0 * cy / height);
-  proj[2][2] = static_cast<float>(-(far + near) / (far - near));
-  proj[2][3] = -1.0f;
-  proj[3][2] = static_cast<float>(-2.0 * far * near / (far - near));
-  return proj;
+  return glm::mat4(1.0);
+  // double fx = m_cameraMatrix.at<double>(0, 0);
+  // double fy = m_cameraMatrix.at<double>(1, 1);
+  // double cx = m_cameraMatrix.at<double>(0, 2);
+  // double cy = m_cameraMatrix.at<double>(1, 2);
+  // int width = m_windowSize.width;
+  // int height = m_windowSize.height;
+
+  // glm::mat4 proj(0.0f);
+  // proj[0][0] = static_cast<float>(2.0 * fx / width);
+  // proj[1][1] = static_cast<float>(2.0 * fy / height);
+  // proj[2][0] = static_cast<float>(2.0 * (cx) / width - 1.0);
+  // proj[2][1] = static_cast<float>(2.0 * (cy) / height - 1.0);
+  // proj[2][2] = static_cast<float>(-(far + near) / (far - near));
+  // proj[2][3] = -1.0f;
+  // proj[3][2] = static_cast<float>(-2.0 * far * near / (far - near));
+  // return proj;
+
+  // glm::mat4 proj(0.0f);
+  // proj[0][0] = fx;
+  // proj[0][2] = cx;
+  // proj[1][1] = fy;
+  // proj[1][2] = cy;
+  // proj[2][2] = 1.0;
+
+  // return proj;
+
+  // glm::mat4 proj(0.0f);
+  // float width = static_cast<float>(m_windowSize.width);
+  // float height = static_cast<float>(m_windowSize.height);
+  // proj[0][0] = 2.0 * fx / width;
+  // proj[2][0] = 2.0f * cx / width - 1.0f;
+  // proj[1][1] = 2.0 * fy / height;
+  // proj[2][1] = 1.0f - 2.0f * cy / height;
+  // // depth mapping
+  // proj[2][2] = -(far + near) / (far - near);
+  // proj[3][2] = -2.0f * far * near / (far - near);
+  // proj[2][3] = -1.0f;
+
+  // return proj;
+
+  return glm::perspective(glm::radians(25.0f),
+                          static_cast<float>(m_windowSize.width) /
+                              static_cast<float>(m_windowSize.height),
+                          0.1f, 100.f);
 }
 
 // Convert OpenCV rvec/tvec into glm model matrix (board-to-world)
@@ -231,21 +265,32 @@ AugmentedLogoLayer::modelMatrixFromCvPose(const cv::Vec3d &rvec,
   // and t, then convert to glm and adjust handedness if needed.
 
   glm::mat4 model(1.0f);
+  // R = cv::Mat::eye(3, 3, CV_64F);
   // Copy rotation (note OpenCV uses row-major Mat, glm is column-major)
-  for (int r = 0; r < 3; ++r) {
-    for (int c = 0; c < 3; ++c)
-      model[c][r] = static_cast<float>(R.at<double>(r, c));
-  }
-  // translation
-  model[3][0] = static_cast<float>(tvec[0]);
-  model[3][1] = static_cast<float>(tvec[1]);
-  model[3][2] = static_cast<float>(tvec[2]);
+  // for (int r = 0; r < 3; ++r) {
+  //   for (int c = 0; c < 3; ++c) {
+  //     auto coeff = static_cast<float>(R.at<double>(r, c));
+  //     if (r > 0) {
+  //       coeff *= -1.0f;
+  //     }
+  //     model[r][c] = coeff;
+  //   }
+  // }
+  // TODO: use rect for the texture --> Already good ratio and then convert to
+  // meters
+  model = glm::transpose(model);
+  //  translation
+  // Factor for converting from opencv scale (relative) to opengl scale
+  model[3][0] = static_cast<float>(1.0 + (1.0 / 0.130 * tvec[0]));
+  model[3][1] = static_cast<float>(1.0 + (-1.0 / 0.09 * tvec[1]));
+  model[3][2] = static_cast<float>(-2.0 * tvec[2]);
+
   // Usually you need to rotate around X to flip Y axis: preview and adjust if
   // the logo is mirrored or upside-down. For example: glm::scale(model,
   // glm::vec3(1, -1, -1)) or multiply by correction matrix if needed.
 
-  // model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.f, 0.0f,
-  // 0.0f)); model = glm::scale(model, glm::vec3(1, -1, -1));
+  // model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.f,
+  // 0.0f, 1.0f)); model = glm::scale(model, glm::vec3(1, -1, -1));
 
   return model;
 }
@@ -260,32 +305,38 @@ glm::mat4 AugmentedLogoLayer::getModelFromPos() {
   cv::Ptr<cv::aruco::DetectorParameters> params =
       cv::aruco::DetectorParameters::create();
 
-  if (!m_inputVideo.grab()) {
+  if (currentImage.empty()) {
     return glm::mat4(1.0f);
   }
 
-  cv::Mat image;
-  m_inputVideo.retrieve(image);
   std::vector<int> markerIds;
   std::vector<std::vector<cv::Point2f>> markerCorners;
-  cv::aruco::detectMarkers(image, board->dictionary, markerCorners, markerIds,
-                           params);
+  cv::aruco::detectMarkers(currentImage, board->dictionary, markerCorners,
+                           markerIds, params);
   // if at least one marker detected
   if (markerIds.size() > 0) {
+    cv::aruco::drawDetectedMarkers(currentImage, markerCorners, markerIds);
     std::vector<cv::Point2f> charucoCorners;
     std::vector<int> charucoIds;
-    cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, image, board,
-                                         charucoCorners, charucoIds,
+    cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, currentImage,
+                                         board, charucoCorners, charucoIds,
                                          m_cameraMatrix, m_distCoeffs);
     // if at least one charuco corner detected
     if (charucoIds.size() > 0) {
       cv::Scalar color = cv::Scalar(255, 0, 0);
-      cv::Vec3d rvec, tvec;
+      cv::aruco::drawDetectedCornersCharuco(currentImage, charucoCorners,
+                                            charucoIds, color);
+      updateBackgroundTexture();
       bool valid = cv::aruco::estimatePoseCharucoBoard(
           charucoCorners, charucoIds, board, m_cameraMatrix, m_distCoeffs, rvec,
           tvec);
 
+      cv::drawFrameAxes(currentImage, m_cameraMatrix, m_distCoeffs, rvec, tvec,
+                        0.1f);
+
       return modelMatrixFromCvPose(rvec, tvec);
     }
   }
+
+  return glm::mat4(1.0f);
 }

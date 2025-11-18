@@ -2,7 +2,7 @@
 
 namespace libs::core {
 Application::Application(const std::string &name)
-    : m_mainWindow(std::make_unique<Window>(800, 600, name)) {
+    : m_mainWindow(std::make_unique<Window>(1920, 1080, name)) {
   m_mainWindow->setEventCallback(
       std::bind(&Application::onEvent, this, std::placeholders::_1));
 }

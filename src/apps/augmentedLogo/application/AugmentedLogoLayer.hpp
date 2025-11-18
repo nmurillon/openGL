@@ -8,7 +8,6 @@
 #include <vector>
 
 struct Size {
-
   int width, height;
 };
 
@@ -24,13 +23,13 @@ public:
 private:
   void updateBackgroundTexture();
   bool onWindowResized(libs::events::WindowResizeEvent &event);
-  glm::mat4 projectionFromCameraMatrix(float near = 0.01f, float far = 100.0f);
+  glm::mat4 projectionFromCameraMatrix(float near = 0.1f, float far = 100.0f);
   glm::mat4 modelMatrixFromCvPose(const cv::Vec3d &rvec,
                                   const cv::Vec3d &tvec) const;
   glm::mat4 getModelFromPos();
   void refreshBackgroundTexture();
 
-  Size m_windowSize{800, 600};
+  Size m_windowSize{1920, 1080};
   unsigned int m_vaoBackground, m_vaoLogo, m_vboBackground, m_ebo;
   std::vector<float> m_vertices{
       -1.0f, -1.0f, 0.0f, 0.f, 0.f, -1.0f, 1.0f,  0.0f, 0.f, 1.f,
@@ -44,10 +43,12 @@ private:
                                   .0, 2667.0, 540.0, .0, .0, 1.0);
   const cv::Mat m_distCoeffs =
       (cv::Mat_<double>(1, 5) << 0.0, 0.0, 0.0, 0.0, 0.0);
-  glm::mat4 m_projectionMatrix;
+  glm::mat4 m_projectionMatrix{projectionFromCameraMatrix()};
 
   // Video capture
   cv::VideoCapture m_inputVideo;
+  cv::Mat currentImage;
+  cv::Vec3d rvec, tvec;
 
   // Texture background
   unsigned int m_backgroundTexture;
