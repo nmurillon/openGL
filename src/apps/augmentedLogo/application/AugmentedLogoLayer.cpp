@@ -101,9 +101,14 @@ AugmentedLogoLayer::AugmentedLogoLayer(const std::string &name) : Layer{name} {
 
   // Setup Logo quad
   glGenVertexArrays(1, &m_vaoLogo);
-  glBindBuffer(GL_ARRAY_BUFFER, m_vboBackground);
+  glGenBuffers(1, &m_vboLogo);
+  glBindBuffer(GL_ARRAY_BUFFER, m_vboLogo);
   glBindVertexArray(m_vaoLogo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+
+  glBufferData(GL_ARRAY_BUFFER,
+               static_cast<GLsizeiptr>(sizeof(float) * m_verticesLogo.size()),
+               m_verticesLogo.data(), GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                         reinterpret_cast<void *>(0));
@@ -203,7 +208,7 @@ bool AugmentedLogoLayer::onWindowResized(
 glm::mat4 AugmentedLogoLayer::projectionFromCameraMatrix(float near,
                                                          float far) {
 
-  return glm::mat4(1.0);
+  // return glm::mat4(1.0);
   // double fx = m_cameraMatrix.at<double>(0, 0);
   // double fy = m_cameraMatrix.at<double>(1, 1);
   // double cx = m_cameraMatrix.at<double>(0, 2);
@@ -244,7 +249,7 @@ glm::mat4 AugmentedLogoLayer::projectionFromCameraMatrix(float near,
 
   // return proj;
 
-  return glm::perspective(glm::radians(25.0f),
+  return glm::perspective(glm::radians(45.0f),
                           static_cast<float>(m_windowSize.width) /
                               static_cast<float>(m_windowSize.height),
                           0.1f, 100.f);
@@ -267,23 +272,27 @@ AugmentedLogoLayer::modelMatrixFromCvPose(const cv::Vec3d &rvec,
   glm::mat4 model(1.0f);
   // R = cv::Mat::eye(3, 3, CV_64F);
   // Copy rotation (note OpenCV uses row-major Mat, glm is column-major)
-  // for (int r = 0; r < 3; ++r) {
-  //   for (int c = 0; c < 3; ++c) {
-  //     auto coeff = static_cast<float>(R.at<double>(r, c));
-  //     if (r > 0) {
-  //       coeff *= -1.0f;
-  //     }
-  //     model[r][c] = coeff;
-  //   }
-  // }
+  for (int r = 0; r < 3; ++r) {
+    for (int c = 0; c < 3; ++c) {
+      auto coeff = static_cast<float>(R.at<double>(r, c));
+      if (r > 0) {
+        coeff *= -1.0f;
+      }
+      model[r][c] = coeff;
+    }
+  }
   // TODO: use rect for the texture --> Already good ratio and then convert to
   // meters
   model = glm::transpose(model);
   //  translation
   // Factor for converting from opencv scale (relative) to opengl scale
-  model[3][0] = static_cast<float>(1.0 + (1.0 / 0.130 * tvec[0]));
-  model[3][1] = static_cast<float>(1.0 + (-1.0 / 0.09 * tvec[1]));
-  model[3][2] = static_cast<float>(-2.0 * tvec[2]);
+  // model[3][0] = static_cast<float>(1.0 + (1.0 / 0.130 * tvec[0]));
+  // model[3][1] = static_cast<float>(1.0 + (-1.0 / 0.09 * tvec[1]));
+  // model[3][2] = static_cast<float>(-tvec[2]);
+
+  model[3][0] = static_cast<float>(tvec[0]);
+  model[3][1] = static_cast<float>(-tvec[1]);
+  model[3][2] = static_cast<float>(-tvec[2]);
 
   // Usually you need to rotate around X to flip Y axis: preview and adjust if
   // the logo is mirrored or upside-down. For example: glm::scale(model,

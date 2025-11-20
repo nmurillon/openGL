@@ -30,11 +30,17 @@ private:
   void refreshBackgroundTexture();
 
   Size m_windowSize{1920, 1080};
-  unsigned int m_vaoBackground, m_vaoLogo, m_vboBackground, m_ebo;
+  unsigned int m_vaoBackground, m_vaoLogo, m_vboBackground, m_vboLogo, m_ebo;
   std::vector<float> m_vertices{
       -1.0f, -1.0f, 0.0f, 0.f, 0.f, -1.0f, 1.0f,  0.0f, 0.f, 1.f,
       1.0f,  1.0f,  0.0f, 1.f, 1.f, 1.0f,  -1.0f, 0.0f, 1.f, 0.f,
   };
+
+  std::vector<float> m_verticesLogo{
+      0.0f,   0.0f,   0.0f, 0.f, 0.f, 0.0f,   0.180f, 0.0f, 0.f, 1.f,
+      0.260f, 0.180f, 0.0f, 1.f, 1.f, 0.260f, 0.f,    0.0f, 1.f, 0.f,
+  };
+
   std::vector<int> m_indices{0, 1, 2, 0, 2, 3};
   libs::renderer::ShaderManager m_shaderManager{};
 
