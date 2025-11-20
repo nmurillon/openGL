@@ -135,8 +135,6 @@ void AugmentedLogoLayer::onUpdate() {
   auto capture = m_inputVideo.retrieve(currentImage);
   auto model = getModelFromPos();
   auto view = glm::mat4(1.0f);
-  // view = glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f),
-  //                    glm::vec3(0.f, 1.f, 0.f));
   updateBackgroundTexture();
 
   auto shader = m_shaderManager.getShader("background");
@@ -209,48 +207,6 @@ bool AugmentedLogoLayer::onWindowResized(
 // Build OpenGL projection matrix from camera intrinsics
 glm::mat4 AugmentedLogoLayer::projectionFromCameraMatrix(float near,
                                                          float far) {
-
-  // return glm::mat4(1.0);
-  // double fx = m_cameraMatrix.at<double>(0, 0);
-  // double fy = m_cameraMatrix.at<double>(1, 1);
-  // double cx = m_cameraMatrix.at<double>(0, 2);
-  // double cy = m_cameraMatrix.at<double>(1, 2);
-  // int width = m_windowSize.width;
-  // int height = m_windowSize.height;
-
-  // glm::mat4 proj(0.0f);
-  // proj[0][0] = static_cast<float>(2.0 * fx / width);
-  // proj[1][1] = static_cast<float>(2.0 * fy / height);
-  // proj[2][0] = static_cast<float>(2.0 * (cx) / width - 1.0);
-  // proj[2][1] = static_cast<float>(2.0 * (cy) / height - 1.0);
-  // proj[2][2] = static_cast<float>(-(far + near) / (far - near));
-  // proj[2][3] = -1.0f;
-  // proj[3][2] = static_cast<float>(-2.0 * far * near / (far - near));
-  // return proj;
-
-  // glm::mat4 proj(0.0f);
-  // proj[0][0] = fx;
-  // proj[0][2] = cx;
-  // proj[1][1] = fy;
-  // proj[1][2] = cy;
-  // proj[2][2] = 1.0;
-
-  // return proj;
-
-  // glm::mat4 proj(0.0f);
-  // float width = static_cast<float>(m_windowSize.width);
-  // float height = static_cast<float>(m_windowSize.height);
-  // proj[0][0] = 2.0 * fx / width;
-  // proj[2][0] = 2.0f * cx / width - 1.0f;
-  // proj[1][1] = 2.0 * fy / height;
-  // proj[2][1] = 1.0f - 2.0f * cy / height;
-  // // depth mapping
-  // proj[2][2] = -(far + near) / (far - near);
-  // proj[3][2] = -2.0f * far * near / (far - near);
-  // proj[2][3] = -1.0f;
-
-  // return proj;
-
   return glm::perspective(glm::radians(22.8f),
                           static_cast<float>(m_windowSize.width) /
                               static_cast<float>(m_windowSize.height),
@@ -265,15 +221,14 @@ AugmentedLogoLayer::modelMatrixFromCvPose(const cv::Vec3d &rvec,
   cv::Rodrigues(rvec, R); // 3x3 rotation matrix
 
   // OpenCV: X right, Y down, Z forward.
-  // We want model matrix that maps from object (board) coordinates to camera
-  // coordinates (then to world/opengl space). Many pipelines use camera as
-  // origin; we want a model matrix placing the board in world so the camera
-  // view matrix is identity. A working approach is to construct a 4x4 with R
-  // and t, then convert to glm and adjust handedness if needed.
+  // We will use the camera as the origin
+  // view matrix is identity.
 
   glm::mat4 model(1.0f);
-  // R = cv::Mat::eye(3, 3, CV_64F);
-  // Copy rotation (note OpenCV uses row-major Mat, glm is column-major)
+  // Copy rotation (OpenCV is row-major, glm is column-major)
+  // Also convert opencv coordinates to opengl ones
+  // see
+  // https://stackoverflow.com/questions/44375149/opencv-to-opengl-coordinate-system-transform
   for (int r = 0; r < 3; ++r) {
     for (int c = 0; c < 3; ++c) {
       auto coeff = static_cast<float>(R.at<double>(r, c));
@@ -283,27 +238,12 @@ AugmentedLogoLayer::modelMatrixFromCvPose(const cv::Vec3d &rvec,
       model[r][c] = coeff;
     }
   }
-  // TODO: use rect for the texture --> Already good ratio and then convert to
-  // meters
-  model = glm::transpose(model);
-  //  translation
-  // Factor for converting from opencv scale (relative) to opengl scale
-  // model[3][0] = static_cast<float>(1.0 + (1.0 / 0.130 * tvec[0]));
-  // model[3][1] = static_cast<float>(1.0 + (-1.0 / 0.09 * tvec[1]));
-  // model[3][2] = static_cast<float>(-tvec[2]);
 
-  // see
-  // https://stackoverflow.com/questions/44375149/opencv-to-opengl-coordinate-system-transform
+  // OpenCV is row-major, glm is column-major
+  model = glm::transpose(model);
   model[3][0] = static_cast<float>(tvec[0]);
   model[3][1] = static_cast<float>(-tvec[1]);
   model[3][2] = static_cast<float>(-tvec[2]);
-
-  // Usually you need to rotate around X to flip Y axis: preview and adjust if
-  // the logo is mirrored or upside-down. For example: glm::scale(model,
-  // glm::vec3(1, -1, -1)) or multiply by correction matrix if needed.
-
-  // model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.f,
-  // 0.0f, 1.0f)); model = glm::scale(model, glm::vec3(1, -1, -1));
 
   return model;
 }
