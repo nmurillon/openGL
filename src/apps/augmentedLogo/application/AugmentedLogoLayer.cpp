@@ -251,7 +251,7 @@ glm::mat4 AugmentedLogoLayer::projectionFromCameraMatrix(float near,
 
   // return proj;
 
-  return glm::perspective(glm::radians(22.5f),
+  return glm::perspective(glm::radians(22.8f),
                           static_cast<float>(m_windowSize.width) /
                               static_cast<float>(m_windowSize.height),
                           0.1f, 100.f);
