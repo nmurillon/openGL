@@ -135,6 +135,8 @@ void AugmentedLogoLayer::onUpdate() {
   auto capture = m_inputVideo.retrieve(currentImage);
   auto model = getModelFromPos();
   auto view = glm::mat4(1.0f);
+  // view = glm::lookAt(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f),
+  //                    glm::vec3(0.f, 1.f, 0.f));
   updateBackgroundTexture();
 
   auto shader = m_shaderManager.getShader("background");
@@ -249,7 +251,7 @@ glm::mat4 AugmentedLogoLayer::projectionFromCameraMatrix(float near,
 
   // return proj;
 
-  return glm::perspective(glm::radians(45.0f),
+  return glm::perspective(glm::radians(22.5f),
                           static_cast<float>(m_windowSize.width) /
                               static_cast<float>(m_windowSize.height),
                           0.1f, 100.f);
@@ -290,6 +292,8 @@ AugmentedLogoLayer::modelMatrixFromCvPose(const cv::Vec3d &rvec,
   // model[3][1] = static_cast<float>(1.0 + (-1.0 / 0.09 * tvec[1]));
   // model[3][2] = static_cast<float>(-tvec[2]);
 
+  // see
+  // https://stackoverflow.com/questions/44375149/opencv-to-opengl-coordinate-system-transform
   model[3][0] = static_cast<float>(tvec[0]);
   model[3][1] = static_cast<float>(-tvec[1]);
   model[3][2] = static_cast<float>(-tvec[2]);
