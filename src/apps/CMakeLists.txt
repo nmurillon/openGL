@@ -1,3 +1,4 @@
 add_subdirectory(augmentedLogo)
 add_subdirectory(basicWindow)
+add_subdirectory(epipolarLines)
 add_subdirectory(lighting)
