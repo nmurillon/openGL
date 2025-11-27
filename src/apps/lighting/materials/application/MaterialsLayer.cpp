@@ -23,13 +23,13 @@ MaterialsLayer::MaterialsLayer(const std::string &name)
                           MATERIALS_RESOURCES_FOLDER / "shaders")
                              .string();
 
-  m_shaderManager.addShader(
-      "cube",
-      std::format("{}/materials.vert", shaderDir),
-      std::format("{}/materials.frag", shaderDir));
+  m_shaderManager.addShader("cube", std::format("{}/materials.vert", shaderDir),
+                            std::format("{}/materials.frag", shaderDir));
 
   m_shaderManager.addShader(
-      "light", (m_shaderManager.getCommonShaderDirectory() / "basicShader.vert").string(),
+      "light",
+      (m_shaderManager.getCommonShaderDirectory() / "basicShader.vert")
+          .string(),
       std::format("{}/light.frag", shaderDir));
 
   glGenVertexArrays(1, &m_vaoCube);
@@ -56,10 +56,10 @@ MaterialsLayer::MaterialsLayer(const std::string &name)
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                         reinterpret_cast<void *>(0));
 
-  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                         reinterpret_cast<void *>(3 * sizeof(float)));
   glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(3);
+  glEnableVertexAttribArray(1);
 
   // Light data
   glBindVertexArray(m_vaoLight);
@@ -180,15 +180,21 @@ void MaterialsLayer::updateShaderCube() {
   glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
                                           m_aspectRatio, 0.1f, 100.f);
 
+  auto view = m_camera->getViewMatrix();
+
   auto shader = m_shaderManager.getShader("cube");
-  // TODO
+
   shader->use();
   shader->setMat4f("model", glm::mat4(1.0f));
-  shader->setMat4f("view", m_camera->getViewMatrix());
+  shader->setMat4f("view", view);
   shader->setMat4f("projection", projection);
-  shader->setVec3f("lightColor", 1.f, 1.f, 1.f);
-  shader->setVec3f("objectColor", 1.f, 0.5f, 0.31f);
+  shader->setVec3f("material.ambient", 1.f, 0.5f, 0.31f);
+  shader->setVec3f("material.diffuse", 1.f, 0.5f, 0.31f);
+  shader->setVec3f("material.specular", 0.5f, 0.5f, 0.5f);
+  shader->setFloat("material.shininess", 32.f);
 
+  shader->setVec3f("light.color", 1.f, 1.f, 1.f);
+  shader->setVec3f("light.position", m_lightPos);
 
   shader->setVec3f("viewPos", m_camera->getPosition());
 }
