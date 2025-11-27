@@ -1,5 +1,7 @@
 #include <libs/renderer/ShaderManager.hpp>
 
+#include <libs/io/ProgramPath.hpp>
+
 #include <format>
 #include <iostream>
 
@@ -9,7 +11,8 @@ ShaderManager::ShaderManager()
           libs::io::ProgramPath::getInstance().getProgramDir() /
           LOGL_RENDERER_RESOURCES_FOLDER / "shaders") {
 
-  addShader("loglBasicShader", (m_commonShaderDirectory / "basicShader.vert").string(),
+  addShader("loglBasicShader",
+            (m_commonShaderDirectory / "basicShader.vert").string(),
             (m_commonShaderDirectory / "basicShader.frag").string());
 }
 
