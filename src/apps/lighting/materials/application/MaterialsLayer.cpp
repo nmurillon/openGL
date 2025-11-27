@@ -193,8 +193,11 @@ void MaterialsLayer::updateShaderCube() {
   shader->setVec3f("material.specular", 0.5f, 0.5f, 0.5f);
   shader->setFloat("material.shininess", 32.f);
 
-  shader->setVec3f("light.color", 1.f, 1.f, 1.f);
+  shader->setVec3f("light.color", m_lightColor);
   shader->setVec3f("light.position", m_lightPos);
+  shader->setVec3f("light.ambient", glm::vec3(0.2f));
+  shader->setVec3f("light.diffuse", glm::vec3(0.5f));
+  shader->setVec3f("light.specular", glm::vec3(1.f));
 
   shader->setVec3f("viewPos", m_camera->getPosition());
 }
@@ -209,7 +212,7 @@ void MaterialsLayer::updateShaderLight() {
   glm::mat4 lightModel = glm::mat4(1.0f);
   lightModel = glm::translate(lightModel, m_lightPos);
   lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-  shader->setVec3f("lightColor", 1.0f, 1.0f, 1.0f);
+  shader->setVec3f("lightColor", m_lightColor);
   shader->setMat4f("model", lightModel);
   shader->setMat4f("projection", projection);
   shader->setMat4f("view", m_camera->getViewMatrix());
