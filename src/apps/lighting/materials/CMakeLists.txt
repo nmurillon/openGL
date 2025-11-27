@@ -5,12 +5,14 @@ logl_add_executable(materials
         # Application layer
         application/MaterialsLayer.cpp
         application/MaterialsLayer.hpp
+        application/Materials.hpp
     LINKS
         logl_core
         logl_io
         logl_events
         logl_renderer
         glm
+        imgui
     RESOURCES
         shaders/light.frag
         shaders/materials.frag

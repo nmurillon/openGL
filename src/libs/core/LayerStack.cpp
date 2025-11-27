@@ -1,5 +1,9 @@
 #include <libs/core/LayerStack.hpp>
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 #include <algorithm>
 #include <iostream>
 #include <ranges>
@@ -38,6 +42,16 @@ void LayerStack::onUpdate() {
   for (const auto &l : m_uiLayers) {
     l->onUpdate();
   }
+
+  imguiStart();
+  for (const auto &l : m_layers) {
+    l->onImguiUpdate();
+  }
+
+  for (const auto &l : m_uiLayers) {
+    l->onImguiUpdate();
+  }
+  imguiEnd();
 }
 
 void LayerStack::onEvent(events::Event &event) {
@@ -64,6 +78,17 @@ void LayerStack::printStack() const {
   for (const auto &l : m_uiLayers) {
     std::cout << "UI Layer: " << l->getName() << std::endl;
   }
+}
+
+void LayerStack::imguiStart() {
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+}
+
+void LayerStack::imguiEnd() {
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 } // namespace libs::core

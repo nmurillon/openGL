@@ -26,6 +26,9 @@ public:
   void printStack() const;
 
 private:
+  void imguiStart();
+  void imguiEnd();
+
   Layers m_layers;
   Layers m_uiLayers;
 };

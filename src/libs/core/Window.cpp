@@ -117,21 +117,6 @@ void Window::onUpdate() {
   m_deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
 
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui_ImplGlfw_NewFrame();
-  ImGui::NewFrame();
-
-  ImGui::Begin("toto");
-  ImGui::Text("FPS: %f", getFps());
-  ImGui::SeparatorText("");
-  ImGui::Text("FPS imgui: %f", ImGui::GetIO().Framerate);
-  ImGui::End();
-
-  ImGui::ShowDemoWindow();
-
-  ImGui::Render();
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
   glfwSwapBuffers(m_window);
 
   // glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

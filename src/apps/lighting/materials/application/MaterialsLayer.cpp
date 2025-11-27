@@ -9,8 +9,9 @@
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
-
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <imgui/imgui.h>
 
 #include <cmath>
 #include <format>
@@ -103,6 +104,14 @@ void MaterialsLayer::onUpdate() {
       GL_TRIANGLES,
       static_cast<GLsizei>(mesh::lighting::withNormals::vertices.size()),
       GL_UNSIGNED_INT, 0);
+}
+
+void MaterialsLayer::onImguiUpdate() {
+  ImGui::Begin("toto");
+  ImGui::Text("FPS imgui: %f", ImGui::GetIO().Framerate);
+  ImGui::End();
+
+  ImGui::ShowDemoWindow();
 }
 
 void MaterialsLayer::onEvent(libs::events::Event &event) {

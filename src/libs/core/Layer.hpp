@@ -16,6 +16,7 @@ public:
   virtual void onAttach();
   virtual void onDetach();
   virtual void onUpdate();
+  virtual void onImguiUpdate(){};
   virtual void onEvent(events::Event &event);
 
   const std::string &getName() const;

@@ -20,6 +20,7 @@ public:
 
   virtual void onUpdate() override;
   virtual void onEvent(libs::events::Event &event) override;
+  virtual void onImguiUpdate() override;
 
 private:
   bool onWindowResized(libs::events::WindowResizeEvent &event);
