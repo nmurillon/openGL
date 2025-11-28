@@ -12,7 +12,13 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${_outputFolderName}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${_outputFolderName}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${_outputFolderName}/bin)
 
-set(BUILD_SHARED_LIBS ON)
+# For imgui, there is a trick to do to handle dll boundaries on windows
+# TODO: handle this on windows to build dynamic libs
+if(WIN32)
+    set(BUILD_SHARED_LIBS OFF)
+else()
+    set(BUILD_SHARED_LIBS ON)
+endif()
 
 include(cmake/CMakeHelper.cmake)
 
