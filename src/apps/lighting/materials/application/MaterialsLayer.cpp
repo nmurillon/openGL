@@ -10,6 +10,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <imgui/imgui.h>
 
@@ -84,8 +85,8 @@ void MaterialsLayer::onUpdate() {
   m_deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
 
-  m_lightPos = glm::vec3(1.2f * cos(currentFrame), sin(currentFrame),
-                         2.0f * cos(currentFrame));
+  m_light.position = glm::vec3(1.2f * cos(currentFrame), sin(currentFrame),
+                               2.0f * cos(currentFrame));
 
   // Cube
   updateShaderCube();
@@ -107,11 +108,29 @@ void MaterialsLayer::onUpdate() {
 }
 
 void MaterialsLayer::onImguiUpdate() {
-  ImGui::Begin("toto");
-  ImGui::Text("FPS imgui: %f", ImGui::GetIO().Framerate);
-  ImGui::End();
+  ImGui::Begin("Properties");
+
+  ImGui::SeparatorText("Material properties");
+  ImGui::SliderFloat3("Material Ambient", glm::value_ptr(m_material.ambient),
+                      0.0f, 1.0f);
+  ImGui::SliderFloat3("Material Diffuse", glm::value_ptr(m_material.diffuse),
+                      0.0f, 1.0f);
+  ImGui::SliderFloat3("Material Specular", glm::value_ptr(m_material.specular),
+                      0.0f, 1.0f);
+  ImGui::SliderFloat("Material Shininess", &m_material.shininess, 0.0f, 256.0f);
+
+  ImGui::SeparatorText("Light properties");
+
+  ImGui::ColorEdit3("Light Color", glm::value_ptr(m_light.color));
+  ImGui::SliderFloat3("Light Ambient", glm::value_ptr(m_light.ambient), 0.0f,
+                      1.0f);
+  ImGui::SliderFloat3("Light Diffuse", glm::value_ptr(m_light.diffuse), 0.0f,
+                      1.0f);
+  ImGui::SliderFloat3("Light Specular", glm::value_ptr(m_light.specular), 0.0f,
+                      1.0f);
 
   ImGui::ShowDemoWindow();
+  ImGui::End();
 }
 
 void MaterialsLayer::onEvent(libs::events::Event &event) {
@@ -197,16 +216,16 @@ void MaterialsLayer::updateShaderCube() {
   shader->setMat4f("model", glm::mat4(1.0f));
   shader->setMat4f("view", view);
   shader->setMat4f("projection", projection);
-  shader->setVec3f("material.ambient", 1.f, 0.5f, 0.31f);
-  shader->setVec3f("material.diffuse", 1.f, 0.5f, 0.31f);
-  shader->setVec3f("material.specular", 0.5f, 0.5f, 0.5f);
-  shader->setFloat("material.shininess", 32.f);
+  shader->setVec3f("material.ambient", m_material.ambient);
+  shader->setVec3f("material.diffuse", m_material.diffuse);
+  shader->setVec3f("material.specular", m_material.specular);
+  shader->setFloat("material.shininess", m_material.shininess);
 
-  shader->setVec3f("light.color", m_lightColor);
-  shader->setVec3f("light.position", m_lightPos);
-  shader->setVec3f("light.ambient", glm::vec3(0.2f));
-  shader->setVec3f("light.diffuse", glm::vec3(0.5f));
-  shader->setVec3f("light.specular", glm::vec3(1.f));
+  shader->setVec3f("light.color", m_light.color);
+  shader->setVec3f("light.position", m_light.position);
+  shader->setVec3f("light.ambient", m_light.ambient);
+  shader->setVec3f("light.diffuse", m_light.diffuse);
+  shader->setVec3f("light.specular", m_light.specular);
 
   shader->setVec3f("viewPos", m_camera->getPosition());
 }
@@ -219,9 +238,9 @@ void MaterialsLayer::updateShaderLight() {
 
   shader->use();
   glm::mat4 lightModel = glm::mat4(1.0f);
-  lightModel = glm::translate(lightModel, m_lightPos);
+  lightModel = glm::translate(lightModel, m_light.position);
   lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-  shader->setVec3f("lightColor", m_lightColor);
+  shader->setVec3f("lightColor", m_light.color);
   shader->setMat4f("model", lightModel);
   shader->setMat4f("projection", projection);
   shader->setMat4f("view", m_camera->getViewMatrix());

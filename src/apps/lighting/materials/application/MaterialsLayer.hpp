@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Materials.hpp"
+
 #include <libs/core/Layer.hpp>
 #include <libs/events/KeyEvent.hpp>
 #include <libs/events/MouseEvent.hpp>
@@ -32,11 +34,12 @@ private:
   void updateShaderLight();
 
   std::shared_ptr<libs::renderer::Camera> m_camera;
-  glm::vec3 m_lightPos;
-  glm::vec3 m_lightColor{1.f, 1.f, 1.f};
   libs::renderer::ShaderManager m_shaderManager{};
 
   unsigned int m_vaoCube, m_vaoLight, m_vbo, m_ebo;
   double m_deltaTime;
   float m_aspectRatio{800.0 / 600.0};
+
+  Material m_material{tutorial};
+  Light m_light{defaultLight};
 };

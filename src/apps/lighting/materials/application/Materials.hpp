@@ -10,6 +10,26 @@ struct Material {
   float shininess;
 };
 
+struct Light {
+  glm::vec3 position;
+  glm::vec3 color;
+
+  glm::vec3 ambient;
+  glm::vec3 diffuse;
+  glm::vec3 specular;
+};
+
+const Light defaultLight{
+    glm::vec3(1.2f, 1.0f, 2.0f),
+    glm::vec3(1.f, 1.f, 1.f),
+    glm::vec3(0.2f),
+    glm::vec3(0.5f),
+    glm::vec3(1.f),
+};
+
+const Material tutorial{glm::vec3{1.0, 0.5, 0.31}, glm::vec3{1.0, 0.5, 0.31},
+                        glm::vec3{0.5, 0.5, 0.5}, 32.0f};
+
 const Material emerald{glm::vec3{0.0215, 0.1745, 0.0215},
                        glm::vec3{0.07568, 0.61424, 0.07568},
                        glm::vec3{0.633, 0.727811, 0.633}, 128.0 * 0.6};
