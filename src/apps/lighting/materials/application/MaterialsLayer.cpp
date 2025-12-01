@@ -111,6 +111,24 @@ void MaterialsLayer::onImguiUpdate() {
   ImGui::Begin("Properties");
 
   ImGui::SeparatorText("Material properties");
+
+  auto materials = getAllMaterialTypeNames();
+  static std::string current_item = getAllMaterialTypeNames()[0];
+
+  if (ImGui::BeginCombo("Material type", current_item.c_str())) {
+    for (const auto &item : materials) {
+      bool is_selected = (current_item == item);
+      if (ImGui::Selectable(item.c_str(), is_selected)) {
+        current_item = item;
+        m_material = getMaterialByString(item);
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
   ImGui::SliderFloat3("Material Ambient", glm::value_ptr(m_material.ambient),
                       0.0f, 1.0f);
   ImGui::SliderFloat3("Material Diffuse", glm::value_ptr(m_material.diffuse),
@@ -118,6 +136,9 @@ void MaterialsLayer::onImguiUpdate() {
   ImGui::SliderFloat3("Material Specular", glm::value_ptr(m_material.specular),
                       0.0f, 1.0f);
   ImGui::SliderFloat("Material Shininess", &m_material.shininess, 0.0f, 256.0f);
+  if (ImGui::Button("Reset material")) {
+    m_material = tutorial;
+  }
 
   ImGui::SeparatorText("Light properties");
 
@@ -128,6 +149,10 @@ void MaterialsLayer::onImguiUpdate() {
                       1.0f);
   ImGui::SliderFloat3("Light Specular", glm::value_ptr(m_light.specular), 0.0f,
                       1.0f);
+
+  if (ImGui::Button("Reset light")) {
+    m_light = defaultLight;
+  }
 
   ImGui::ShowDemoWindow();
   ImGui::End();
