@@ -7,6 +7,7 @@ set(RENDERER_HEADERS
 )
 
 set(RENDERER_SRC
+    Camera.cpp
     FlyCameraController.cpp
     PerspectiveCamera.cpp
     Shader.cpp

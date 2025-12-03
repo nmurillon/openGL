@@ -1,14 +1,14 @@
 #include <libs/renderer/FlyCameraController.hpp>
 
 #include <libs/events/EventDispatcher.hpp>
+#include <libs/renderer/PerspectiveCamera.hpp>
 
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
 
 namespace libs::renderer {
-FlyCameraController::FlyCameraController(
-    std::shared_ptr<PerspectiveCamera> camera)
+FlyCameraController::FlyCameraController(std::shared_ptr<Camera> camera)
     : m_camera(std::move(camera)), m_lastFrame(glfwGetTime()) {}
 
 void FlyCameraController::update() {
@@ -46,7 +46,7 @@ void FlyCameraController::onEvent(libs::events::Event &event) {
       LOGL_BIND_EVENT_FN(FlyCameraController::onMouseScrolled));
 };
 
-void FlyCameraController::setCamera(std::shared_ptr<PerspectiveCamera> camera) {
+void FlyCameraController::setCamera(std::shared_ptr<Camera> camera) {
   m_camera = std::move(camera);
 };
 
@@ -70,7 +70,7 @@ void FlyCameraController::onMouseMoved(libs::events::MouseMovedEvent &event) {
 
 void FlyCameraController::onMouseScrolled(
     libs::events::MouseScrolledEvent &event) {
-  m_camera->adjustFov(-static_cast<float>(event.getYOffset()));
+  m_camera->adjustZoom(-static_cast<float>(event.getYOffset()));
 
   event.handle();
 }

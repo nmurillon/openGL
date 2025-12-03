@@ -4,7 +4,7 @@
 
 #include <libs/events/KeyEvent.hpp>
 #include <libs/events/MouseEvent.hpp>
-#include <libs/renderer/PerspectiveCamera.hpp>
+#include <libs/renderer/Camera.hpp>
 
 #include <memory>
 
@@ -12,7 +12,7 @@ namespace libs::renderer {
 class LOGL_RENDERER_EXPORT FlyCameraController {
 public:
   FlyCameraController() = default;
-  FlyCameraController(std::shared_ptr<PerspectiveCamera> camera);
+  FlyCameraController(std::shared_ptr<Camera> camera);
   FlyCameraController(const FlyCameraController &other) = delete;
   FlyCameraController(FlyCameraController &&other) = delete;
   FlyCameraController &operator=(const FlyCameraController &other) = delete;
@@ -21,14 +21,14 @@ public:
 
   void update();
   void onEvent(libs::events::Event &event);
-  void setCamera(std::shared_ptr<PerspectiveCamera> camera);
+  void setCamera(std::shared_ptr<Camera> camera);
 
 private:
   void onMouseMoved(libs::events::MouseMovedEvent &event);
   void onMouseScrolled(libs::events::MouseScrolledEvent &event);
 
 private:
-  std::shared_ptr<PerspectiveCamera> m_camera;
+  std::shared_ptr<Camera> m_camera;
 
   float m_mouseSensitivity{0.1f};
   float m_movementSpeed{2.5f};
