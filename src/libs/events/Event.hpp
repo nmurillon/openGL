@@ -17,7 +17,7 @@ enum class EventType {
   // Mouse events
   MouseButtonPressedEvent,
   MouseButtonReleasedEvent,
-  MouseMouvedEvent,
+  MouseMovedEvent,
   MouseScrolledEvent
 };
 
@@ -54,9 +54,10 @@ protected:
   std::string m_name{"Basic Event"};
 };
 
-inline std::ostream &operator<<(std::ostream &o, const libs::events::Event &event) {
+inline std::ostream &operator<<(std::ostream &o,
+                                const libs::events::Event &event) {
   o << event.toString();
-  
+
   return o;
 }
 
