@@ -14,14 +14,38 @@ PerspectiveCamera::PerspectiveCamera(const glm::vec3 &position,
 }
 
 void PerspectiveCamera::setFov(float fov) {
-  m_fov = fov;
+  m_fov = std::max(std::min(fov, m_maxFov), m_minFov);
+  ;
   updateProjection();
 }
+
+void PerspectiveCamera::adjustFov(float delta) { setFov(m_fov + delta); }
 
 float PerspectiveCamera::getFov() const { return m_fov; }
 
 void PerspectiveCamera::translate(const glm::vec3 &offset) {
   m_position += offset;
+  updateView();
+}
+
+void PerspectiveCamera::translate(CameraMovement direction, float velocity) {
+  switch (direction) {
+  case CameraMovement::FORWARD:
+    m_position += m_front * velocity;
+    break;
+  case CameraMovement::BACKWARD:
+    m_position -= m_front * velocity;
+    break;
+  case CameraMovement::LEFT:
+    m_position -= m_right * velocity;
+    break;
+  case CameraMovement::RIGHT:
+    m_position += m_right * velocity;
+    break;
+  default:
+    break;
+  }
+
   updateView();
 }
 

@@ -14,8 +14,11 @@ public:
                     float yaw = -90.f, float pitch = 0.f);
 
   void setFov(float fov);
+  void adjustFov(float delta);
   float getFov() const;
+
   void translate(const glm::vec3 &offset);
+  void translate(CameraMovement direction, float velocity);
   void rotate(float xOffset, float yOffset);
   void setViewportSize(float width, float height);
 

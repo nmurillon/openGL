@@ -1,11 +1,13 @@
 set(RENDERER_HEADERS
     Camera.hpp
+    FlyCameraController.hpp
     PerspectiveCamera.hpp
     Shader.hpp
     ShaderManager.hpp
 )
 
 set(RENDERER_SRC
+    FlyCameraController.cpp
     PerspectiveCamera.cpp
     Shader.cpp
     ShaderManager.cpp
