@@ -38,6 +38,10 @@ private:
   unsigned int m_vaoCube, m_vaoLight, m_vbo, m_ebo;
   double m_deltaTime;
   float m_aspectRatio{800.0 / 600.0};
+  bool m_useLightingMaps{true};
+
+  int m_diffuseMap;
+  int m_specularMap;
 
   Material m_material{tutorial};
   Light m_light{defaultLight};

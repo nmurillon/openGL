@@ -13,9 +13,58 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <imgui/imgui.h>
+#include <iostream>
+#include <stb_image/stb_image.h>
 
 #include <cmath>
 #include <format>
+
+unsigned int loadTexture(const std::string &textureFile,
+                         GLenum textureUnit = GL_TEXTURE0,
+                         GLint wrapping = GL_REPEAT) {
+  int width, height, nChannels;
+  const std::string texturePath{
+      (libs::io::ProgramPath::getInstance().getProgramDir() /
+       MATERIALS_RESOURCES_FOLDER / textureFile)
+          .string()};
+
+  unsigned char *data =
+      stbi_load(texturePath.c_str(), &width, &height, &nChannels, 0);
+
+  unsigned int texture;
+  glGenTextures(1, &texture);
+
+  // Bind the texture to work on it
+  glActiveTexture(textureUnit);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  // Set texture wrapping
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  if (data) {
+
+    GLenum format;
+    if (nChannels == 1)
+      format = GL_RED;
+    else if (nChannels == 3)
+      format = GL_RGB;
+    else if (nChannels == 4)
+      format = GL_RGBA;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    std::cout << "WARNING::TEXTURE::FAIL_TO_OPEN" << std::endl;
+  }
+
+  stbi_image_free(data);
+
+  return texture;
+}
 
 MaterialsLayer::MaterialsLayer(const std::string &name)
     : Layer(name), m_camera(std::make_shared<libs::renderer::PerspectiveCamera>(
@@ -29,11 +78,20 @@ MaterialsLayer::MaterialsLayer(const std::string &name)
   m_shaderManager.addShader("cube", std::format("{}/materials.vert", shaderDir),
                             std::format("{}/materials.frag", shaderDir));
 
+  m_shaderManager.addShader("cubeMatMaps",
+                            std::format("{}/materialsMap.vert", shaderDir),
+                            std::format("{}/materialsMap.frag", shaderDir));
+
   m_shaderManager.addShader(
       "light",
       (m_shaderManager.getCommonShaderDirectory() / "basicShader.vert")
           .string(),
       std::format("{}/light.frag", shaderDir));
+
+  // Setup textures
+  m_diffuseMap = loadTexture("assets/wood_container.png", GL_TEXTURE0);
+  m_specularMap =
+      loadTexture("assets/wood_container_specular.png", GL_TEXTURE1);
 
   glGenVertexArrays(1, &m_vaoCube);
   glGenVertexArrays(1, &m_vaoLight);
@@ -43,32 +101,39 @@ MaterialsLayer::MaterialsLayer(const std::string &name)
   // Cube data
   glBindVertexArray(m_vaoCube);
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-  glBufferData(
-      GL_ARRAY_BUFFER,
-      static_cast<GLsizeiptr>(mesh::lighting::withNormals::vertices.size() *
-                              sizeof(float)),
-      mesh::lighting::withNormals::vertices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER,
+               static_cast<GLsizeiptr>(
+                   mesh::lighting::withNormalsAndTexCoords::vertices.size() *
+                   sizeof(float)),
+               mesh::lighting::withNormalsAndTexCoords::vertices.data(),
+               GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-  glBufferData(
-      GL_ELEMENT_ARRAY_BUFFER,
-      static_cast<GLsizeiptr>(mesh::lighting::withNormals::indices.size() *
-                              sizeof(unsigned int)),
-      mesh::lighting::withNormals::indices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+               static_cast<GLsizeiptr>(
+                   mesh::lighting::withNormalsAndTexCoords::indices.size() *
+                   sizeof(unsigned int)),
+               mesh::lighting::withNormalsAndTexCoords::indices.data(),
+               GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                         reinterpret_cast<void *>(0));
 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                         reinterpret_cast<void *>(3 * sizeof(float)));
+
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                        reinterpret_cast<void *>(6 * sizeof(float)));
+
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
 
   // Light data
   glBindVertexArray(m_vaoLight);
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                         reinterpret_cast<void *>(0));
   glEnableVertexAttribArray(0);
 
@@ -95,52 +160,59 @@ void MaterialsLayer::onUpdate() {
   updateShaderCube();
 
   glBindVertexArray(m_vaoCube);
-  glDrawElements(
-      GL_TRIANGLES,
-      static_cast<GLsizei>(mesh::lighting::withNormals::vertices.size()),
-      GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES,
+                 static_cast<GLsizei>(
+                     mesh::lighting::withNormalsAndTexCoords::vertices.size()),
+                 GL_UNSIGNED_INT, 0);
 
   // Light
   updateShaderLight();
 
   glBindVertexArray(m_vaoLight);
-  glDrawElements(
-      GL_TRIANGLES,
-      static_cast<GLsizei>(mesh::lighting::withNormals::vertices.size()),
-      GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES,
+                 static_cast<GLsizei>(
+                     mesh::lighting::withNormalsAndTexCoords::vertices.size()),
+                 GL_UNSIGNED_INT, 0);
 }
 
 void MaterialsLayer::onImguiUpdate() {
   ImGui::Begin("Properties");
 
-  ImGui::SeparatorText("Material properties");
+  ImGui::Checkbox("Use lighting maps", &m_useLightingMaps);
 
-  auto materials = getAllMaterialTypeNames();
-  static std::string current_item = getAllMaterialTypeNames()[0];
+  if (!m_useLightingMaps) {
 
-  if (ImGui::BeginCombo("Material type", current_item.c_str())) {
-    for (const auto &item : materials) {
-      bool is_selected = (current_item == item);
-      if (ImGui::Selectable(item.c_str(), is_selected)) {
-        current_item = item;
-        m_material = getMaterialByString(item);
+    ImGui::SeparatorText("Material properties");
+
+    auto materials = getAllMaterialTypeNames();
+    static std::string current_item = getAllMaterialTypeNames()[0];
+
+    if (ImGui::BeginCombo("Material type", current_item.c_str())) {
+      for (const auto &item : materials) {
+        bool is_selected = (current_item == item);
+        if (ImGui::Selectable(item.c_str(), is_selected)) {
+          current_item = item;
+          m_material = getMaterialByString(item);
+        }
+        if (is_selected) {
+          ImGui::SetItemDefaultFocus();
+        }
       }
-      if (is_selected) {
-        ImGui::SetItemDefaultFocus();
-      }
+      ImGui::EndCombo();
     }
-    ImGui::EndCombo();
-  }
 
-  ImGui::SliderFloat3("Material Ambient", glm::value_ptr(m_material.ambient),
-                      0.0f, 1.0f);
-  ImGui::SliderFloat3("Material Diffuse", glm::value_ptr(m_material.diffuse),
-                      0.0f, 1.0f);
-  ImGui::SliderFloat3("Material Specular", glm::value_ptr(m_material.specular),
-                      0.0f, 1.0f);
-  ImGui::SliderFloat("Material Shininess", &m_material.shininess, 0.0f, 256.0f);
-  if (ImGui::Button("Reset material")) {
-    m_material = tutorial;
+    ImGui::SliderFloat3("Material Ambient", glm::value_ptr(m_material.ambient),
+                        0.0f, 1.0f);
+    ImGui::SliderFloat3("Material Diffuse", glm::value_ptr(m_material.diffuse),
+                        0.0f, 1.0f);
+    ImGui::SliderFloat3("Material Specular",
+                        glm::value_ptr(m_material.specular), 0.0f, 1.0f);
+    ImGui::SliderFloat("Material Shininess", &m_material.shininess, 0.0f,
+                       256.0f);
+
+    if (ImGui::Button("Reset material")) {
+      m_material = tutorial;
+    }
   }
 
   ImGui::SeparatorText("Light properties");
@@ -183,15 +255,24 @@ void MaterialsLayer::updateShaderCube() {
   auto projection = m_camera->getProjection();
   auto view = m_camera->getViewMatrix();
 
-  auto shader = m_shaderManager.getShader("cube");
+  const auto shaderName = m_useLightingMaps ? "cubeMatMaps" : "cube";
+
+  auto shader = m_shaderManager.getShader(shaderName);
 
   shader->use();
   shader->setMat4f("model", glm::mat4(1.0f));
   shader->setMat4f("view", view);
   shader->setMat4f("projection", projection);
-  shader->setVec3f("material.ambient", m_material.ambient);
-  shader->setVec3f("material.diffuse", m_material.diffuse);
-  shader->setVec3f("material.specular", m_material.specular);
+
+  if (m_useLightingMaps) {
+    shader->setInt("material.diffuse", 0);
+    shader->setInt("material.specular", 1);
+  } else {
+    shader->setVec3f("material.ambient", m_material.ambient);
+    shader->setVec3f("material.diffuse", m_material.diffuse);
+    shader->setVec3f("material.specular", m_material.specular);
+  }
+
   shader->setFloat("material.shininess", m_material.shininess);
 
   shader->setVec3f("light.color", m_light.color);

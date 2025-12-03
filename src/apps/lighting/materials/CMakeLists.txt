@@ -11,10 +11,15 @@ logl_add_executable(materials
         logl_io
         logl_events
         logl_renderer
+        stb_image
         glm
         imgui
     RESOURCES
+        assets/wood_container.png
+        assets/wood_container_specular.png
         shaders/light.frag
         shaders/materials.frag
         shaders/materials.vert
+        shaders/materialsMap.frag
+        shaders/materialsMap.vert
 )
