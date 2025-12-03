@@ -6,7 +6,8 @@
 #include <libs/events/KeyEvent.hpp>
 #include <libs/events/MouseEvent.hpp>
 #include <libs/events/WindowEvent.hpp>
-#include <libs/renderer/Camera.hpp>
+#include <libs/renderer/FlyCameraController.hpp>
+#include <libs/renderer/PerspectiveCamera.hpp>
 #include <libs/renderer/ShaderManager.hpp>
 
 #include <glm/glm.hpp>
@@ -26,14 +27,12 @@ public:
 
 private:
   bool onWindowResized(libs::events::WindowResizeEvent &event);
-  bool onKeyPressed(libs::events::KeyPressedEvent &event);
-  bool onMouseMoved(libs::events::MouseMouvedEvent &event);
-  bool onMouseScrolled(libs::events::MouseScrolledEvent &event);
 
   void updateShaderCube();
   void updateShaderLight();
 
-  std::shared_ptr<libs::renderer::Camera> m_camera;
+  std::shared_ptr<libs::renderer::PerspectiveCamera> m_camera;
+  libs::renderer::FlyCameraController m_cameraController;
   libs::renderer::ShaderManager m_shaderManager{};
 
   unsigned int m_vaoCube, m_vaoLight, m_vbo, m_ebo;

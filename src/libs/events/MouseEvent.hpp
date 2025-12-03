@@ -5,17 +5,17 @@
 #include <format>
 
 namespace libs::events {
-class MouseMouvedEvent : public Event {
+class MouseMovedEvent : public Event {
 public:
-  MouseMouvedEvent(double xPos, double yPos) : m_xPos(xPos), m_yPos(yPos){}
-  ~MouseMouvedEvent() = default;
+  MouseMovedEvent(double xPos, double yPos) : m_xPos(xPos), m_yPos(yPos) {}
+  ~MouseMovedEvent() = default;
   double getXPos() const { return m_xPos; }
   double getYPos() const { return m_yPos; }
   virtual const std::string toString() const override {
     return std::format("{} (x={}, y={})", getEventName(), m_xPos, m_yPos);
   }
 
-  EVENT_CLASS_TYPE(MouseMouvedEvent)
+  EVENT_CLASS_TYPE(MouseMovedEvent)
 
 private:
   double m_xPos;

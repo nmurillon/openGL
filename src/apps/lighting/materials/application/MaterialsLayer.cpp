@@ -18,8 +18,9 @@
 #include <format>
 
 MaterialsLayer::MaterialsLayer(const std::string &name)
-    : Layer(name), m_camera(std::make_shared<libs::renderer::Camera>(
-                       glm::vec3(0.f, 0.0f, 5.0f))) {
+    : Layer(name), m_camera(std::make_shared<libs::renderer::PerspectiveCamera>(
+                       glm::vec3(0.f, 0.0f, 5.0f))),
+      m_cameraController(m_camera) {
 
   const auto shaderDir = (libs::io::ProgramPath::getInstance().getProgramDir() /
                           MATERIALS_RESOURCES_FOLDER / "shaders")
@@ -84,6 +85,8 @@ void MaterialsLayer::onUpdate() {
   double currentFrame = glfwGetTime();
   m_deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
+
+  m_cameraController.update();
 
   m_light.position = glm::vec3(1.2f * cos(currentFrame), sin(currentFrame),
                                2.0f * cos(currentFrame));
@@ -163,76 +166,21 @@ void MaterialsLayer::onEvent(libs::events::Event &event) {
   dispatcher.dispatch<libs::events::WindowResizeEvent>(
       LOGL_BIND_EVENT_FN(MaterialsLayer::onWindowResized));
 
-  dispatcher.dispatch<libs::events::KeyPressedEvent>(
-      LOGL_BIND_EVENT_FN(MaterialsLayer::onKeyPressed));
-
-  dispatcher.dispatch<libs::events::MouseMouvedEvent>(
-      LOGL_BIND_EVENT_FN(MaterialsLayer::onMouseMoved));
-
-  dispatcher.dispatch<libs::events::MouseScrolledEvent>(
-      LOGL_BIND_EVENT_FN(MaterialsLayer::onMouseScrolled));
-  // Handle events here
+  m_cameraController.onEvent(event);
 }
 
 bool MaterialsLayer::onWindowResized(libs::events::WindowResizeEvent &event) {
-  m_aspectRatio = static_cast<float>(event.getWidth()) /
-                  static_cast<float>(event.getHeight());
-  return event.handle();
-}
+  float width = static_cast<float>(event.getWidth());
+  float height = static_cast<float>(event.getHeight());
 
-bool MaterialsLayer::onKeyPressed(libs::events::KeyPressedEvent &event) {
-  switch (event.getKeyCode()) {
-  case GLFW_KEY_W:
-    m_camera->processKeyboardInput(libs::renderer::CameraMovement::FORWARD,
-                                   m_deltaTime);
-    return event.handle();
-  case GLFW_KEY_S:
-    m_camera->processKeyboardInput(libs::renderer::CameraMovement::BACKWARD,
-                                   m_deltaTime);
-    return event.handle();
-  case GLFW_KEY_A:
-    m_camera->processKeyboardInput(libs::renderer::CameraMovement::LEFT,
-                                   m_deltaTime);
-    return event.handle();
-  case GLFW_KEY_D:
-    m_camera->processKeyboardInput(libs::renderer::CameraMovement::RIGHT,
-                                   m_deltaTime);
-    return event.handle();
-  default:
-    return false;
-  }
-}
+  m_aspectRatio = width / height;
 
-bool MaterialsLayer::onMouseMoved(libs::events::MouseMouvedEvent &event) {
-  static bool firstMouse{true};
-  static float lastX{0.f}, lastY{0.f};
-
-  if (firstMouse) {
-    lastX = static_cast<float>(event.getXPos());
-    lastY = static_cast<float>(event.getYPos());
-    firstMouse = false;
-  }
-
-  float xOffset = static_cast<float>(event.getXPos()) - lastX;
-  float yOffset = lastY - static_cast<float>(event.getYPos());
-
-  lastX = static_cast<float>(event.getXPos());
-  lastY = static_cast<float>(event.getYPos());
-
-  m_camera->processMouseMovement(xOffset, yOffset);
-  return event.handle();
-}
-
-bool MaterialsLayer::onMouseScrolled(libs::events::MouseScrolledEvent &event) {
-
-  m_camera->processMouseScroll(event.getYOffset());
+  m_camera->setViewportSize(width, height);
   return event.handle();
 }
 
 void MaterialsLayer::updateShaderCube() {
-  glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
-                                          m_aspectRatio, 0.1f, 100.f);
-
+  auto projection = m_camera->getProjection();
   auto view = m_camera->getViewMatrix();
 
   auto shader = m_shaderManager.getShader("cube");
@@ -256,9 +204,6 @@ void MaterialsLayer::updateShaderCube() {
 }
 
 void MaterialsLayer::updateShaderLight() {
-  glm::mat4 projection = glm::perspective(glm::radians(m_camera->getZoom()),
-                                          m_aspectRatio, 0.1f, 100.f);
-
   auto shader = m_shaderManager.getShader("light");
 
   shader->use();
@@ -267,6 +212,6 @@ void MaterialsLayer::updateShaderLight() {
   lightModel = glm::scale(lightModel, glm::vec3(0.2f));
   shader->setVec3f("lightColor", m_light.color);
   shader->setMat4f("model", lightModel);
-  shader->setMat4f("projection", projection);
+  shader->setMat4f("projection", m_camera->getProjection());
   shader->setMat4f("view", m_camera->getViewMatrix());
 }

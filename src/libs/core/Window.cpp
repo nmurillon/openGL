@@ -66,7 +66,7 @@ Window::Window(int width, int height, const std::string &title)
       m_window, [](GLFWwindow *window, double xpos, double ypos) {
         auto callback =
             *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
-        libs::events::MouseMouvedEvent event{xpos, ypos};
+        libs::events::MouseMovedEvent event{xpos, ypos};
         callback(event);
       });
 
