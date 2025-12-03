@@ -4,7 +4,8 @@
 #include <algorithm>
 #include <iostream>
 #include <libs/io/ProgramPath.hpp>
-#include <libs/renderer/Camera.hpp>
+#include <libs/renderer/FlyCameraController.hpp>
+#include <libs/renderer/PerspectiveCamera.hpp>
 #include <libs/renderer/ShaderManager.hpp>
 #include <memory>
 #include <stb_image/stb_image.h>
@@ -34,27 +35,6 @@ void processInput(GLFWwindow *window) {
 
   if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
     textureMixingOpacity = std::max(0.f, textureMixingOpacity - 0.1f);
-  }
-
-  libs::renderer::CameraMovement cameraMovement;
-  auto camera = *reinterpret_cast<std::shared_ptr<libs::renderer::Camera> *>(
-      glfwGetWindowUserPointer(window));
-
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera->processKeyboardInput(libs::renderer::CameraMovement::FORWARD,
-                                 deltaTime);
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera->processKeyboardInput(libs::renderer::CameraMovement::BACKWARD,
-                                 deltaTime);
-  }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera->processKeyboardInput(libs::renderer::CameraMovement::LEFT,
-                                 deltaTime);
-  }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera->processKeyboardInput(libs::renderer::CameraMovement::RIGHT,
-                                 deltaTime);
   }
 }
 
@@ -96,33 +76,6 @@ unsigned int loadTexture(const std::string &textureFile,
   return texture;
 }
 
-bool firstMouse{true};
-void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-  static float lastX{0}, lastY{0};
-  auto camera = *reinterpret_cast<std::shared_ptr<libs::renderer::Camera> *>(
-      glfwGetWindowUserPointer(window));
-
-  if (firstMouse) {
-    lastX = xpos;
-    lastY = ypos;
-    firstMouse = false;
-  }
-
-  float xOffset = xpos - lastX;
-  float yOffset = lastY - ypos;
-
-  lastX = xpos;
-  lastY = ypos;
-  camera->processMouseMovement(xOffset, yOffset);
-}
-
-void scroll_callback(GLFWwindow *window, double xoffset, double yOffset) {
-  auto camera = *reinterpret_cast<std::shared_ptr<libs::renderer::Camera> *>(
-      glfwGetWindowUserPointer(window));
-
-  camera->processMouseScroll(yOffset);
-}
-
 int main(int argc, char **argv) {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -137,14 +90,13 @@ int main(int argc, char **argv) {
     return -1;
   }
   glfwMakeContextCurrent(window);
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  auto camera =
-      std::make_shared<libs::renderer::Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
-  glfwSetWindowUserPointer(window, reinterpret_cast<void *>(&camera));
+  auto camera = std::make_shared<libs::renderer::PerspectiveCamera>(
+      glm::vec3(0.0f, 0.0f, 3.0f));
+
+  auto cameraController =
+      std::make_shared<libs::renderer::FlyCameraController>(camera);
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  glfwSetCursorPosCallback(window, mouse_callback);
-  glfwSetScrollCallback(window, scroll_callback);
 
   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     std::cout << "Failed to initialize GLAD" << std::endl;
@@ -276,14 +228,14 @@ int main(int argc, char **argv) {
   // Wait for user input to keep the window opened
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
+    cameraController->update();
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shaderProgram->setFloat("TextureMixingOpacity", textureMixingOpacity);
 
     glBindVertexArray(VAO);
-    projection = glm::perspective(glm::radians(camera->getZoom()),
-                                  800.f / 600.f, 0.1f, 100.f);
+    const auto projection = camera->getProjection();
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
