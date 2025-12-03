@@ -1,11 +1,12 @@
 set(RENDERER_HEADERS
     Camera.hpp
+    PerspectiveCamera.hpp
     Shader.hpp
     ShaderManager.hpp
 )
 
 set(RENDERER_SRC
-    Camera.cpp
+    PerspectiveCamera.cpp
     Shader.cpp
     ShaderManager.cpp
 )

@@ -1,0 +1,45 @@
+#include <libs/renderer/PerspectiveCamera.hpp>
+
+#include <glm/gtc/matrix_transform.hpp>
+
+namespace libs::renderer {
+PerspectiveCamera::PerspectiveCamera(const glm::vec3 &position,
+                                     float viewportWidth, float viewportHeight,
+                                     const glm::vec3 &front, float yaw,
+                                     float pitch)
+    : Camera(position, viewportWidth, viewportHeight), m_front(front),
+      m_up(m_worldUp), m_yaw(yaw), m_pitch(pitch) {}
+
+void PerspectiveCamera::setFov(float fov) {
+  m_fov = fov;
+  updateProjection();
+}
+
+float PerspectiveCamera::getFov() const { return m_fov; }
+
+void PerspectiveCamera::update() {
+  updateView();
+  updateProjection();
+}
+
+void PerspectiveCamera::updateView() {
+  // Update front vector based on yaw and pitch
+  glm::vec3 front;
+  front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+  front.y = sin(glm::radians(m_pitch));
+  front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+  m_front = glm::normalize(front);
+
+  // Recalculate right and up vectors
+  m_right = glm::normalize(glm::cross(m_front, m_worldUp));
+  m_up = glm::normalize(glm::cross(m_right, m_front));
+
+  // Update view matrix
+  m_view = glm::lookAt(m_position, m_position + m_front, m_up);
+}
+
+void PerspectiveCamera::updateProjection() {
+  m_projection = glm::perspective(
+      glm::radians(m_fov), m_viewportWidth / m_viewportHeight, m_near, m_far);
+}
+} // namespace libs::renderer
