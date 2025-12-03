@@ -4,7 +4,7 @@
 
 #include <libs/events/EventDispatcher.hpp>
 #include <libs/io/ProgramPath.hpp>
-#include <libs/renderer/Camera.hpp>
+#include <libs/renderer/PerspectiveCamera.hpp>
 
 #include <glad/glad.h>
 

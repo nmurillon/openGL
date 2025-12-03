@@ -4,8 +4,8 @@
 #include <libs/events/KeyEvent.hpp>
 #include <libs/events/MouseEvent.hpp>
 #include <libs/events/WindowEvent.hpp>
+#include <libs/renderer/Camera.hpp>
 #include <libs/renderer/FlyCameraController.hpp>
-#include <libs/renderer/PerspectiveCamera.hpp>
 #include <libs/renderer/ShaderManager.hpp>
 
 #include <glm/glm.hpp>
@@ -32,7 +32,7 @@ private:
   void updateShaderCube();
   void updateShaderLight();
 
-  std::shared_ptr<libs::renderer::PerspectiveCamera> m_camera;
+  std::shared_ptr<libs::renderer::Camera> m_camera;
   libs::renderer::FlyCameraController m_cameraController;
   glm::vec3 m_lightPos;
   LightType m_lightType{LightType::Gouraud};

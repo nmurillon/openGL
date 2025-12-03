@@ -91,8 +91,9 @@ int main(int argc, char **argv) {
   }
   glfwMakeContextCurrent(window);
 
-  auto camera = std::make_shared<libs::renderer::PerspectiveCamera>(
-      glm::vec3(0.0f, 0.0f, 3.0f));
+  std::shared_ptr<libs::renderer::Camera> camera =
+      std::make_shared<libs::renderer::PerspectiveCamera>(
+          glm::vec3(0.0f, 0.0f, 3.0f));
 
   auto cameraController =
       std::make_shared<libs::renderer::FlyCameraController>(camera);
