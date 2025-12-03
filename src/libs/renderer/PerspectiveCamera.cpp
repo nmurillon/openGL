@@ -1,5 +1,6 @@
 #include <libs/renderer/PerspectiveCamera.hpp>
 
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace libs::renderer {
@@ -8,7 +9,9 @@ PerspectiveCamera::PerspectiveCamera(const glm::vec3 &position,
                                      const glm::vec3 &front, float yaw,
                                      float pitch)
     : Camera(position, viewportWidth, viewportHeight), m_front(front),
-      m_up(m_worldUp), m_yaw(yaw), m_pitch(pitch) {}
+      m_up(m_worldUp), m_yaw(yaw), m_pitch(pitch) {
+  update();
+}
 
 void PerspectiveCamera::setFov(float fov) {
   m_fov = fov;
@@ -16,6 +19,28 @@ void PerspectiveCamera::setFov(float fov) {
 }
 
 float PerspectiveCamera::getFov() const { return m_fov; }
+
+void PerspectiveCamera::translate(const glm::vec3 &offset) {
+  m_position += offset;
+  updateView();
+}
+
+void PerspectiveCamera::rotate(float xOffset, float yOffset) {
+  m_yaw += xOffset;
+  m_pitch += yOffset;
+
+  if (m_constrainPitch) {
+    m_pitch = std::max(std::min(m_pitch, 89.0f), -89.0f);
+  }
+
+  updateView();
+}
+
+void PerspectiveCamera::setViewportSize(float width, float height) {
+  m_viewportWidth = width;
+  m_viewportHeight = height;
+  updateProjection();
+}
 
 void PerspectiveCamera::update() {
   updateView();

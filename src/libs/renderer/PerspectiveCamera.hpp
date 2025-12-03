@@ -15,6 +15,9 @@ public:
 
   void setFov(float fov);
   float getFov() const;
+  void translate(const glm::vec3 &offset);
+  void rotate(float xOffset, float yOffset);
+  void setViewportSize(float width, float height);
 
 protected:
   void update() override;
@@ -24,6 +27,7 @@ private:
   void updateProjection();
 
 private:
+  bool m_constrainPitch{false};
   float m_yaw;
   float m_pitch;
 
