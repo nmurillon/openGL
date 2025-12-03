@@ -92,6 +92,7 @@ MaterialsLayer::MaterialsLayer(const std::string &name)
   m_diffuseMap = loadTexture("assets/wood_container.png", GL_TEXTURE0);
   m_specularMap =
       loadTexture("assets/wood_container_specular.png", GL_TEXTURE1);
+  m_emissionMap = loadTexture("assets/matrix.jpg", GL_TEXTURE2);
 
   glGenVertexArrays(1, &m_vaoCube);
   glGenVertexArrays(1, &m_vaoLight);
@@ -181,7 +182,6 @@ void MaterialsLayer::onImguiUpdate() {
   ImGui::Checkbox("Use lighting maps", &m_useLightingMaps);
 
   if (!m_useLightingMaps) {
-
     ImGui::SeparatorText("Material properties");
 
     auto materials = getAllMaterialTypeNames();
@@ -213,6 +213,8 @@ void MaterialsLayer::onImguiUpdate() {
     if (ImGui::Button("Reset material")) {
       m_material = tutorial;
     }
+  } else {
+    ImGui::Checkbox("Show emission maps", &m_showEmissionMap);
   }
 
   ImGui::SeparatorText("Light properties");
@@ -267,6 +269,8 @@ void MaterialsLayer::updateShaderCube() {
   if (m_useLightingMaps) {
     shader->setInt("material.diffuse", 0);
     shader->setInt("material.specular", 1);
+    shader->setInt("material.emissionMap", 2);
+    shader->setFloat("useEmissionMap", m_showEmissionMap ? 1.0 : 0.f);
   } else {
     shader->setVec3f("material.ambient", m_material.ambient);
     shader->setVec3f("material.diffuse", m_material.diffuse);

@@ -15,6 +15,7 @@ logl_add_executable(materials
         glm
         imgui
     RESOURCES
+        assets/matrix.jpg
         assets/wood_container.png
         assets/wood_container_specular.png
         shaders/light.frag

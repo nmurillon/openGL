@@ -39,9 +39,11 @@ private:
   double m_deltaTime;
   float m_aspectRatio{800.0 / 600.0};
   bool m_useLightingMaps{true};
+  bool m_showEmissionMap{false};
 
   int m_diffuseMap;
   int m_specularMap;
+  int m_emissionMap;
 
   Material m_material{tutorial};
   Light m_light{defaultLight};
