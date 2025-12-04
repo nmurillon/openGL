@@ -74,25 +74,24 @@ LightCasterLayer::LightCasterLayer(const std::string &name)
                           LIGHTCASTER_RESOURCES_FOLDER / "shaders")
                              .string();
 
-  m_shaderManager.addShader("cube",
+  m_shaderManager.addShader("Directional Light",
                             std::format("{}/directionalLight.vert", shaderDir),
                             std::format("{}/directionalLight.frag", shaderDir));
 
-  // m_shaderManager.addShader(
-  //     "light",
-  //     (m_shaderManager.getCommonShaderDirectory() / "basicShader.vert")
-  //         .string(),
-  //     std::format("{}/light.frag", shaderDir));
+  m_shaderManager.addShader("Point Light",
+                            std::format("{}/pointLight.vert", shaderDir),
+                            std::format("{}/pointLight.frag", shaderDir));
+
+  m_shaderManager.addShader(
+      "lightSource",
+      (m_shaderManager.getCommonShaderDirectory() / "basicShader.vert")
+          .string(),
+      std::format("{}/light.frag", shaderDir));
 
   // Setup textures
   m_diffuseMap = loadTexture("assets/wood_container.png", GL_TEXTURE0);
   m_specularMap =
       loadTexture("assets/wood_container_specular.png", GL_TEXTURE1);
-
-  const auto shaderCube = m_shaderManager.getShader("cube");
-  shaderCube->use();
-  shaderCube->setInt("material.diffuse", 0);
-  shaderCube->setInt("material.specular", 1);
 
   glGenVertexArrays(1, &m_vaoCube);
   glGenVertexArrays(1, &m_vaoLight);
@@ -158,16 +157,47 @@ void LightCasterLayer::onUpdate() {
   updateShaderCube();
 
   // Light
-  // updateShaderLight();
+  if (m_currentLightType == "Point Light") {
+    updateShaderLight();
+  }
 }
 
 void LightCasterLayer::onImguiUpdate() {
-  ImGui::Begin("Properties");
+  ImGui::Begin("Light Properties");
 
-  ImGui::SeparatorText("Light properties");
+  static std::string current_item = lightTypes[0];
 
-  ImGui::SliderFloat3("Light Direction", glm::value_ptr(m_light.direction),
-                      -500.0f, 500.0f);
+  if (ImGui::BeginCombo("Light type", m_currentLightType.c_str())) {
+    for (const auto &item : lightTypes) {
+      bool is_selected = (current_item == item);
+      if (ImGui::Selectable(item.c_str(), is_selected)) {
+        m_currentLightType = item;
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  if (m_currentLightType == "Directional Light") {
+    ImGui::SliderFloat3("Light Direction", glm::value_ptr(m_light.direction),
+                        -500.0f, 500.0f);
+  } else if (m_currentLightType == "Point Light") {
+    ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light.position),
+                        -10.0f, 10.0f);
+
+    ImGui::SliderFloat("Constant", &m_light.constant, 0.0f, 2.0f);
+    ImGui::SliderFloat("Linear", &m_light.linear, 0.0f, 0.5f);
+    ImGui::SliderFloat("Quadratic", &m_light.quadratic, 0.0f, 0.1f);
+  }
+  // else if (m_currentLightType == "Spotlight") {
+  //   ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light.position),
+  //                       -10.0f, 10.0f);
+  //   ImGui::SliderFloat3("Light Direction", glm::value_ptr(m_light.direction),
+  //                       -500.0f, 500.0f);
+
+  // }
 
   ImGui::SliderFloat3("Light Ambient", glm::value_ptr(m_light.ambient), 0.0f,
                       1.0f);
@@ -206,15 +236,27 @@ void LightCasterLayer::updateShaderCube() {
   auto projection = m_camera->getProjection();
   auto view = m_camera->getViewMatrix();
 
-  auto shader = m_shaderManager.getShader("cube");
+  auto shader = m_shaderManager.getShader(m_currentLightType);
 
   shader->use();
+
+  shader->setInt("material.diffuse", 0);
+  shader->setInt("material.specular", 1);
+
   shader->setMat4f("view", view);
   shader->setMat4f("projection", projection);
 
   shader->setFloat("material.shininess", 32.f);
 
-  shader->setVec3f("light.direction", m_light.direction);
+  if (m_currentLightType == "Directional Light") {
+    shader->setVec3f("light.direction", m_light.direction);
+  } else if (m_currentLightType == "Point Light") {
+    shader->setVec3f("light.position", m_light.position);
+    shader->setFloat("light.constant", m_light.constant);
+    shader->setFloat("light.linear", m_light.linear);
+    shader->setFloat("light.quadratic", m_light.quadratic);
+  }
+
   shader->setVec3f("light.ambient", m_light.ambient);
   shader->setVec3f("light.diffuse", m_light.diffuse);
   shader->setVec3f("light.specular", m_light.specular);
@@ -238,7 +280,7 @@ void LightCasterLayer::updateShaderCube() {
 }
 
 void LightCasterLayer::updateShaderLight() {
-  auto shader = m_shaderManager.getShader("light");
+  auto shader = m_shaderManager.getShader("lightSource");
 
   shader->use();
   glm::mat4 lightModel = glm::mat4(1.0f);

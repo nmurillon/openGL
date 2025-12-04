@@ -19,4 +19,6 @@ logl_add_executable(lightCaster
         shaders/light.frag
         shaders/directionalLight.frag
         shaders/directionalLight.vert
+        shaders/pointLight.frag
+        shaders/pointLight.vert
 )

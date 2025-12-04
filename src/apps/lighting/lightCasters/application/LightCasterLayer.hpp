@@ -15,6 +15,9 @@
 
 class LightCasterLayer : public libs::core::Layer {
 
+  const std::vector<std::string> lightTypes{"Directional Light", "Point Light",
+                                            "Spotlight"};
+
   struct Light {
     glm::vec3 position;
     glm::vec3 direction;
@@ -23,16 +26,21 @@ class LightCasterLayer : public libs::core::Layer {
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
   };
 
-  const Light defaultLight{
-      glm::vec3(1.2f, 1.0f, 2.0f),
-      glm::vec3(-0.2f, -1.f, -0.3f),
-      glm::vec3(1.f, 1.f, 1.f),
-      glm::vec3(0.2f),
-      glm::vec3(0.5f),
-      glm::vec3(1.f),
-  };
+  const Light defaultLight{glm::vec3(1.2f, 1.0f, 2.0f),
+                           glm::vec3(-0.2f, -1.f, -0.3f),
+                           glm::vec3(1.f, 1.f, 1.f),
+                           glm::vec3(0.2f),
+                           glm::vec3(0.5f),
+                           glm::vec3(1.f),
+                           1.0f,
+                           0.09f,
+                           0.032f};
 
 public:
   LightCasterLayer(const std::string &name = "LightCasterLayer");
@@ -59,6 +67,8 @@ private:
 
   int m_diffuseMap;
   int m_specularMap;
+
+  std::string m_currentLightType{lightTypes[0]};
 
   Light m_light{defaultLight};
 };
