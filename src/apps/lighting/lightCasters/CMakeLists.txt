@@ -1,0 +1,22 @@
+logl_add_executable(lightCaster
+    SOURCES
+        lightCaster.cpp
+        ../mesh.hpp
+        # Application layer
+        application/LightCasterLayer.cpp
+        application/LightCasterLayer.hpp
+    LINKS
+        logl_core
+        logl_io
+        logl_events
+        logl_renderer
+        stb_image
+        glm
+        imgui
+    RESOURCES
+        assets/wood_container.png
+        assets/wood_container_specular.png
+        shaders/light.frag
+        shaders/directionalLight.frag
+        shaders/directionalLight.vert
+)
