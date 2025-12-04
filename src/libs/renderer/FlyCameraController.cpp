@@ -35,6 +35,14 @@ void FlyCameraController::update() {
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
     m_camera->translate(CameraMovement::RIGHT, velocity);
   }
+
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+    m_camera->translate(CameraMovement::UP, velocity);
+  }
+
+  if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+    m_camera->translate(CameraMovement::DOWN, velocity);
+  }
 }
 
 void FlyCameraController::onEvent(libs::events::Event &event) {

@@ -22,6 +22,12 @@ void Camera::translate(CameraMovement direction, float velocity) {
   case CameraMovement::RIGHT:
     m_position += m_right * velocity;
     break;
+  case CameraMovement::UP:
+    m_position += m_up * velocity;
+    break;
+  case CameraMovement::DOWN:
+    m_position -= m_up * velocity;
+    break;
   default:
     break;
   }
