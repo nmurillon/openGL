@@ -19,6 +19,7 @@ struct Light {
     float quadratic;
 
     float cutoff;
+    float outerCutoff;
 };
 
 in vec3 normal;
@@ -31,6 +32,8 @@ uniform vec3 viewPos;
 
 out vec4 FragColor;
 
+// The learnopengl tutorial uses another calculation to make the edges smoother
+// Here we use smoothstep
 void main()
 {
     vec3 norm = normalize(normal);
@@ -39,7 +42,7 @@ void main()
     float theta = dot(lightDir, normalize(-light.direction));
 
     float inSpotLight = step(light.cutoff, theta);
-
+    float outerConeIntensity = smoothstep(light.cutoff, theta, light.outerCutoff);
 
     vec3 viewDir = normalize(viewPos - fragPos);
     vec3 reflected = reflect(-lightDir, norm);
@@ -52,8 +55,10 @@ void main()
     float dist = distance(fragPos, light.position);
     float attenuation = 1.0 / (light.constant + light.linear * dist + light.quadratic * dist * dist);
 
-    vec3 lightInsideSpotlight = inSpotLight * (attenuation* (specular + diffuse) + ambient);
-    vec3 lightOutsideSpotlight = (1.0 - inSpotLight) * ambient;
+    vec3 insideLight = attenuation* (specular + diffuse + ambient);
+
+    vec3 lightInsideSpotlight = inSpotLight * insideLight;
+    vec3 lightOutsideSpotlight = (1.0 - inSpotLight) * outerConeIntensity * insideLight;
     
     FragColor = vec4(lightInsideSpotlight + lightOutsideSpotlight, 1.0);
 }

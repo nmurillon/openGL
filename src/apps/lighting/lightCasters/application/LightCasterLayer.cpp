@@ -206,6 +206,8 @@ void LightCasterLayer::onImguiUpdate() {
     ImGui::SliderFloat("Quadratic", &m_light.quadratic, 0.0f, 0.1f);
 
     ImGui::SliderFloat("Light cut off", &m_light.cutoff, 0.f, 45.f);
+    ImGui::SliderFloat("Light outer cut off", &m_light.outerCutoff,
+                       m_light.cutoff + 5.f, 50.f);
   }
 
   ImGui::SliderFloat3("Light Ambient", glm::value_ptr(m_light.ambient), 0.0f,
@@ -268,6 +270,8 @@ void LightCasterLayer::updateShaderCube() {
     shader->setVec3f("light.position", m_light.position);
     shader->setVec3f("light.direction", m_light.direction);
     shader->setFloat("light.cutoff", glm::cos(glm::radians(m_light.cutoff)));
+    shader->setFloat("light.outerCutoff",
+                     glm::cos(glm::radians(m_light.outerCutoff)));
     shader->setFloat("light.constant", m_light.constant);
     shader->setFloat("light.linear", m_light.linear);
     shader->setFloat("light.quadratic", m_light.quadratic);
