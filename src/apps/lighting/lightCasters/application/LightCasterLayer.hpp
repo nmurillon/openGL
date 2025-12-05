@@ -30,6 +30,8 @@ class LightCasterLayer : public libs::core::Layer {
     float constant;
     float linear;
     float quadratic;
+
+    float cutoff;
   };
 
   const Light defaultLight{glm::vec3(1.2f, 1.0f, 2.0f),
@@ -40,7 +42,8 @@ class LightCasterLayer : public libs::core::Layer {
                            glm::vec3(1.f),
                            1.0f,
                            0.09f,
-                           0.032f};
+                           0.032f,
+                           12.5f};
 
 public:
   LightCasterLayer(const std::string &name = "LightCasterLayer");

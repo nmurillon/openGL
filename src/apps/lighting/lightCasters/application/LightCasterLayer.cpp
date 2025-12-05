@@ -82,6 +82,10 @@ LightCasterLayer::LightCasterLayer(const std::string &name)
                             std::format("{}/pointLight.vert", shaderDir),
                             std::format("{}/pointLight.frag", shaderDir));
 
+  m_shaderManager.addShader("Spotlight",
+                            std::format("{}/spotLight.vert", shaderDir),
+                            std::format("{}/spotLight.frag", shaderDir));
+
   m_shaderManager.addShader(
       "lightSource",
       (m_shaderManager.getCommonShaderDirectory() / "basicShader.vert")
@@ -157,7 +161,8 @@ void LightCasterLayer::onUpdate() {
   updateShaderCube();
 
   // Light
-  if (m_currentLightType == "Point Light") {
+  if (m_currentLightType == "Point Light" ||
+      m_currentLightType == "Spotlight") {
     updateShaderLight();
   }
 }
@@ -190,14 +195,18 @@ void LightCasterLayer::onImguiUpdate() {
     ImGui::SliderFloat("Constant", &m_light.constant, 0.0f, 2.0f);
     ImGui::SliderFloat("Linear", &m_light.linear, 0.0f, 0.5f);
     ImGui::SliderFloat("Quadratic", &m_light.quadratic, 0.0f, 0.1f);
-  }
-  // else if (m_currentLightType == "Spotlight") {
-  //   ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light.position),
-  //                       -10.0f, 10.0f);
-  //   ImGui::SliderFloat3("Light Direction", glm::value_ptr(m_light.direction),
-  //                       -500.0f, 500.0f);
+  } else if (m_currentLightType == "Spotlight") {
+    ImGui::SliderFloat3("Light Position", glm::value_ptr(m_light.position),
+                        -10.0f, 10.0f);
+    ImGui::SliderFloat3("Light Direction", glm::value_ptr(m_light.direction),
+                        -30.0f, 30.0f);
 
-  // }
+    ImGui::SliderFloat("Constant", &m_light.constant, 0.0f, 2.0f);
+    ImGui::SliderFloat("Linear", &m_light.linear, 0.0f, 0.5f);
+    ImGui::SliderFloat("Quadratic", &m_light.quadratic, 0.0f, 0.1f);
+
+    ImGui::SliderFloat("Light cut off", &m_light.cutoff, 0.f, 45.f);
+  }
 
   ImGui::SliderFloat3("Light Ambient", glm::value_ptr(m_light.ambient), 0.0f,
                       1.0f);
@@ -252,6 +261,13 @@ void LightCasterLayer::updateShaderCube() {
     shader->setVec3f("light.direction", m_light.direction);
   } else if (m_currentLightType == "Point Light") {
     shader->setVec3f("light.position", m_light.position);
+    shader->setFloat("light.constant", m_light.constant);
+    shader->setFloat("light.linear", m_light.linear);
+    shader->setFloat("light.quadratic", m_light.quadratic);
+  } else if (m_currentLightType == "Spotlight") {
+    shader->setVec3f("light.position", m_light.position);
+    shader->setVec3f("light.direction", m_light.direction);
+    shader->setFloat("light.cutoff", glm::cos(glm::radians(m_light.cutoff)));
     shader->setFloat("light.constant", m_light.constant);
     shader->setFloat("light.linear", m_light.linear);
     shader->setFloat("light.quadratic", m_light.quadratic);
