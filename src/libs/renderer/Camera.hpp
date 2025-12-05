@@ -11,6 +11,8 @@ enum class LOGL_RENDERER_EXPORT CameraMovement {
   BACKWARD,
   LEFT,
   RIGHT,
+  UP,
+  DOWN,
 };
 
 class LOGL_RENDERER_EXPORT Camera {
