@@ -25,6 +25,7 @@ logl_add_library(logl_renderer
         glad
         glm
     PRIVATE_LINKS
+        glfw
         logl_io
     RESOURCES
         shaders/basicShader.frag
