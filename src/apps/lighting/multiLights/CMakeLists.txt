@@ -1,0 +1,21 @@
+logl_add_executable(multiLights
+    SOURCES
+        main.cpp
+        ../mesh.hpp
+        MultiLightsLayer.cpp
+        MultiLightsLayer.hpp
+    LINKS
+        logl_core
+        logl_io
+        logl_events
+        logl_renderer
+        stb_image
+        glm
+        imgui
+    RESOURCES
+        assets/textures/wood_container.png
+        assets/textures/wood_container_specular.png
+        assets/shaders/light.frag
+        assets/shaders/multiLight.frag
+        assets/shaders/multiLight.vert
+)
