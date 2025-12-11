@@ -17,6 +17,8 @@ std::string textureTypeToString(TextureType type) {
   }
 }
 
+std::map<std::filesystem::path, Texture::Data> Texture::s_loadedTextures;
+
 Texture::Texture(Data data) : m_data(data) {}
 
 Texture::Texture(TextureType type, const std::string &path)
@@ -70,4 +72,8 @@ void Texture::load(const std::filesystem::path &path) {
 
   stbi_image_free(data);
 }
+
+GLuint Texture::id() const { return m_data.id; }
+
+TextureType Texture::type() const { return m_data.type; }
 } // namespace libs::renderer
