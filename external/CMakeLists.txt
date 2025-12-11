@@ -41,3 +41,15 @@ add_subdirectory(glad)
 ## STB_IMAGE
 ############
 add_subdirectory(stb_image)
+
+############
+## ASSIMP
+############
+
+FetchContent_Declare(
+    assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp.git
+    GIT_TAG v6.0.2
+)
+
+FetchContent_MakeAvailable(assimp)
