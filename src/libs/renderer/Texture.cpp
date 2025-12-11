@@ -17,15 +17,30 @@ std::string textureTypeToString(TextureType type) {
   }
 }
 
+Texture::Texture(Data data) : m_data(data) {}
+
+Texture::Texture(TextureType type, const std::string &path)
+    : Texture(type, std::filesystem::path(path)) {}
+
+Texture::Texture(TextureType type, const std::filesystem::path &path) {
+  const auto it = s_loadedTextures.find(path);
+
+  if (it == s_loadedTextures.end()) {
+    load(path);
+    s_loadedTextures[path] = m_data;
+  } else {
+    m_data = it->second;
+  }
+}
+
 void Texture::load(const std::filesystem::path &path) {
   int width, height, nChannels;
 
   stbi_set_flip_vertically_on_load(true);
   unsigned char *data = stbi_load(path.c_str(), &width, &height, &nChannels, 0);
 
-  glGenTextures(1, &id);
-
-  glBindTexture(GL_TEXTURE_2D, id);
+  glGenTextures(1, &m_data.id);
+  glBindTexture(GL_TEXTURE_2D, m_data.id);
 
   if (!data) {
 
