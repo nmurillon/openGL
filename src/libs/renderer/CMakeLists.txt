@@ -31,10 +31,10 @@ logl_add_library(logl_renderer
     PUBLIC_LINKS
         glad
         glm
+        assimp
     PRIVATE_LINKS
         glfw
         logl_io
-        assimp
         stb_image
     RESOURCES
         shaders/basicShader.frag

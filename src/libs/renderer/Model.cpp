@@ -13,7 +13,7 @@ glm::vec2 toVec2(const aiVector3D &vec) { return glm::vec2(vec.x, vec.y); }
 namespace libs::renderer {
 Model::Model(const std::string &path) {}
 
-void Model::draw(Shader &shader) {
+void Model::draw(Shader &shader) const {
   for (auto &mesh : m_meshes) {
     mesh.draw(shader);
   }

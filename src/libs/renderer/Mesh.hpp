@@ -16,7 +16,7 @@ public:
        const std::vector<unsigned int> &indices,
        const std::vector<Texture> &textures);
 
-  void draw(Shader &shader);
+  void draw(Shader &shader) const;
 
 public:
   std::vector<Vertex> vertices;
