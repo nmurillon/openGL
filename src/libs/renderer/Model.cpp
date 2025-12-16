@@ -11,7 +11,10 @@ glm::vec2 toVec2(const aiVector3D &vec) { return glm::vec2(vec.x, vec.y); }
 } // namespace
 
 namespace libs::renderer {
-Model::Model(const std::string &path) {}
+Model::Model(const std::string &path)
+    : m_directory(std::filesystem::path{path}.parent_path()) {
+  load(path);
+}
 
 void Model::draw(Shader &shader) const {
   for (auto &mesh : m_meshes) {
@@ -98,8 +101,7 @@ void Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
   for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
     aiString str;
     mat->GetTexture(type, i, &str);
-    textures.emplace_back(textureType,
-                          std::filesystem::path(m_directory) / str.C_Str());
+    textures.emplace_back(textureType, m_directory / str.C_Str());
   }
 }
 } // namespace libs::renderer

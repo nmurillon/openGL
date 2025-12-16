@@ -29,6 +29,7 @@ Texture::Texture(TextureType type, const std::filesystem::path &path) {
 
   if (it == s_loadedTextures.end()) {
     load(path);
+    m_data.type = type;
     s_loadedTextures[path] = m_data;
   } else {
     m_data = it->second;
@@ -44,7 +45,7 @@ void Texture::load(const std::filesystem::path &path) {
   glGenTextures(1, &m_data.id);
   glBindTexture(GL_TEXTURE_2D, m_data.id);
 
-  if (!data) {
+  if (data) {
 
     GLenum format;
     if (nChannels == 1) {
