@@ -3,6 +3,7 @@
 #include <libs/events/Event.hpp>
 
 #include <format>
+#include <vector>
 
 namespace libs::events {
 class WindowCloseEvent : public Event {
@@ -36,5 +37,24 @@ public:
 private:
   int m_width;
   int m_height;
+};
+
+class PathDropEvent : public Event {
+public:
+  PathDropEvent(int count, const char **paths)
+      : m_paths(paths, paths + count) {}
+  ~PathDropEvent() = default;
+
+  EVENT_CLASS_TYPE(PathDropEvent)
+
+public:
+  virtual const std::string toString() const override {
+    return std::format("{} with {} paths\n", getEventName(), m_paths.size());
+  }
+
+  const std::vector<std::string> &getPaths() const { return m_paths; }
+
+private:
+  std::vector<std::string> m_paths;
 };
 } // namespace libs::events

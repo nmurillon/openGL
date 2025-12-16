@@ -3,6 +3,7 @@
 #include <libs/events/EventDispatcher.hpp>
 #include <libs/events/KeyEvent.hpp>
 #include <libs/events/MouseEvent.hpp>
+#include <libs/events/WindowEvent.hpp>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -75,6 +76,14 @@ Window::Window(int width, int height, const std::string &title)
         auto callback =
             *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
         libs::events::MouseScrolledEvent event{xoffset, yoffset};
+        callback(event);
+      });
+
+  glfwSetDropCallback(
+      m_window, [](GLFWwindow *window, int count, const char **paths) {
+        auto callback =
+            *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
+        libs::events::PathDropEvent event{count, paths};
         callback(event);
       });
 
