@@ -20,6 +20,7 @@ public:
   Model(const std::string &path);
 
   void draw(Shader &shader) const;
+  bool isValid() const;
 
 private:
   void load(const std::string &path);
@@ -32,5 +33,6 @@ private:
   std::vector<Mesh> m_meshes;
   std::string m_name;
   std::filesystem::path m_directory;
+  bool m_isValid{false};
 };
 } // namespace libs::renderer

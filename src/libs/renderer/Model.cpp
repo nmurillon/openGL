@@ -22,6 +22,8 @@ void Model::draw(Shader &shader) const {
   }
 }
 
+bool Model::isValid() const { return m_isValid; }
+
 void Model::load(const std::string &path) {
   Assimp::Importer importer;
   const aiScene *scene =
@@ -35,6 +37,7 @@ void Model::load(const std::string &path) {
   m_directory = std::filesystem::path(path).parent_path();
 
   processNode(scene->mRootNode, scene);
+  m_isValid = true;
 }
 
 void Model::processNode(aiNode *node, const aiScene *scene) {
