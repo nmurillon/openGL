@@ -1,8 +1,8 @@
 #include <libs/renderer/Texture.hpp>
 
-#include <stb_image/stb_image.h>
+#include <libs/logger/Logger.hpp>
 
-#include <iostream>
+#include <stb_image/stb_image.h>
 
 namespace libs::renderer {
 
@@ -69,7 +69,7 @@ void Texture::load(const std::filesystem::path &path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   } else {
-    std::cout << "WARNING::TEXTURE::FAIL_TO_OPEN" << std::endl;
+    Logger::logWarning("WARNING::TEXTURE::FAIL_TO_OPEN");
   }
 
   stbi_image_free(data);

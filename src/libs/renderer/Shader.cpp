@@ -1,5 +1,7 @@
 #include <libs/renderer/Shader.hpp>
 
+#include <libs/logger/Logger.hpp>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include <format>
@@ -32,8 +34,8 @@ Shader::Shader(const std::string &vertexSrcFile,
   glGetProgramiv(m_shaderId, GL_LINK_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(m_shaderId, 512, NULL, error);
-    std::cout << std::format("ERROR::SHADER::LINKING_FAILED\n{}", error)
-              << std::endl;
+
+    Logger::logError("SHADER::LINKING_FAILED: {}", error);
   };
 
   // Once linked, shaders can be deleted
@@ -118,11 +120,10 @@ unsigned int Shader::readShaderFile(const std::string &src, unsigned int type) {
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader, 512, NULL, error);
-    std::cout << std::format("ERROR::SHADER::COMPILATION_FAILED\n"
-                             "Source file: {}\n"
-                             "{}",
-                             src, error)
-              << std::endl;
+    Logger::logError("SHADER::COMPILATION_FAILED\n"
+                     "Source file: {}\n"
+                     "Error: {}",
+                     src, error);
   };
 
   return shader;

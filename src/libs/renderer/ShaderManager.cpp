@@ -1,9 +1,9 @@
 #include <libs/renderer/ShaderManager.hpp>
 
 #include <libs/io/ProgramPath.hpp>
+#include <libs/logger/Logger.hpp>
 
 #include <format>
-#include <iostream>
 
 namespace libs::renderer {
 ShaderManager::ShaderManager()
@@ -19,9 +19,7 @@ ShaderManager::ShaderManager()
 std::shared_ptr<Shader>
 ShaderManager::getShader(const std::string &name) const {
   if (!m_shaders.contains(name)) {
-    std::cout << std::format("No shader with name {} exists", name)
-              << std::endl;
-
+    Logger::logWarning("No shader with name {} exists", name);
     return {};
   }
 

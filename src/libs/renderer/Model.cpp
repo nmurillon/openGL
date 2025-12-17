@@ -1,6 +1,6 @@
 #include <libs/renderer/Model.hpp>
 
-#include <iostream>
+#include <libs/logger/Logger.hpp>
 
 namespace {
 glm::vec3 toVec3(const aiVector3D &vec) {
@@ -31,7 +31,7 @@ void Model::load(const std::string &path) {
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
       !scene->mRootNode) {
-    std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
+    Logger::logError("ERROR::ASSIMP: {}", importer.GetErrorString());
     return;
   }
   m_directory = std::filesystem::path(path).parent_path();

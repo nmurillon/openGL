@@ -36,6 +36,7 @@ logl_add_library(logl_renderer
         glfw
         logl_io
         stb_image
+        logl_logger
     RESOURCES
         shaders/basicShader.frag
         shaders/basicShader.vert
