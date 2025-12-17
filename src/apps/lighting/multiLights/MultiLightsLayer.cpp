@@ -204,6 +204,15 @@ void MultiLightsLayer::onImguiUpdate() {
     }
   }
 
+  if (ImGui::Button("Add Point Light") &&
+      m_pointLights.size() < s_maxPointLights) {
+
+    PointLight newLight = s_defaultPointLight;
+    newLight.position =
+        mesh::lighting::pointLightPositions[m_pointLights.size()];
+    m_pointLights.push_back(newLight);
+  }
+
   ImGui::ShowDemoWindow();
   ImGui::End();
 }
@@ -250,6 +259,7 @@ void MultiLightsLayer::updateCubes() {
   shader->setVec3f("directionalLight.specular", m_directionalLight.specular);
 
   // Set point lights
+  shader->setInt("pointLightCount", m_pointLights.size());
   for (std::size_t i = 0; i < m_pointLights.size(); ++i) {
     const auto &pointLight = m_pointLights[i];
     std::string baseName = std::format("pointLights[{}].", i);
@@ -289,8 +299,7 @@ void MultiLightsLayer::updateLights() {
 
   for (std::size_t i = 0; i < m_pointLights.size(); ++i) {
     glm::mat4 lightModel = glm::mat4(1.0f);
-    lightModel =
-        glm::translate(lightModel, mesh::lighting::pointLightPositions[i]);
+    lightModel = glm::translate(lightModel, m_pointLights[i].position);
     lightModel = glm::scale(lightModel, glm::vec3(0.2f));
 
     shader->setVec3f("lightColor", m_pointLights[i].color);
