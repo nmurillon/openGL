@@ -79,6 +79,30 @@ void ModelLoadingLayer::onUpdate() {
   shader->setMat4f("model", model);
   shader->setMat4f("projection", m_camera->getProjection());
   shader->setMat4f("view", m_camera->getViewMatrix());
+  shader->setVec3f("viewPos", m_camera->getPosition());
+
+  // Directional Light
+  shader->setVec3f("directionalLight.direction", defaultLight.direction);
+  shader->setVec3f("directionalLight.ambient", defaultLight.ambient);
+  shader->setVec3f("directionalLight.diffuse", defaultLight.diffuse);
+  shader->setVec3f("directionalLight.specular", defaultLight.specular);
+
+  // Set point lights
+  shader->setInt("pointLightCount", m_pointLights.size());
+  shader->setInt("material.shininess", 64.f);
+  for (std::size_t i = 0; i < m_pointLights.size(); ++i) {
+    const auto &pointLight = m_pointLights[i];
+    std::string baseName = std::format("pointLights[{}].", i);
+
+    shader->setVec3f(baseName + "position", pointLight.position);
+    shader->setFloat(baseName + "constant", pointLight.constant);
+    shader->setFloat(baseName + "linear", pointLight.linear);
+    shader->setFloat(baseName + "quadratic", pointLight.quadratic);
+    shader->setVec3f(baseName + "ambient", pointLight.ambient);
+    shader->setVec3f(baseName + "diffuse", pointLight.diffuse);
+    shader->setVec3f(baseName + "specular", pointLight.specular);
+  }
+
   for (const auto &[path, model] : m_models) {
     model.draw(*shader);
   }
@@ -87,7 +111,38 @@ void ModelLoadingLayer::onUpdate() {
   updateShaderLight();
 }
 
-void ModelLoadingLayer::onImguiUpdate() {}
+void ModelLoadingLayer::onImguiUpdate() {
+
+  ImGui::Begin("Light Properties");
+  for (std::size_t i = 0; i < m_pointLights.size(); ++i) {
+    ImGui::SeparatorText(std::format("Point Light {}", i + 1).c_str());
+
+    ImGui::SliderFloat3(std::format("Point Light {} Position", i + 1).c_str(),
+                        glm::value_ptr(m_pointLights[i].position), -10.0f,
+                        10.0f);
+
+    ImGui::SliderFloat(std::format("Point Light {} Constant", i + 1).c_str(),
+                       &m_pointLights[i].constant, 0.0f, 2.0f);
+
+    ImGui::SliderFloat(std::format("Point Light {} Linear", i + 1).c_str(),
+                       &m_pointLights[i].linear, 0.0f, 0.5f);
+    ImGui::SliderFloat(std::format("Point Light {} Quadratic", i + 1).c_str(),
+                       &m_pointLights[i].quadratic, 0.0f, 0.1f);
+
+    ImGui::SliderFloat3(std::format("Point Light {} Ambient", i + 1).c_str(),
+                        glm::value_ptr(m_pointLights[i].ambient), 0.0f, 1.0f);
+    ImGui::SliderFloat3(std::format("Point Light {} Diffuse", i + 1).c_str(),
+                        glm::value_ptr(m_pointLights[i].diffuse), 0.0f, 1.0f);
+    ImGui::SliderFloat3(std::format("Point Light {} Specular", i + 1).c_str(),
+                        glm::value_ptr(m_pointLights[i].specular), 0.0f, 1.0f);
+
+    if (ImGui::Button(std::format("Reset Point Light {}", i).c_str())) {
+      m_pointLights[i] = defaultLight;
+    }
+  }
+
+  ImGui::End();
+}
 
 void ModelLoadingLayer::onEvent(libs::events::Event &event) {
   libs::events::EventDispatcher dispatcher(event);
@@ -126,15 +181,18 @@ void ModelLoadingLayer::updateShaderLight() {
   auto shader = m_shaderManager.getShader("lightSource");
 
   shader->use();
-  glm::mat4 lightModel = glm::mat4(1.0f);
-  lightModel = glm::translate(lightModel, m_light.position);
-  lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-  shader->setVec3f("lightColor", m_light.color);
-  shader->setMat4f("model", lightModel);
   shader->setMat4f("projection", m_camera->getProjection());
   shader->setMat4f("view", m_camera->getViewMatrix());
 
-  glBindVertexArray(m_vaoLight);
-  glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
-                 GL_UNSIGNED_INT, 0);
+  for (const auto &pointLight : m_pointLights) {
+    glm::mat4 lightModel = glm::mat4(1.0f);
+    lightModel = glm::translate(lightModel, pointLight.position);
+    lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+    shader->setVec3f("lightColor", pointLight.color);
+    shader->setMat4f("model", lightModel);
+
+    glBindVertexArray(m_vaoLight);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
+                   GL_UNSIGNED_INT, 0);
+  }
 }

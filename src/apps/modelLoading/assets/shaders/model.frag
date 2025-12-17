@@ -88,13 +88,14 @@ void main()
     vec3 normal = normalize(normal);
     vec3 viewDir = normalize(viewPos - fragPos);
 
-    //vec3 directional = computeDirectionalLight(directionalLight, normal, viewDir);
+    // vec3 directional = vec3(0.0);
+    vec3 directional = computeDirectionalLight(directionalLight, normal, viewDir);
     vec3 points = vec3(0.0);
 
     //for (int i = 0; i < pointLightCount; ++i) {
     //    points += computePointLight(pointLights[i], normal, viewDir);
     //}
     
-    //FragColor = vec4(directional + points, 1.0);
-    FragColor = texture(material.texture_diffuse1, texCoords);
+    FragColor = vec4(directional + points, 1.0);
+    //FragColor = texture(material.texture_specular1, texCoords);
 }

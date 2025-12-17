@@ -36,7 +36,7 @@ class ModelLoadingLayer : public libs::core::Layer {
   };
 
   const Light defaultLight{glm::vec3(1.2f, 1.0f, 2.0f),
-                           glm::vec3(-0.2f, -1.f, -0.3f),
+                           glm::vec3(-0.2f, -1.f, -1.f),
                            glm::vec3(1.f, 1.f, 1.f),
                            glm::vec3(0.2f),
                            glm::vec3(0.5f),
@@ -66,12 +66,11 @@ private:
   libs::renderer::FlyCameraController m_cameraController;
   libs::renderer::ShaderManager m_shaderManager{};
   std::map<std::string, libs::renderer::Model> m_models;
+  std::vector<Light> m_pointLights{Light{defaultLight}};
 
   unsigned int m_vaoLight, m_vbo, m_ebo;
   double m_deltaTime;
   float m_aspectRatio{800.0 / 600.0};
-
-  Light m_light{defaultLight};
 
   const std::vector<unsigned int> indices = {
       0, 1, 2, 1, 2, 3, // Up face
