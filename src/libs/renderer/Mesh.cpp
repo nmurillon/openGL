@@ -36,6 +36,7 @@ void Mesh::draw(Shader &shader) const {
         i);
     glBindTexture(GL_TEXTURE_2D, textures[i].id());
   }
+  shader.setFloat("material.shininess", 16.f);
   glActiveTexture(GL_TEXTURE0);
 
   glBindVertexArray(m_vao);

@@ -66,7 +66,7 @@ private:
   libs::renderer::FlyCameraController m_cameraController;
   libs::renderer::ShaderManager m_shaderManager{};
   std::map<std::string, libs::renderer::Model> m_models;
-  std::vector<Light> m_pointLights{Light{defaultLight}};
+  std::vector<Light> m_pointLights{};
 
   unsigned int m_vaoLight, m_vbo, m_ebo;
   double m_deltaTime;

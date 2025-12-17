@@ -89,7 +89,6 @@ void ModelLoadingLayer::onUpdate() {
 
   // Set point lights
   shader->setInt("pointLightCount", m_pointLights.size());
-  shader->setInt("material.shininess", 64.f);
   for (std::size_t i = 0; i < m_pointLights.size(); ++i) {
     const auto &pointLight = m_pointLights[i];
     std::string baseName = std::format("pointLights[{}].", i);
@@ -138,6 +137,16 @@ void ModelLoadingLayer::onImguiUpdate() {
 
     if (ImGui::Button(std::format("Reset Point Light {}", i).c_str())) {
       m_pointLights[i] = defaultLight;
+    }
+
+    if (ImGui::Button(std::format("Remove Point Light {}", i).c_str())) {
+      m_pointLights.erase(m_pointLights.begin() + i);
+    }
+  }
+
+  if (m_pointLights.size() < 4) {
+    if (ImGui::Button("Add Point Light") && m_pointLights.size() < 4) {
+      m_pointLights.push_back(Light{defaultLight});
     }
   }
 
