@@ -40,7 +40,8 @@ void Texture::load(const std::filesystem::path &path) {
   int width, height, nChannels;
 
   stbi_set_flip_vertically_on_load(true);
-  unsigned char *data = stbi_load(path.c_str(), &width, &height, &nChannels, 0);
+  unsigned char *data =
+      stbi_load(path.string().c_str(), &width, &height, &nChannels, 0);
 
   glGenTextures(1, &m_data.id);
   glBindTexture(GL_TEXTURE_2D, m_data.id);
