@@ -9,6 +9,7 @@ enum class EventType {
   // Window Events
   WindowCloseEvent,
   WindowResizeEvent, // TODO: add new events as needed
+  PathDropEvent,
 
   // Key events
   KeyPressedEvent,

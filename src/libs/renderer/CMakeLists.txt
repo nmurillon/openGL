@@ -1,17 +1,24 @@
 set(RENDERER_HEADERS
     Camera.hpp
     FlyCameraController.hpp
+    Mesh.hpp
+    Model.hpp
     PerspectiveCamera.hpp
     Shader.hpp
     ShaderManager.hpp
+    Texture.hpp
+    Vertex.hpp
 )
 
 set(RENDERER_SRC
     Camera.cpp
     FlyCameraController.cpp
+    Mesh.cpp
+    Model.cpp
     PerspectiveCamera.cpp
     Shader.cpp
     ShaderManager.cpp
+    Texture.cpp
 )
 
 logl_add_library(logl_renderer
@@ -24,9 +31,11 @@ logl_add_library(logl_renderer
     PUBLIC_LINKS
         glad
         glm
+        assimp
     PRIVATE_LINKS
         glfw
         logl_io
+        stb_image
     RESOURCES
         shaders/basicShader.frag
         shaders/basicShader.vert

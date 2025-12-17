@@ -1,0 +1,17 @@
+logl_add_executable(modelLoading
+    SOURCES
+        main.cpp
+        ModelLoadingLayer.cpp
+        ModelLoadingLayer.hpp
+    LINKS
+        logl_core
+        logl_io
+        logl_events
+        logl_renderer
+        glm
+        imgui
+    RESOURCES
+        assets/shaders/light.frag
+        assets/shaders/model.frag
+        assets/shaders/model.vert
+)
