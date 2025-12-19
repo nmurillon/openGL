@@ -3,6 +3,8 @@ logl_add_executable(modelLoading
         main.cpp
         ModelLoadingLayer.cpp
         ModelLoadingLayer.hpp
+        ModelLoadingViewport.cpp
+        ModelLoadingViewport.hpp
     LINKS
         logl_core
         logl_io
