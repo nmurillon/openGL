@@ -44,3 +44,9 @@ Using VS Code and Mingw, you will need to specify where to search for system hea
 ```
 
 With the cmake extension installed for vscode: Open the Command Palette (Ctrl+Shift+P) and run CMake: Select a Kit. Then configure everything that you need using the settings.json file
+
+# TODO list
+
+- Make a scene/viewport to have only one app by chapter
+- Handle events only if a viewport is active/hovered
+- Rework camera movement to use mouse but only when clicked
