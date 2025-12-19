@@ -22,23 +22,47 @@ void Viewport::prepareScene() {
 void Viewport::display() {
 
   ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.f, 1.f));
   ImGui::SetNextWindowSizeConstraints(ImVec2(200.0f, 150.0f),
                                       ImVec2(FLT_MAX, FLT_MAX));
 
   const bool isCurrentTab = ImGui::Begin(m_name.c_str());
-  const auto windowPos = ImGui::GetWindowPos(); // Top left of the window
-  const auto contentAvailable = ImGui::GetContentRegionAvail();
 
-  // TODO: rework this
-  m_xBottomLeft = windowPos.x;
-  m_yBottomLeft = -(windowPos.y - contentAvailable.y);
+  // This does not take into account the height of the window name
+  // see https://github.com/ocornut/imgui/issues/2486
+  //   const auto windowPos = ImGui::GetWindowPos(); // Top left of the window
+  //   const auto contentAvailable = ImGui::GetContentRegionAvail();
+  //   const auto mainViewPort = ImGui::GetMainViewport()->Size;
+
+  //   m_xBottomLeft = windowPos.x;
+  //   m_yBottomLeft = mainViewPort.y - contentAvailable.y - windowPos.y;
+  //   m_width = contentAvailable.x;
+  //   m_height = contentAvailable.y;
+
+  ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+  ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+  const auto windowPos = ImGui::GetWindowPos();
+  const auto contentAvailable = ImGui::GetContentRegionAvail();
+  const auto mainViewPort = ImGui::GetMainViewport()->Size;
+
+  vMin.x += windowPos.x;
+  vMin.y += windowPos.y;
+  vMax.x += windowPos.x;
+  vMax.y += windowPos.y;
+
+  m_xBottomLeft = vMin.x;
+  m_yBottomLeft = mainViewPort.y - vMax.y;
   m_width = contentAvailable.x;
   m_height = contentAvailable.y;
+
+  // Debug info
+  //   ImGui::GetForegroundDrawList()->AddRect(vMin, vMax,
+  //                                           IM_COL32(255, 255, 0, 255));
 
   m_isActive = isCurrentTab && !ImGui::IsWindowCollapsed();
 
   ImGui::End();
-  //   ImGui::PopStyleVar();
+  ImGui::PopStyleVar();
   ImGui::PopStyleColor();
 }
 
