@@ -84,6 +84,8 @@ void LayerStack::imguiStart() {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
+
+  ImGui::DockSpaceOverViewport();
 }
 
 void LayerStack::imguiEnd() {
