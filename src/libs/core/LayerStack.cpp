@@ -85,7 +85,9 @@ void LayerStack::imguiStart() {
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  ImGui::DockSpaceOverViewport();
+  ImGui::DockSpaceOverViewport(
+      0, NULL, ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_PassthruCentralNode,
+      NULL);
 }
 
 void LayerStack::imguiEnd() {
