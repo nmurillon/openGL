@@ -4,6 +4,8 @@
 #include <libs/io/ProgramPath.hpp>
 #include <libs/renderer/PerspectiveCamera.hpp>
 
+#include <format>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
@@ -107,6 +109,40 @@ void ModelLoadingViewport::drawScene() {
 }
 
 void ModelLoadingViewport::onImguiUpdate() {
+  // ImGui::Begin("Debug");
+  // const auto wpos = ImGui::GetWindowPos();
+  // const auto available = ImGui::GetContentRegionAvail();
+  // const auto vp = ImGui::GetMainViewport()->Size;
+  // ImGui::Text(
+  //     std::format("X bl: {}\tY bl: {}", m_xBottomLeft,
+  //     m_yBottomLeft).c_str());
+  // ImGui::Text(
+  //     std::format("Window pos top left: ({}, {})", wpos.x, wpos.y).c_str());
+  // ImGui::Text(std::format("Window available ({}, {})", available.x,
+  // available.y)
+  //                 .c_str());
+
+  // ImGui::Text(std::format("Window size ({}, {})", m_width,
+  // m_height).c_str()); ImGui::Text(std::format("Main vp available ({}, {})",
+  // vp.x, vp.y).c_str());
+
+  // ImGuiIO &io = ImGui::GetIO();
+  // const auto mousePos = io.MousePos;
+  // const auto wvp = ImGui::GetMainViewport()->Pos;
+
+  // ImGui::Text(std::format("Window vp ({}, {})", wvp.x, wvp.y).c_str());
+
+  // ImGui::Text(
+  //     std::format("Mouse pos ({}, {})", mousePos.x, mousePos.y).c_str());
+
+  // ImGui::Text(std::format("In viewport: {}",
+  //                         isInViewport(mousePos.x, s_windowHeight -
+  //                         mousePos.y)
+  //                             ? "Yes"
+  //                             : "No")
+  //                 .c_str());
+
+  // ImGui::End();
 
   ImGui::Begin("Light Properties");
   for (std::size_t i = 0; i < m_pointLights.size(); ++i) {
@@ -157,7 +193,13 @@ void ModelLoadingViewport::onEvent(libs::events::Event &event) {
   dispatcher.dispatch<libs::events::PathDropEvent>(
       LOGL_BIND_EVENT_FN(ModelLoadingViewport::onPathDropped));
 
-  m_cameraController.onEvent(event);
+  // TODO  Require Window size to check if mouse is in viewport
+
+  ImGuiIO &io = ImGui::GetIO();
+  const auto mousePos = io.MousePos;
+  if (isInViewport(mousePos.x, s_windowHeight - mousePos.y)) {
+    m_cameraController.onEvent(event);
+  }
 }
 
 void ModelLoadingViewport::onPathDropped(libs::events::PathDropEvent &event) {

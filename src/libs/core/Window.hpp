@@ -16,7 +16,7 @@ class LOGL_CORE_EXPORT Window {
 public:
   using EventCallbackFn = std::function<void(events::Event &)>;
 
-  Window(int width, int height, const std::string &title);
+  Window(float width, float height, const std::string &title);
   ~Window();
 
   void setEventCallback(const EventCallbackFn &eventCallback);
@@ -33,8 +33,8 @@ private:
   bool onWindowResized(libs::events::WindowResizeEvent &event);
 
   GLFWwindow *m_window;
-  int m_width;
-  int m_height;
+  float m_width;
+  float m_height;
   // Time between two last frames
   double m_deltaTime;
 };

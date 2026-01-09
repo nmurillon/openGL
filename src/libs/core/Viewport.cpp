@@ -9,6 +9,9 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 namespace libs::core {
+float Viewport::s_windowWidth = 800.f;
+float Viewport::s_windowHeight = 600.f;
+
 Viewport::Viewport(const std::string &name, float width, float height)
     : m_name(name), m_width(width), m_height(height) {}
 
@@ -52,14 +55,18 @@ void Viewport::display() {
 
   m_xBottomLeft = vMin.x;
   m_yBottomLeft = mainViewPort.y - vMax.y;
-  m_width = contentAvailable.x;
-  m_height = contentAvailable.y;
+  m_width = vMax.x - vMin.x;
+  m_height = vMax.y - vMin.y;
 
   // Debug info
   //   ImGui::GetForegroundDrawList()->AddRect(vMin, vMax,
   //                                           IM_COL32(255, 255, 0, 255));
 
   m_isActive = isCurrentTab && !ImGui::IsWindowCollapsed();
+
+  // ImVec2 p = ImGui::GetWindowPos();
+  // ImGui::GetForegroundDrawList()->AddCircle(p, 10.0f, IM_COL32(255, 0, 0,
+  // 255));
 
   ImGui::End();
   ImGui::PopStyleVar();
@@ -76,4 +83,15 @@ void Viewport::onUpdate() {
 }
 
 bool Viewport::isActive() { return m_isActive; }
+
+bool Viewport::isInViewport(float x, float y) {
+  return m_xBottomLeft <= x && x <= m_xBottomLeft + m_width &&
+         m_yBottomLeft <= y && y <= m_yBottomLeft + m_height;
+}
+
+void Viewport::setWindowSize(float width, float height) {
+  s_windowWidth = width;
+  s_windowHeight = height;
+}
+
 } // namespace libs::core

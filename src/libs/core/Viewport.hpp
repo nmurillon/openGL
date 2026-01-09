@@ -14,10 +14,18 @@ public:
   void display();
   [[nodiscard]] bool isActive();
 
+  /**
+   * Check if a point is within the viewport. (0,0) is the bottom-left corner of
+   * the window
+   */
+  [[nodiscard]] bool isInViewport(float x, float y);
+
   virtual void onEvent(libs::events::Event &event) = 0;
   void onUpdate();
   //   virtual void onUpdate() = 0;
   virtual void onImguiUpdate(){};
+
+  static void setWindowSize(float width, float height);
 
 protected:
   virtual void drawScene() = 0;
@@ -34,6 +42,9 @@ protected:
   // Coords of the view port
   float m_xBottomLeft;
   float m_yBottomLeft;
+
+  static float s_windowWidth;
+  static float s_windowHeight;
 
 private:
   bool m_isActive{true};

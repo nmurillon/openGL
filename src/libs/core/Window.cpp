@@ -1,5 +1,6 @@
 #include <libs/core/Window.hpp>
 
+#include <libs/core/Viewport.hpp>
 #include <libs/events/EventDispatcher.hpp>
 #include <libs/events/KeyEvent.hpp>
 #include <libs/events/MouseEvent.hpp>
@@ -11,7 +12,7 @@
 
 #include <stdexcept>
 namespace libs::core {
-Window::Window(int width, int height, const std::string &title)
+Window::Window(float width, float height, const std::string &title)
     : m_width(width), m_height(height) {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -32,7 +33,8 @@ Window::Window(int width, int height, const std::string &title)
 
   glfwSetFramebufferSizeCallback(
       m_window, [](GLFWwindow *window, int width, int height) {
-        libs::events::WindowResizeEvent event{width, height};
+        libs::events::WindowResizeEvent event{static_cast<float>(width),
+                                              static_cast<float>(height)};
         auto callback =
             *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
         callback(event);
@@ -162,6 +164,8 @@ bool Window::onWindowResized(libs::events::WindowResizeEvent &event) {
   m_height = event.getHeight();
 
   glViewport(0, 0, m_width, m_height);
+
+  libs::core::Viewport::setWindowSize(m_width, m_height);
 
   return false;
 }
