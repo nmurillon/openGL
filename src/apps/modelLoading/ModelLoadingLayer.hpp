@@ -19,8 +19,4 @@ public:
 
 private:
   ModelLoadingViewport m_modelLoadingViewport;
-  // bool onWindowResized(libs::events::WindowResizeEvent &event);
-
-  // double m_deltaTime;
-  // float m_aspectRatio{800.0 / 600.0};
 };
