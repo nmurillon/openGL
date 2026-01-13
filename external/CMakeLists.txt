@@ -46,6 +46,8 @@ add_subdirectory(stb_image)
 ## ASSIMP
 ############
 
+set(ASSIMP_BUILD_ZLIB ON  CACHE BOOL "Build assimp's bundled zlib" FORCE)
+
 FetchContent_Declare(
     assimp
     GIT_REPOSITORY https://github.com/assimp/assimp.git

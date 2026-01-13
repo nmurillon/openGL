@@ -4,6 +4,7 @@
 #include <format>
 #include <iostream>
 #include <string>
+#include <utility>
 
 class Logger {
 public:
@@ -13,30 +14,29 @@ public:
 
   template <typename... Ts>
   static void logError(std::format_string<Ts...> format, Ts &&...args) {
-    log(LogLevel::ERROR, format, args...);
+    log<Ts...>(LogLevel::ERROR, format, std::forward<Ts>(args)...);
   }
 
   template <typename... Ts>
   static void logWarning(std::format_string<Ts...> format, Ts &&...args) {
-    log(LogLevel::WARNING, format, args...);
+    log<Ts...>(LogLevel::WARNING, format, std::forward<Ts>(args)...);
   }
 
   template <typename... Ts>
   static void logInfo(std::format_string<Ts...> format, Ts &&...args) {
-    log(LogLevel::INFO, format, args...);
+    log<Ts...>(LogLevel::INFO, format, std::forward<Ts>(args)...);
   }
 
   template <typename... Ts>
   static void logDebug(std::format_string<Ts...> format, Ts &&...args) {
-    log(LogLevel::DEBUG, format, args...);
+    log<Ts...>(LogLevel::DEBUG, format, std::forward<Ts>(args)...);
   }
 
   template <typename... Ts>
   static void logTrace(std::format_string<Ts...> format, Ts &&...args) {
-    log(LogLevel::TRACE, format, args...);
+    log<Ts...>(LogLevel::TRACE, format, std::forward<Ts>(args)...);
   }
 
-private:
   template <typename... Ts>
   static void log(LogLevel level, std::format_string<Ts...> format,
                   Ts &&...args) {
@@ -47,8 +47,7 @@ private:
     const auto now = std::chrono::system_clock::now();
     std::string s;
     auto it = std::back_inserter(s);
-    std::format_to(it, std::forward<std::format_string<Ts...>>(format),
-                   std::forward<Ts>(args)...);
+    std::format_to(it, format, std::forward<Ts>(args)...);
     std::cout << std::format("[{}]{} ", now, logLevelToStr(level)) << s
               << std::endl;
   }

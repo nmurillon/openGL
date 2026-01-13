@@ -2,6 +2,7 @@ set(CORE_HEADERS
     Application.hpp
     Layer.hpp
     LayerStack.hpp
+    Viewport.hpp
     Window.hpp
 )
 
@@ -9,6 +10,7 @@ set(CORE_SRC
     Application.cpp
     Layer.cpp
     LayerStack.cpp
+    Viewport.cpp
     Window.cpp
 )
 

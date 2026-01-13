@@ -19,7 +19,8 @@ public:
 
 class WindowResizeEvent : public Event {
 public:
-  WindowResizeEvent(int width, int height) : m_width(width), m_height(height) {}
+  WindowResizeEvent(float width, float height)
+      : m_width(width), m_height(height) {}
   ~WindowResizeEvent() = default;
 
   EVENT_CLASS_TYPE(WindowResizeEvent)
@@ -30,13 +31,13 @@ public:
                        m_width, m_height);
   }
 
-  int getWidth() const { return m_width; }
+  float getWidth() const { return m_width; }
 
-  int getHeight() const { return m_height; }
+  float getHeight() const { return m_height; }
 
 private:
-  int m_width;
-  int m_height;
+  float m_width;
+  float m_height;
 };
 
 class PathDropEvent : public Event {
