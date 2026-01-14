@@ -1,0 +1,20 @@
+logl_add_executable(advancedOpenGl
+    SOURCES
+        main.cpp
+        AdvancedOpenGlLayer.cpp
+        AdvancedOpenGlLayer.hpp
+        DepthTestViewport.cpp
+        DepthTestViewport.hpp
+    LINKS
+        logl_core
+        logl_io
+        logl_events
+        logl_renderer
+        glm
+        imgui
+    RESOURCES
+        assets/shaders/depthTesting.frag
+        assets/shaders/depthTesting.vert
+        assets/textures/marble.jpg
+        assets/textures/metal.png
+)
