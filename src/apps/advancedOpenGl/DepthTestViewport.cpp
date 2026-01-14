@@ -8,6 +8,28 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
 
+namespace {
+int depthFuncFromString(const std::string &funcStr) {
+  if (funcStr == "GL_NEVER")
+    return GL_NEVER;
+  if (funcStr == "GL_LESS")
+    return GL_LESS;
+  if (funcStr == "GL_EQUAL")
+    return GL_EQUAL;
+  if (funcStr == "GL_LEQUAL")
+    return GL_LEQUAL;
+  if (funcStr == "GL_GREATER")
+    return GL_GREATER;
+  if (funcStr == "GL_NOTEQUAL")
+    return GL_NOTEQUAL;
+  if (funcStr == "GL_GEQUAL")
+    return GL_GEQUAL;
+  if (funcStr == "GL_ALWAYS")
+    return GL_ALWAYS;
+  return GL_ALWAYS; // Default
+}
+} // namespace
+
 DepthTestViewport::DepthTestViewport(const std::string &name, float width,
                                      float height)
     : libs::core::Viewport(name, width, height),
@@ -129,6 +151,7 @@ DepthTestViewport::DepthTestViewport(const std::string &name, float width,
 }
 
 void DepthTestViewport::drawScene() {
+  glDepthFunc(m_depthFunc);
   m_camera->setViewportSize(m_width, m_height);
   m_cameraController.update();
 
@@ -142,6 +165,7 @@ void DepthTestViewport::drawScene() {
   shader->setMat4f("model", model);
   shader->setMat4f("projection", m_camera->getProjection());
   shader->setMat4f("view", m_camera->getViewMatrix());
+  shader->setBool("showDepthBuffer", m_showDepthBuffer);
 
   glBindVertexArray(m_cubeVAO);
   shader->setInt("tex", 0);
@@ -160,14 +184,36 @@ void DepthTestViewport::drawScene() {
   glBindVertexArray(0);
 }
 
-void DepthTestViewport::onImguiUpdate() {}
+void DepthTestViewport::onImguiUpdate() {
+  static std::string current_item = m_depthFuncs[0];
+
+  ImGui::Begin("Depth Test Settings");
+
+  ImGui::Checkbox("Show depth buffer", &m_showDepthBuffer);
+
+  if (!m_showDepthBuffer &&
+      ImGui::BeginCombo("Depth function", current_item.c_str())) {
+    for (const auto &item : m_depthFuncs) {
+      bool is_selected = (current_item == item);
+      if (ImGui::Selectable(item.c_str(), is_selected)) {
+        m_depthFunc = depthFuncFromString(item);
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  ImGui::End();
+}
 
 void DepthTestViewport::onEvent(libs::events::Event &event) {
   libs::events::EventDispatcher dispatcher(event);
 
   ImGuiIO &io = ImGui::GetIO();
   const auto mousePos = io.MousePos;
-  if (isInViewport(mousePos.x, s_windowHeight - mousePos.y)) {
+  if (isActive() && isInViewport(mousePos.x, s_windowHeight - mousePos.y)) {
     m_cameraController.onEvent(event);
   }
 }

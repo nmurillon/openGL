@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 class DepthTestViewport : public libs::core::Viewport {
 public:
@@ -55,4 +56,10 @@ private:
                                    std::string{}};
   libs::renderer::Texture m_metal{libs::renderer::TextureType::DIFFUSE,
                                   std::string{}};
+
+  bool m_showDepthBuffer{false};
+  int m_depthFunc = GL_ALWAYS;
+  const std::vector<std::string> m_depthFuncs{
+      "GL_NEVER",   "GL_LESS",     "GL_EQUAL",  "GL_LEQUAL",
+      "GL_GREATER", "GL_NOTEQUAL", "GL_GEQUAL", "GL_ALWAYS"};
 };
