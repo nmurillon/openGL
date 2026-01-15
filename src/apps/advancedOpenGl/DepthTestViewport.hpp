@@ -46,6 +46,10 @@ protected:
   virtual void drawScene() override;
 
 private:
+  void drawFloor();
+  void drawCubes();
+  void drawCubesOutline();
+
   unsigned int m_cubeVAO, m_planeVAO, m_cubeVBO, m_planeVBO;
 
   std::shared_ptr<libs::renderer::Camera> m_camera;
@@ -58,8 +62,13 @@ private:
                                   std::string{}};
 
   bool m_showDepthBuffer{false};
-  int m_depthFunc = GL_ALWAYS;
+  bool m_showOutline{true};
+
+  glm::vec3 m_outlineColor{1.0f, 0.0f, 0.0f};
+  float m_outlineScale{1.025f};
+
+  int m_depthFunc = GL_LESS;
   const std::vector<std::string> m_depthFuncs{
-      "GL_NEVER",   "GL_LESS",     "GL_EQUAL",  "GL_LEQUAL",
+      "GL_LESS",    "GL_NEVER",    "GL_EQUAL",  "GL_LEQUAL",
       "GL_GREATER", "GL_NOTEQUAL", "GL_GEQUAL", "GL_ALWAYS"};
 };

@@ -15,6 +15,7 @@ logl_add_executable(advancedOpenGl
     RESOURCES
         assets/shaders/depthTesting.frag
         assets/shaders/depthTesting.vert
+        assets/shaders/outline.frag
         assets/textures/marble.jpg
         assets/textures/metal.png
 )

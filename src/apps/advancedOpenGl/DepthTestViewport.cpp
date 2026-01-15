@@ -47,6 +47,10 @@ DepthTestViewport::DepthTestViewport(const std::string &name, float width,
                             std::format("{}/depthTesting.vert", shaderDir),
                             std::format("{}/depthTesting.frag", shaderDir));
 
+  m_shaderManager.addShader("modelOutline",
+                            std::format("{}/depthTesting.vert", shaderDir),
+                            std::format("{}/outline.frag", shaderDir));
+
   // clang-format off
   float cubeVertices[] = {
         // positions          // texture Coords
@@ -151,35 +155,40 @@ DepthTestViewport::DepthTestViewport(const std::string &name, float width,
 }
 
 void DepthTestViewport::drawScene() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   glDepthFunc(m_depthFunc);
+
+  if (m_showOutline) {
+    glEnable(GL_STENCIL_TEST);
+  }
+
+  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
   m_camera->setViewportSize(m_width, m_height);
   m_cameraController.update();
 
-  auto shader = m_shaderManager.getShader("model");
-  shader->use();
+  // floor - Don't update the stencil buffer
+  glStencilMask(0x00);
+  drawFloor();
 
-  glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-  model = glm::scale(model, glm::vec3(1.0f));
+  // cubes
+  // All fragments pass the stencil test + Enable writing to the stencil buffer
+  glStencilFunc(GL_ALWAYS, 1, 0xFF);
+  glStencilMask(0xFF);
+  drawCubes();
 
-  shader->setMat4f("model", model);
-  shader->setMat4f("projection", m_camera->getProjection());
-  shader->setMat4f("view", m_camera->getViewMatrix());
-  shader->setBool("showDepthBuffer", m_showDepthBuffer);
+  if (m_showOutline) {
+    // Note: if the objects are aligned, the one in front will not be fully
+    // outlined
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+    glDisable(GL_DEPTH_TEST);
+    drawCubesOutline();
 
-  glBindVertexArray(m_cubeVAO);
-  shader->setInt("tex", 0);
-  glDrawArrays(GL_TRIANGLES, 0, 36);
-
-  model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-  shader->setMat4f("model", model);
-  glDrawArrays(GL_TRIANGLES, 0, 36);
-
-  // floor
-  glBindVertexArray(m_planeVAO);
-  shader->setInt("tex", 1);
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glEnable(GL_DEPTH_TEST);
+  }
 
   glBindVertexArray(0);
 }
@@ -205,6 +214,13 @@ void DepthTestViewport::onImguiUpdate() {
     ImGui::EndCombo();
   }
 
+  ImGui::SeparatorText("Outline settings");
+
+  ImGui::Checkbox("Show outline", &m_showOutline);
+
+  ImGui::ColorPicker3("Outline color", glm::value_ptr(m_outlineColor));
+  ImGui::SliderFloat("Outline scale", &m_outlineScale, 1.0f, 1.5f);
+
   ImGui::End();
 }
 
@@ -216,4 +232,60 @@ void DepthTestViewport::onEvent(libs::events::Event &event) {
   if (isActive() && isInViewport(mousePos.x, s_windowHeight - mousePos.y)) {
     m_cameraController.onEvent(event);
   }
+}
+
+void DepthTestViewport::drawFloor() {
+  auto shader = m_shaderManager.getShader("model");
+  shader->use();
+
+  glBindVertexArray(m_planeVAO);
+  shader->setInt("tex", 1);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void DepthTestViewport::drawCubes() {
+  auto shader = m_shaderManager.getShader("model");
+  shader->use();
+
+  glm::mat4 model = glm::mat4(1.0f);
+  model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+  model = glm::scale(model, glm::vec3(1.0f));
+
+  shader->setMat4f("model", model);
+  shader->setMat4f("projection", m_camera->getProjection());
+  shader->setMat4f("view", m_camera->getViewMatrix());
+  shader->setBool("showDepthBuffer", m_showDepthBuffer);
+
+  glBindVertexArray(m_cubeVAO);
+  shader->setInt("tex", 0);
+  glDrawArrays(GL_TRIANGLES, 0, 36);
+
+  model = glm::mat4(1.0f);
+  model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+  shader->setMat4f("model", model);
+  glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void DepthTestViewport::drawCubesOutline() {
+  auto shader = m_shaderManager.getShader("modelOutline");
+  shader->use();
+
+  glm::mat4 model = glm::mat4(1.0f);
+  model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+  model = glm::scale(model, glm::vec3(m_outlineScale));
+
+  shader->setMat4f("model", model);
+  shader->setMat4f("projection", m_camera->getProjection());
+  shader->setMat4f("view", m_camera->getViewMatrix());
+  shader->setVec3f("outlineColor", m_outlineColor);
+
+  glBindVertexArray(m_cubeVAO);
+  shader->setInt("tex", 0);
+  glDrawArrays(GL_TRIANGLES, 0, 36);
+
+  model = glm::mat4(1.0f);
+  model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+  model = glm::scale(model, glm::vec3(m_outlineScale));
+  shader->setMat4f("model", model);
+  glDrawArrays(GL_TRIANGLES, 0, 36);
 }
