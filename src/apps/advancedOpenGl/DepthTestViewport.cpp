@@ -167,28 +167,12 @@ void DepthTestViewport::drawScene() {
   m_camera->setViewportSize(m_width, m_height);
   m_cameraController.update();
 
-  // floor - Don't update the stencil buffer
-  glStencilMask(0x00);
+  // floor
   drawFloor();
 
   // cubes
-  // All fragments pass the stencil test + Enable writing to the stencil buffer
-  glStencilFunc(GL_ALWAYS, 1, 0xFF);
-  glStencilMask(0xFF);
-  drawCubes();
-
-  if (m_showOutline) {
-    // Note: if the objects are aligned, the one in front will not be fully
-    // outlined
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilMask(0x00);
-    glDisable(GL_DEPTH_TEST);
-    drawCubesOutline();
-
-    glStencilMask(0xFF);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glEnable(GL_DEPTH_TEST);
-  }
+  drawCube(glm::vec3(-1.0f, 0.0f, -1.0f));
+  drawCube(glm::vec3(2.0f, 0.0f, 0.0f));
 
   glBindVertexArray(0);
 }
@@ -220,6 +204,7 @@ void DepthTestViewport::onImguiUpdate() {
 
   ImGui::ColorPicker3("Outline color", glm::value_ptr(m_outlineColor));
   ImGui::SliderFloat("Outline scale", &m_outlineScale, 1.0f, 1.5f);
+  ImGui::Checkbox("Group outline", &m_showGroupedOutline);
 
   ImGui::End();
 }
@@ -235,6 +220,8 @@ void DepthTestViewport::onEvent(libs::events::Event &event) {
 }
 
 void DepthTestViewport::drawFloor() {
+  // Don't update the stencil buffer
+  glStencilMask(0x00);
   auto shader = m_shaderManager.getShader("model");
   shader->use();
 
@@ -243,13 +230,16 @@ void DepthTestViewport::drawFloor() {
   glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void DepthTestViewport::drawCubes() {
+void DepthTestViewport::drawCube(const glm::vec3 &position) {
+  // All fragments pass the stencil test + Enable writing to the stencil buffer
+  glStencilFunc(GL_ALWAYS, 1, 0xFF);
+  glStencilMask(0xFF);
+
   auto shader = m_shaderManager.getShader("model");
   shader->use();
 
   glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-  model = glm::scale(model, glm::vec3(1.0f));
+  model = glm::translate(model, position);
 
   shader->setMat4f("model", model);
   shader->setMat4f("projection", m_camera->getProjection());
@@ -260,32 +250,30 @@ void DepthTestViewport::drawCubes() {
   shader->setInt("tex", 0);
   glDrawArrays(GL_TRIANGLES, 0, 36);
 
-  model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-  shader->setMat4f("model", model);
-  glDrawArrays(GL_TRIANGLES, 0, 36);
-}
+  glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+  glStencilMask(0x00);
+  glDisable(GL_DEPTH_TEST);
 
-void DepthTestViewport::drawCubesOutline() {
-  auto shader = m_shaderManager.getShader("modelOutline");
-  shader->use();
+  if (m_showOutline) {
 
-  glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-  model = glm::scale(model, glm::vec3(m_outlineScale));
+    auto outlineShader = m_shaderManager.getShader("modelOutline");
+    outlineShader->use();
 
-  shader->setMat4f("model", model);
-  shader->setMat4f("projection", m_camera->getProjection());
-  shader->setMat4f("view", m_camera->getViewMatrix());
-  shader->setVec3f("outlineColor", m_outlineColor);
+    model = glm::scale(model, glm::vec3(m_outlineScale));
+    outlineShader->setInt("tex", 0);
+    outlineShader->setMat4f("model", model);
+    outlineShader->setMat4f("projection", m_camera->getProjection());
+    outlineShader->setMat4f("view", m_camera->getViewMatrix());
+    outlineShader->setVec3f("outlineColor", m_outlineColor);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+  }
 
-  glBindVertexArray(m_cubeVAO);
-  shader->setInt("tex", 0);
-  glDrawArrays(GL_TRIANGLES, 0, 36);
+  // TODO: does this need to be in the if block?
+  glStencilMask(0xFF);
+  glStencilFunc(GL_ALWAYS, 1, 0xFF);
+  glEnable(GL_DEPTH_TEST);
 
-  model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-  model = glm::scale(model, glm::vec3(m_outlineScale));
-  shader->setMat4f("model", model);
-  glDrawArrays(GL_TRIANGLES, 0, 36);
+  if (!m_showGroupedOutline) {
+    glClear(GL_STENCIL_BUFFER_BIT);
+  }
 }

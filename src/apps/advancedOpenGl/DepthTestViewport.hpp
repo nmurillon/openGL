@@ -47,8 +47,7 @@ protected:
 
 private:
   void drawFloor();
-  void drawCubes();
-  void drawCubesOutline();
+  void drawCube(const glm::vec3 &position);
 
   unsigned int m_cubeVAO, m_planeVAO, m_cubeVBO, m_planeVBO;
 
@@ -63,6 +62,7 @@ private:
 
   bool m_showDepthBuffer{false};
   bool m_showOutline{true};
+  bool m_showGroupedOutline{false};
 
   glm::vec3 m_outlineColor{1.0f, 0.0f, 0.0f};
   float m_outlineScale{1.025f};
