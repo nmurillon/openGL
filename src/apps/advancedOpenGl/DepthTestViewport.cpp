@@ -51,36 +51,6 @@ DepthTestViewport::DepthTestViewport(const std::string &name, float width,
                             std::format("{}/depthTesting.vert", shaderDir),
                             std::format("{}/outline.frag", shaderDir));
 
-  // clang-format off
-    float planeVertices[] = {
-        // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-
-         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-         5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
-    };
-  // clang-format on
-
-  glGenVertexArrays(1, &m_planeVAO);
-  glGenBuffers(1, &m_planeVBO);
-  glBindVertexArray(m_planeVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, m_planeVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices,
-               GL_STATIC_DRAW);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        reinterpret_cast<void *>(0));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        reinterpret_cast<void *>(3 * sizeof(float)));
-
-  // Unbind VBO & VAO to prevent further operations to modify them
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
   // Setup textures
   m_marble = {libs::renderer::TextureType::DIFFUSE,
               std::format("{}/marble.jpg", textureDir.string())};
@@ -133,6 +103,7 @@ void DepthTestViewport::onImguiUpdate() {
       bool is_selected = (current_item == item);
       if (ImGui::Selectable(item.c_str(), is_selected)) {
         m_depthFunc = depthFuncFromString(item);
+        current_item = item;
       }
       if (is_selected) {
         ImGui::SetItemDefaultFocus();
@@ -168,9 +139,8 @@ void DepthTestViewport::drawFloor() {
   auto shader = m_shaderManager.getShader("model");
   shader->use();
 
-  glBindVertexArray(m_planeVAO);
   shader->setInt("tex", 1);
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  m_floor.draw();
 }
 
 void DepthTestViewport::drawCube(const glm::vec3 &position) {

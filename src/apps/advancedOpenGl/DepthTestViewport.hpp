@@ -50,8 +50,6 @@ private:
   void drawFloor();
   void drawCube(const glm::vec3 &position);
 
-  unsigned int m_planeVAO, m_planeVBO;
-
   std::shared_ptr<libs::renderer::Camera> m_camera;
   libs::renderer::FlyCameraController m_cameraController;
   libs::renderer::ShaderManager m_shaderManager{};
@@ -118,8 +116,21 @@ private:
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
+    const std::vector<float> m_planeVertices{
+        // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+
+         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+         5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
+    };
   // clang-format on
 
   libs::renderer::Cube m_cube{libs::renderer::Cube::DataType::POSITION_TEXTURE,
                               m_cubeVertices};
+
+  libs::renderer::Cube m_floor{libs::renderer::Cube::DataType::POSITION_TEXTURE,
+                               m_planeVertices};
 };
