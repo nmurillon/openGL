@@ -1,5 +1,6 @@
 set(RENDERER_HEADERS
     Camera.hpp
+    Cube.hpp
     FlyCameraController.hpp
     Mesh.hpp
     Model.hpp
@@ -12,6 +13,7 @@ set(RENDERER_HEADERS
 
 set(RENDERER_SRC
     Camera.cpp
+    Cube.cpp
     FlyCameraController.cpp
     Mesh.cpp
     Model.cpp
