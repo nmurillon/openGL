@@ -4,6 +4,7 @@ set(RENDERER_HEADERS
     FlyCameraController.hpp
     Mesh.hpp
     Model.hpp
+    MouseCameraController.hpp
     PerspectiveCamera.hpp
     Shader.hpp
     ShaderManager.hpp
@@ -17,6 +18,7 @@ set(RENDERER_SRC
     FlyCameraController.cpp
     Mesh.cpp
     Model.cpp
+    MouseCameraController.cpp
     PerspectiveCamera.cpp
     Shader.cpp
     ShaderManager.cpp

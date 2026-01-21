@@ -77,6 +77,11 @@ void DepthTestViewport::drawScene() {
 
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
+  ImGuiIO &io = ImGui::GetIO();
+  const auto mousePos = io.MousePos;
+  m_cameraController.setEnabled(
+      isActive() && isInViewport(mousePos.x, s_windowHeight - mousePos.y));
+
   m_camera->setViewportSize(m_width, m_height);
   m_cameraController.update();
 
@@ -125,12 +130,7 @@ void DepthTestViewport::onImguiUpdate() {
 
 void DepthTestViewport::onEvent(libs::events::Event &event) {
   libs::events::EventDispatcher dispatcher(event);
-
-  ImGuiIO &io = ImGui::GetIO();
-  const auto mousePos = io.MousePos;
-  if (isActive() && isInViewport(mousePos.x, s_windowHeight - mousePos.y)) {
-    m_cameraController.onEvent(event);
-  }
+  m_cameraController.onEvent(event);
 }
 
 void DepthTestViewport::drawFloor() {

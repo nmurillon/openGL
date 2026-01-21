@@ -4,8 +4,8 @@
 #include <libs/events/WindowEvent.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Cube.hpp>
-#include <libs/renderer/FlyCameraController.hpp>
 #include <libs/renderer/Model.hpp>
+#include <libs/renderer/MouseCameraController.hpp>
 #include <libs/renderer/ShaderManager.hpp>
 #include <libs/renderer/Texture.hpp>
 
@@ -51,7 +51,7 @@ private:
   void drawCube(const glm::vec3 &position);
 
   std::shared_ptr<libs::renderer::Camera> m_camera;
-  libs::renderer::FlyCameraController m_cameraController;
+  libs::renderer::MouseCameraController m_cameraController;
   libs::renderer::ShaderManager m_shaderManager{};
 
   libs::renderer::Texture m_marble{libs::renderer::TextureType::DIFFUSE,
