@@ -8,6 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
 
+#include <map>
+
 BlendingViewport::BlendingViewport(const std::string &name, float width,
                                    float height)
     : libs::core::Viewport(name, width, height),
@@ -35,10 +37,11 @@ BlendingViewport::BlendingViewport(const std::string &name, float width,
   m_metal = {libs::renderer::TextureType::DIFFUSE,
              std::format("{}/metal.png", textureDir.string())};
 
-  m_grass = {libs::renderer::TextureType::DIFFUSE,
-             std::format("{}/grass.png", textureDir.string())};
+  m_transparent = {
+      libs::renderer::TextureType::DIFFUSE,
+      std::format("{}/blending_transparent_window.png", textureDir.string())};
 
-  m_grass.setTextureWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+  m_transparent.setTextureWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_metal.id());
@@ -47,9 +50,11 @@ BlendingViewport::BlendingViewport(const std::string &name, float width,
   glBindTexture(GL_TEXTURE_2D, m_marble.id());
 
   glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, m_grass.id());
+  glBindTexture(GL_TEXTURE_2D, m_transparent.id());
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void BlendingViewport::drawScene() {
@@ -70,7 +75,7 @@ void BlendingViewport::drawScene() {
   drawCube(glm::vec3(2.0f, 0.0f, 0.0f));
 
   // grass
-  drawGrass();
+  drawTransparent();
 
   glBindVertexArray(0);
 }
@@ -108,19 +113,27 @@ void BlendingViewport::drawCube(const glm::vec3 &position) {
   m_cube.draw();
 }
 
-void BlendingViewport::drawGrass() {
-  auto shader = m_shaderManager.getShader("grass");
+void BlendingViewport::drawTransparent() {
+  auto shader = m_shaderManager.getShader("model");
   shader->use();
 
-  for (const auto &position : m_grassPositions) {
+  // Draw further objects first, else background objects will not be drawn
+  std::map<float, glm::vec3> sorted;
+  for (const auto &position : m_positions) {
+    // Note that this works because all the distance are different at the start.
+    float distance = glm::length(m_camera->getPosition() - position);
+    sorted[distance] = position;
+  }
+
+  for (auto it = sorted.rbegin(); it != sorted.rend(); ++it) {
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, position);
+    model = glm::translate(model, it->second);
 
     shader->setMat4f("model", model);
     shader->setMat4f("projection", m_camera->getProjection());
     shader->setMat4f("view", m_camera->getViewMatrix());
 
     shader->setInt("tex", 2);
-    m_grassCube.draw();
+    m_transparentCube.draw();
   }
 }
