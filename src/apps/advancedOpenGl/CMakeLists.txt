@@ -3,6 +3,8 @@ logl_add_executable(advancedOpenGl
         main.cpp
         AdvancedOpenGlLayer.cpp
         AdvancedOpenGlLayer.hpp
+        BlendingViewport.cpp
+        BlendingViewport.hpp
         DepthTestViewport.cpp
         DepthTestViewport.hpp
     LINKS
@@ -13,9 +15,12 @@ logl_add_executable(advancedOpenGl
         glm
         imgui
     RESOURCES
+        assets/shaders/blendingDiscard.frag
+        assets/shaders/blendingDiscard.vert
         assets/shaders/depthTesting.frag
         assets/shaders/depthTesting.vert
         assets/shaders/outline.frag
+        assets/textures/grass.png
         assets/textures/marble.jpg
         assets/textures/metal.png
 )

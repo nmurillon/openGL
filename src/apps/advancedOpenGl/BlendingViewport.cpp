@@ -25,8 +25,10 @@ BlendingViewport::BlendingViewport(const std::string &name, float width,
                             std::format("{}/depthTesting.vert", shaderDir),
                             std::format("{}/depthTesting.frag", shaderDir));
 
+  m_shaderManager.addShader("grass",
+                            std::format("{}/blendingDiscard.vert", shaderDir),
+                            std::format("{}/blendingDiscard.frag", shaderDir));
   // Setup textures
-
   m_marble = {libs::renderer::TextureType::DIFFUSE,
               std::format("{}/marble.jpg", textureDir.string())};
 
@@ -36,11 +38,16 @@ BlendingViewport::BlendingViewport(const std::string &name, float width,
   m_grass = {libs::renderer::TextureType::DIFFUSE,
              std::format("{}/grass.png", textureDir.string())};
 
+  m_grass.setTextureWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_metal.id());
 
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, m_marble.id());
+
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, m_grass.id());
 
   glEnable(GL_DEPTH_TEST);
 }
@@ -62,6 +69,9 @@ void BlendingViewport::drawScene() {
   drawCube(glm::vec3(-1.0f, 0.0f, -1.0f));
   drawCube(glm::vec3(2.0f, 0.0f, 0.0f));
 
+  // grass
+  drawGrass();
+
   glBindVertexArray(0);
 }
 
@@ -76,6 +86,9 @@ void BlendingViewport::drawFloor() {
   auto shader = m_shaderManager.getShader("model");
   shader->use();
 
+  shader->setMat4f("model", glm::mat4(1.0f));
+  shader->setMat4f("projection", m_camera->getProjection());
+  shader->setMat4f("view", m_camera->getViewMatrix());
   shader->setInt("tex", 1);
   m_floor.draw();
 }
@@ -93,4 +106,21 @@ void BlendingViewport::drawCube(const glm::vec3 &position) {
 
   shader->setInt("tex", 0);
   m_cube.draw();
+}
+
+void BlendingViewport::drawGrass() {
+  auto shader = m_shaderManager.getShader("grass");
+  shader->use();
+
+  for (const auto &position : m_grassPositions) {
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, position);
+
+    shader->setMat4f("model", model);
+    shader->setMat4f("projection", m_camera->getProjection());
+    shader->setMat4f("view", m_camera->getViewMatrix());
+
+    shader->setInt("tex", 2);
+    m_grassCube.draw();
+  }
 }

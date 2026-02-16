@@ -57,7 +57,7 @@ void Texture::load(const std::filesystem::path &path) {
       format = GL_RGBA;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, format,
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
                  GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -78,4 +78,10 @@ void Texture::load(const std::filesystem::path &path) {
 GLuint Texture::id() const { return m_data.id; }
 
 TextureType Texture::type() const { return m_data.type; }
+
+void Texture::setTextureWrap(GLint wrapS, GLint wrapT) {
+  glBindTexture(GL_TEXTURE_2D, m_data.id);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
+}
 } // namespace libs::renderer

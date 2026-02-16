@@ -18,7 +18,7 @@
 class BlendingViewport : public libs::core::Viewport {
 public:
   BlendingViewport(const std::string &name, float width = 800.f,
-                    float height = 600.f);
+                   float height = 600.f);
 
 public:
   virtual ~BlendingViewport() = default;
@@ -32,6 +32,7 @@ protected:
 private:
   void drawFloor();
   void drawCube(const glm::vec3 &position);
+  void drawGrass();
 
   std::shared_ptr<libs::renderer::Camera> m_camera;
   libs::renderer::MouseCameraController m_cameraController;
@@ -99,6 +100,17 @@ private:
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f								
     };
+
+    const std::vector<float> m_grassVertices{
+        // positions          // texture Coords
+         0.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+         1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+
+         0.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+         1.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+         0.0f,  1.0f,  0.0f,  0.0f, 1.0f								
+    };
   // clang-format on
 
   libs::renderer::Cube m_cube{libs::renderer::Cube::DataType::POSITION_TEXTURE,
@@ -106,4 +118,13 @@ private:
 
   libs::renderer::Cube m_floor{libs::renderer::Cube::DataType::POSITION_TEXTURE,
                                m_planeVertices};
+
+  libs::renderer::Cube m_grassCube{
+      libs::renderer::Cube::DataType::POSITION_TEXTURE, m_grassVertices};
+
+  std::vector<glm::vec3> m_grassPositions{{-1.5f, -0.5f, -0.48f},
+                                          {1.5f, -0.5f, 0.51f},
+                                          {0.f, -0.5f, 0.7f},
+                                          {-0.3f, -0.5f, -2.3f},
+                                          {0.5f, -0.5f, -0.6f}};
 };

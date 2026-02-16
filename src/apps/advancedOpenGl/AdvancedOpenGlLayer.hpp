@@ -2,9 +2,12 @@
 
 #include <libs/core/Layer.hpp>
 
+#include "BlendingViewport.hpp"
 #include "DepthTestViewport.hpp"
 
+#include <memory>
 #include <string>
+#include <vector>
 
 class AdvancedOpenGlLayer : public libs::core::Layer {
 
@@ -18,5 +21,7 @@ public:
   virtual void onImguiUpdate() override;
 
 private:
-  DepthTestViewport m_depthTestViewport;
+  std::vector<std::shared_ptr<libs::core::Viewport>> m_viewports{
+      std::make_shared<DepthTestViewport>("Depth Test"),
+      std::make_shared<BlendingViewport>("Blending")};
 };

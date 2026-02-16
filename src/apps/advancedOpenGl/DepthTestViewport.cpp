@@ -96,6 +96,10 @@ void DepthTestViewport::drawScene() {
 }
 
 void DepthTestViewport::onImguiUpdate() {
+  if (!isActive()) {
+    return;
+  }
+
   static std::string current_item = m_depthFuncs[0];
 
   ImGui::Begin("Depth Test Settings");

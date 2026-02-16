@@ -23,6 +23,7 @@ public:
 
   GLuint id() const;
   TextureType type() const;
+  void setTextureWrap(GLint wrapS, GLint wrapT);
 
 private:
   struct Data {

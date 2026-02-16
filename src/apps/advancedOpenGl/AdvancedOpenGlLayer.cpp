@@ -1,15 +1,23 @@
 #include "AdvancedOpenGlLayer.hpp"
 
 AdvancedOpenGlLayer::AdvancedOpenGlLayer(const std::string &name)
-    : Layer(name), m_depthTestViewport("Depth Test") {}
+    : Layer(name) {}
 
-void AdvancedOpenGlLayer::onUpdate() { m_depthTestViewport.onUpdate(); }
+void AdvancedOpenGlLayer::onUpdate() {
+  for (const auto &viewport : m_viewports) {
+    viewport->onUpdate();
+  }
+}
 
 void AdvancedOpenGlLayer::onImguiUpdate() {
-  m_depthTestViewport.display();
-  m_depthTestViewport.onImguiUpdate();
+  for (const auto &viewport : m_viewports) {
+    viewport->display();
+    viewport->onImguiUpdate();
+  }
 }
 
 void AdvancedOpenGlLayer::onEvent(libs::events::Event &event) {
-  m_depthTestViewport.onEvent(event);
+  for (const auto &viewport : m_viewports) {
+    viewport->onEvent(event);
+  }
 }
