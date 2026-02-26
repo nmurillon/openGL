@@ -18,7 +18,7 @@ public:
       const std::string &name, float width = 800.f, float height = 600.f,
       const std::filesystem::path &assetsDir = std::filesystem::path{});
 
-  //   void onImguiUpdate() override;
+  void onImguiUpdate() override;
   void onEvent(libs::events::Event &event) override;
 
 protected:

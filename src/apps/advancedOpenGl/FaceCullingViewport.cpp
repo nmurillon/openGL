@@ -3,6 +3,23 @@
 #include <libs/renderer/PerspectiveCamera.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <imgui/imgui.h>
+
+const std::vector<std::string> cullModes{"GL_BACK", "GL_FRONT",
+                                         "GL_FRONT_AND_BACK"};
+
+namespace {
+int cullModeFromString(const std::string &cullMode) {
+  if (cullMode == "GL_FRONT")
+    return GL_FRONT;
+  if (cullMode == "GL_BACK")
+    return GL_BACK;
+  if (cullMode == "GL_FRONT_AND_BACK")
+    return GL_FRONT_AND_BACK;
+  return GL_BACK; // Default
+}
+
+} // namespace
 
 FaceCullingViewport::FaceCullingViewport(const std::string &name, float width,
                                          float height,
@@ -31,7 +48,35 @@ void FaceCullingViewport::onEvent(libs::events::Event &event) {
   m_cameraController.onEvent(event);
 }
 
+void FaceCullingViewport::onImguiUpdate() {
+  if (!isActive()) {
+    return;
+  }
+
+  static std::string current_item = cullModes[0];
+
+  ImGui::Begin("Face Culling Settings");
+
+  if (ImGui::BeginCombo("Cull mode", current_item.c_str())) {
+    for (const auto &item : cullModes) {
+      bool is_selected = (current_item == item);
+      if (ImGui::Selectable(item.c_str(), is_selected)) {
+        const auto cullMode = cullModeFromString(item);
+        glCullFace(cullMode);
+        current_item = item;
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  ImGui::End();
+}
+
 void FaceCullingViewport::drawScene() {
+  m_camera->setViewportSize(m_width, m_height);
   m_cameraController.update();
 
   auto shader = m_shaderManager.getShader("cube");
