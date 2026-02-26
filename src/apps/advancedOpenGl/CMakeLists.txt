@@ -7,6 +7,8 @@ logl_add_executable(advancedOpenGl
         BlendingViewport.hpp
         DepthTestViewport.cpp
         DepthTestViewport.hpp
+        FaceCullingViewport.cpp
+        FaceCullingViewport.hpp
     LINKS
         logl_core
         logl_io
@@ -17,6 +19,8 @@ logl_add_executable(advancedOpenGl
     RESOURCES
         assets/shaders/blendingDiscard.frag
         assets/shaders/blendingDiscard.vert
+        assets/shaders/cube.frag
+        assets/shaders/cube.vert
         assets/shaders/depthTesting.frag
         assets/shaders/depthTesting.vert
         assets/shaders/outline.frag

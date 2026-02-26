@@ -1,7 +1,16 @@
 #include "AdvancedOpenGlLayer.hpp"
 
+#include "FaceCullingViewport.hpp"
+#include <libs/io/ProgramPath.hpp>
+
 AdvancedOpenGlLayer::AdvancedOpenGlLayer(const std::string &name)
-    : Layer(name) {}
+    : Layer(name) {
+  const auto assetsDir = (libs::io::ProgramPath::getInstance().getProgramDir() /
+                          ADVANCEDOPENGL_RESOURCES_FOLDER / "assets");
+
+  m_viewports.emplace_back(std::make_shared<FaceCullingViewport>(
+      "Face Culling", 800.f, 600.f, assetsDir));
+}
 
 void AdvancedOpenGlLayer::onUpdate() {
   for (const auto &viewport : m_viewports) {
