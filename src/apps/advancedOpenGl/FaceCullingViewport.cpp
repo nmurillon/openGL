@@ -8,6 +8,8 @@
 const std::vector<std::string> cullModes{"GL_BACK", "GL_FRONT",
                                          "GL_FRONT_AND_BACK"};
 
+const std::vector<std::string> frontFaceModes{"GL_CCW", "GL_CW"};
+
 namespace {
 int cullModeFromString(const std::string &cullMode) {
   if (cullMode == "GL_FRONT")
@@ -19,6 +21,13 @@ int cullModeFromString(const std::string &cullMode) {
   return GL_BACK; // Default
 }
 
+int frontFaceFromString(const std::string &frontFaceMode) {
+  if (frontFaceMode == "GL_CCW")
+    return GL_CCW;
+  if (frontFaceMode == "GL_CW")
+    return GL_CW;
+  return GL_CCW; // Default
+}
 } // namespace
 
 FaceCullingViewport::FaceCullingViewport(const std::string &name, float width,
@@ -64,6 +73,22 @@ void FaceCullingViewport::onImguiUpdate() {
         const auto cullMode = cullModeFromString(item);
         glCullFace(cullMode);
         current_item = item;
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  static std::string current_front_face_item = frontFaceModes[0];
+  if (ImGui::BeginCombo("Cull front face", current_front_face_item.c_str())) {
+    for (const auto &item : frontFaceModes) {
+      bool is_selected = (current_front_face_item == item);
+      if (ImGui::Selectable(item.c_str(), is_selected)) {
+        const auto frontFace = frontFaceFromString(item);
+        glFrontFace(frontFace);
+        current_front_face_item = item;
       }
       if (is_selected) {
         ImGui::SetItemDefaultFocus();
