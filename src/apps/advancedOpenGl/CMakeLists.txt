@@ -9,11 +9,14 @@ logl_add_executable(advancedOpenGl
         DepthTestViewport.hpp
         FaceCullingViewport.cpp
         FaceCullingViewport.hpp
+        FrameBufferViewport.cpp
+        FrameBufferViewport.hpp
     LINKS
         logl_core
         logl_io
         logl_events
         logl_renderer
+        logl_logger
         glm
         imgui
     RESOURCES
@@ -23,6 +26,8 @@ logl_add_executable(advancedOpenGl
         assets/shaders/cube.vert
         assets/shaders/depthTesting.frag
         assets/shaders/depthTesting.vert
+        assets/shaders/frameBuffer.frag
+        assets/shaders/frameBuffer.vert
         assets/shaders/outline.frag
         assets/textures/blending_transparent_window.png
         assets/textures/grass.png

@@ -10,6 +10,7 @@ public:
   enum class LOGL_RENDERER_EXPORT DataType {
     POSITION,
     POSITION_COLOR,
+    POSITION2D_TEXTURE,
     POSITION_TEXTURE,
     POSITION_NORMAL,
     POSITION_NORMAL_TEXTURE,
@@ -23,6 +24,7 @@ public:
 private:
   int getVertexOffset() const;
   int getStride() const;
+  std::vector<int> getAttributeSizes() const;
 
 private:
   DataType m_type;

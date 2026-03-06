@@ -12,12 +12,26 @@ std::string textureTypeToString(TextureType type) {
     return "texture_diffuse";
   case TextureType::SPECULAR:
     return "texture_specular";
+  case TextureType::BUFFER:
+    return "texture_buffer";
   default:
     return "unknown";
   }
 }
 
 std::map<std::filesystem::path, Texture::Data> Texture::s_loadedTextures;
+
+Texture::Texture(int width, int height) {
+  m_data.type = TextureType::BUFFER;
+  glGenTextures(1, &m_data.id);
+  glBindTexture(GL_TEXTURE_2D, m_data.id);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, NULL);
+
+  // Set texture wrapping
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
 
 Texture::Texture(Data data) : m_data(data) {}
 
@@ -69,7 +83,7 @@ void Texture::load(const std::filesystem::path &path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   } else {
-    Logger::logWarning("WARNING::TEXTURE::FAIL_TO_OPEN");
+    Logger::logWarning("WARNING::TEXTURE::FAIL_TO_OPEN {}", path.string());
   }
 
   stbi_image_free(data);

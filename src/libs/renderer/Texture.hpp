@@ -12,12 +12,15 @@
 
 namespace libs::renderer {
 
-enum class TextureType { DIFFUSE, SPECULAR };
+enum class TextureType { DIFFUSE, SPECULAR, BUFFER };
 
 std::string textureTypeToString(TextureType type);
 
 class LOGL_RENDERER_EXPORT Texture {
 public:
+  // Constructor used for framebuffer textures --> Will probably need a rework
+  // in the future
+  Texture(int width, int height);
   Texture(TextureType type, const std::string &path);
   Texture(TextureType type, const std::filesystem::path &path);
 

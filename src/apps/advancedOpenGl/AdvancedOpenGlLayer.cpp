@@ -1,6 +1,7 @@
 #include "AdvancedOpenGlLayer.hpp"
 
 #include "FaceCullingViewport.hpp"
+#include "FrameBufferViewport.hpp"
 #include <libs/io/ProgramPath.hpp>
 
 AdvancedOpenGlLayer::AdvancedOpenGlLayer(const std::string &name)
@@ -10,6 +11,8 @@ AdvancedOpenGlLayer::AdvancedOpenGlLayer(const std::string &name)
 
   m_viewports.emplace_back(std::make_shared<FaceCullingViewport>(
       "Face Culling", 800.f, 600.f, assetsDir));
+  m_viewports.emplace_back(std::make_shared<FrameBufferViewport>(
+      "Frame Buffer", 800.f, 600.f, assetsDir));
 }
 
 void AdvancedOpenGlLayer::onUpdate() {

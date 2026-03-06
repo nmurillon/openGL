@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <numeric>
+
 namespace libs::renderer {
 Cube::Cube(const DataType &type, const std::vector<float> &vertices,
            const std::vector<unsigned int> &indices)
@@ -26,24 +28,24 @@ Cube::Cube(const DataType &type, const std::vector<float> &vertices,
 
   const auto stride = getStride();
 
+  const auto sizes = getAttributeSizes();
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
+  glVertexAttribPointer(0, sizes[0], GL_FLOAT, GL_FALSE, stride,
                         reinterpret_cast<void *>(0));
 
   // Vertex attribute 1
-  if (m_type != DataType::POSITION) {
-    const auto size = (m_type == DataType::POSITION_TEXTURE) ? 2 : 3;
-
+  if (sizes.size() > 1) {
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride,
-                          reinterpret_cast<void *>(3 * sizeof(float)));
+    glVertexAttribPointer(1, sizes[1], GL_FLOAT, GL_FALSE, stride,
+                          reinterpret_cast<void *>(sizes[0] * sizeof(float)));
   }
 
   // Vertex attribute 2
-  if (m_type == DataType::POSITION_NORMAL_TEXTURE) {
+  if (sizes.size() > 2) {
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
-                          reinterpret_cast<void *>(6 * sizeof(float)));
+    glVertexAttribPointer(
+        2, sizes[2], GL_FLOAT, GL_FALSE, stride,
+        reinterpret_cast<void *>((sizes[1] + sizes[0]) * sizeof(float)));
   }
 
   // Unbind VBO & VAO to prevent further operations to modify them
@@ -64,21 +66,27 @@ void Cube::draw() const {
 }
 
 int Cube::getVertexOffset() const {
-  switch (m_type) {
-  case DataType::POSITION:
-    return 3;
-  case DataType::POSITION_COLOR:
-    return 6;
-  case DataType::POSITION_TEXTURE:
-    return 5;
-  case DataType::POSITION_NORMAL:
-    return 6;
-  case DataType::POSITION_NORMAL_TEXTURE:
-    return 8;
-  default:
-    return 0;
-  }
+  const auto sizes = getAttributeSizes();
+  return std::accumulate(sizes.begin(), sizes.end(), 0);
 }
 
 int Cube::getStride() const { return getVertexOffset() * sizeof(float); }
+
+std::vector<int> Cube::getAttributeSizes() const {
+  switch (m_type) {
+  case DataType::POSITION:
+    return {3};
+  case DataType::POSITION_COLOR:
+    return {3, 3};
+  case DataType::POSITION_TEXTURE:
+    return {3, 2};
+  case DataType::POSITION2D_TEXTURE:
+    return {2, 2};
+  case DataType::POSITION_NORMAL:
+    return {3, 3};
+  case DataType::POSITION_NORMAL_TEXTURE:
+    return {3, 3, 2};
+  }
+}
+
 }; // namespace libs::renderer
