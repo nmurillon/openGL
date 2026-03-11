@@ -79,6 +79,7 @@ void Viewport::display() {
 }
 
 void Viewport::onUpdate() {
+  // Should each viewport be responsible for checking if it should render?
   if (!isActive()) {
     resetState();
     return;
