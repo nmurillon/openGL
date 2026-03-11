@@ -94,7 +94,7 @@ private:
 
   libs::renderer::Cube m_cube{libs::renderer::Cube::DataType::POSITION_TEXTURE,
                               m_cubeVertices};
-  libs::renderer::Texture m_metal{800, 600};
+  libs::renderer::Texture m_wood{800, 600};
 
   // Everything related to the framebuffer, textures and renderbuffer
   // TODO: move this to a FrameBuffer class

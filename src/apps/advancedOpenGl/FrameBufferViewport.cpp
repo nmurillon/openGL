@@ -30,8 +30,9 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
                             m_assetsDir / "shaders/frameBuffer.vert",
                             m_assetsDir / "shaders/inversion.frag");
 
-  m_metal = {libs::renderer::TextureType::DIFFUSE,
-             std::format("{}/metal.png", (m_assetsDir / "textures").string())};
+  m_wood = {libs::renderer::TextureType::DIFFUSE,
+            std::format("{}/wood_container.png",
+                        (m_assetsDir / "textures").string())};
 
   // TODO: move this to a FrameBuffer class
   glGenFramebuffers(1, &m_frameBuffer);
@@ -132,7 +133,7 @@ void FrameBufferViewport::drawInFrameBuffer() {
   shader->use();
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, m_metal.id());
+  glBindTexture(GL_TEXTURE_2D, m_wood.id());
   shader->setMat4f("view", m_camera->getViewMatrix());
   shader->setMat4f("projection", m_camera->getProjection());
   shader->setInt("tex", 0);

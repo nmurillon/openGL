@@ -35,4 +35,5 @@ logl_add_executable(advancedOpenGl
         assets/textures/grass.png
         assets/textures/marble.jpg
         assets/textures/metal.png
+        assets/textures/wood_container.png
 )
