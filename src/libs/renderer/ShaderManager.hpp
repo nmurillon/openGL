@@ -19,6 +19,9 @@ public:
   void addShader(const std::string &name, std::shared_ptr<Shader> shader);
   void addShader(const std::string &name, const std::string &vertexSrcFile,
                  const std::string &fragmentSrcFile);
+  void addShader(const std::string &name,
+                 const std::filesystem::path &vertexSrcFile,
+                 const std::filesystem::path &fragmentSrcFile);
 
   std::filesystem::path getCommonShaderDirectory() const;
 

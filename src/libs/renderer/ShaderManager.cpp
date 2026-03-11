@@ -47,6 +47,18 @@ void ShaderManager::addShader(const std::string &name,
   m_shaders[name] = std::make_shared<Shader>(vertexSrcFile, fragmentSrcFile);
 }
 
+void ShaderManager::addShader(const std::string &name,
+                              const std::filesystem::path &vertexSrcFile,
+                              const std::filesystem::path &fragmentSrcFile) {
+  if (m_shaders.contains(name)) {
+    throw std::runtime_error(
+        std::format("A shader with name {} already exists", name));
+  }
+
+  m_shaders[name] = std::make_shared<Shader>(vertexSrcFile.string(),
+                                             fragmentSrcFile.string());
+}
+
 std::filesystem::path ShaderManager::getCommonShaderDirectory() const {
   return m_commonShaderDirectory;
 }
