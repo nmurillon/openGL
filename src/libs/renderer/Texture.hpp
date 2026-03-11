@@ -27,11 +27,16 @@ public:
   GLuint id() const;
   TextureType type() const;
   void setTextureWrap(GLint wrapS, GLint wrapT);
+  void setSize(int width, int height);
 
 private:
   struct Data {
     GLuint id;
     TextureType type;
+    GLenum format;
+
+    int width;
+    int height;
   };
 
   Data m_data;

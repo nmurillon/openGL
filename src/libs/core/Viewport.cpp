@@ -55,8 +55,13 @@ void Viewport::display() {
 
   m_xBottomLeft = vMin.x;
   m_yBottomLeft = mainViewPort.y - vMax.y;
-  m_width = vMax.x - vMin.x;
-  m_height = vMax.y - vMin.y;
+
+  if (m_width != vMax.x - vMin.x || m_height != vMax.y - vMin.y) {
+    m_width = vMax.x - vMin.x;
+    m_height = vMax.y - vMin.y;
+
+    onViewportResize(m_width, m_height);
+  }
 
   // Debug info
   //   ImGui::GetForegroundDrawList()->AddRect(vMin, vMax,

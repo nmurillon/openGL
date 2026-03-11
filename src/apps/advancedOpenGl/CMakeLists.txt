@@ -28,6 +28,8 @@ logl_add_executable(advancedOpenGl
         assets/shaders/depthTesting.vert
         assets/shaders/frameBuffer.frag
         assets/shaders/frameBuffer.vert
+        assets/shaders/grayscale.frag
+        assets/shaders/inversion.frag
         assets/shaders/outline.frag
         assets/textures/blending_transparent_window.png
         assets/textures/grass.png

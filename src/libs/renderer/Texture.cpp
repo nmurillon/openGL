@@ -51,11 +51,11 @@ Texture::Texture(TextureType type, const std::filesystem::path &path) {
 }
 
 void Texture::load(const std::filesystem::path &path) {
-  int width, height, nChannels;
+  int nChannels;
 
   stbi_set_flip_vertically_on_load(true);
-  unsigned char *data =
-      stbi_load(path.string().c_str(), &width, &height, &nChannels, 0);
+  unsigned char *data = stbi_load(path.string().c_str(), &m_data.width,
+                                  &m_data.height, &nChannels, 0);
 
   glGenTextures(1, &m_data.id);
   glBindTexture(GL_TEXTURE_2D, m_data.id);
@@ -71,8 +71,10 @@ void Texture::load(const std::filesystem::path &path) {
       format = GL_RGBA;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
-                 GL_UNSIGNED_BYTE, data);
+    m_data.format = format;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, m_data.format, m_data.width, m_data.height,
+                 0, m_data.format, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     // Set texture wrapping
@@ -98,4 +100,19 @@ void Texture::setTextureWrap(GLint wrapS, GLint wrapT) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
 }
+
+void Texture::setSize(int width, int height) {
+  if (m_data.type != TextureType::BUFFER) {
+    Logger::logError(
+        "ERROR::TEXTURE::SET_SIZE can only be called on BUFFER textures");
+    return;
+  }
+
+  m_data.width = width;
+  m_data.height = height;
+  glBindTexture(GL_TEXTURE_2D, m_data.id);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+               GL_UNSIGNED_BYTE, NULL);
+}
+
 } // namespace libs::renderer

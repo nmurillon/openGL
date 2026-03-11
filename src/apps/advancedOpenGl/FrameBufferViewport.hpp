@@ -31,6 +31,8 @@ protected:
 
 private:
   void drawInFrameBuffer();
+  bool onViewportResize(float newWidth, float newHeight) override;
+
   // clang-format off
   const std::vector<float> m_cubeVertices{
         // positions                        // texture Coords
@@ -111,4 +113,6 @@ private:
           // clang-format on
       },
       {0, 1, 2, 0, 2, 3}};
+
+  std::string m_currentShader{"framebuffer"};
 };

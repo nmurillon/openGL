@@ -2,6 +2,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <imgui/imgui.h>
+
 #include <libs/logger/Logger.hpp>
 #include <libs/renderer/PerspectiveCamera.hpp>
 
@@ -19,6 +21,14 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
   m_shaderManager.addShader("framebuffer",
                             m_assetsDir / "shaders/frameBuffer.vert",
                             m_assetsDir / "shaders/frameBuffer.frag");
+
+  m_shaderManager.addShader("grayscale",
+                            m_assetsDir / "shaders/frameBuffer.vert",
+                            m_assetsDir / "shaders/grayscale.frag");
+
+  m_shaderManager.addShader("inversion",
+                            m_assetsDir / "shaders/frameBuffer.vert",
+                            m_assetsDir / "shaders/inversion.frag");
 
   m_metal = {libs::renderer::TextureType::DIFFUSE,
              std::format("{}/metal.png", (m_assetsDir / "textures").string())};
@@ -48,10 +58,43 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBufferViewport::onImguiUpdate() {}
+void FrameBufferViewport::onImguiUpdate() {
+  static std::vector<std::string> postProcessingEffects{
+      "framebuffer", "grayscale", "inversion"};
+  static std::string current_item = postProcessingEffects[0];
+
+  ImGui::Begin("Frame Buffer Settings");
+
+  if (ImGui::BeginCombo("post processing", current_item.c_str())) {
+    for (const auto &item : postProcessingEffects) {
+      bool is_selected = (current_item == item);
+      if (ImGui::Selectable(item.c_str(), is_selected)) {
+        current_item = item;
+        m_currentShader = item;
+      }
+      if (is_selected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  ImGui::End();
+}
 
 void FrameBufferViewport::onEvent(libs::events::Event &event) {
   m_cameraController.onEvent(event);
+}
+
+bool FrameBufferViewport::onViewportResize(float newWidth, float newHeight) {
+  m_textureColorBuffer.setSize(newWidth, newHeight);
+  m_camera->setViewportSize(newWidth, newHeight);
+
+  glBindRenderbuffer(GL_RENDERBUFFER, m_renderBuffer);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, newWidth,
+                        newHeight);
+
+  return false;
 }
 
 void FrameBufferViewport::drawScene() {
@@ -63,10 +106,11 @@ void FrameBufferViewport::drawScene() {
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  glViewport(m_xBottomLeft, m_yBottomLeft, m_width, m_height);
   glDisable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  auto screenShader = m_shaderManager.getShader("framebuffer");
+  auto screenShader = m_shaderManager.getShader(m_currentShader);
   screenShader->use();
 
   glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer.id());
@@ -77,6 +121,9 @@ void FrameBufferViewport::drawScene() {
 
 void FrameBufferViewport::drawInFrameBuffer() {
   glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+  // We need to draw the scene considering the viewport full size
+  glViewport(0, 0, m_width, m_height);
+
   glEnable(GL_DEPTH_TEST);
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

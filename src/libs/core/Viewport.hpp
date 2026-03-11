@@ -29,6 +29,9 @@ public:
 
 protected:
   virtual void drawScene() = 0;
+  virtual bool onViewportResize(float newWidth, float newHeight) {
+    return false;
+  }
 
 private:
   void prepareScene();
