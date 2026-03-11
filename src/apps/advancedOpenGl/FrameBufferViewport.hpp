@@ -28,10 +28,12 @@ private:
 
 protected:
   void drawScene() override;
+  void initState() override;
+  void resetState() override;
 
 private:
   void drawInFrameBuffer();
-  bool onViewportResize(float newWidth, float newHeight) override;
+  void onViewportResize(float newWidth, float newHeight) override;
 
   // clang-format off
   const std::vector<float> m_cubeVertices{

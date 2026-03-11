@@ -1,7 +1,4 @@
 #include <libs/core/Viewport.hpp>
-#include <libs/events/KeyEvent.hpp>
-#include <libs/events/MouseEvent.hpp>
-#include <libs/events/WindowEvent.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Cube.hpp>
 #include <libs/renderer/Model.hpp>
@@ -28,6 +25,8 @@ public:
 
 protected:
   virtual void drawScene() override;
+  void initState() override;
+  void resetState() override;
 
 private:
   void drawFloor();

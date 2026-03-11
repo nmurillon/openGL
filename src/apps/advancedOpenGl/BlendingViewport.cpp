@@ -1,6 +1,5 @@
 #include "BlendingViewport.hpp"
 
-#include <libs/events/EventDispatcher.hpp>
 #include <libs/io/ProgramPath.hpp>
 #include <libs/renderer/PerspectiveCamera.hpp>
 
@@ -42,7 +41,9 @@ BlendingViewport::BlendingViewport(const std::string &name, float width,
       std::format("{}/blending_transparent_window.png", textureDir.string())};
 
   m_transparent.setTextureWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+}
 
+void BlendingViewport::initState() {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_metal.id());
 
@@ -55,6 +56,11 @@ BlendingViewport::BlendingViewport(const std::string &name, float width,
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void BlendingViewport::resetState() {
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
 }
 
 void BlendingViewport::drawScene() {
@@ -83,8 +89,9 @@ void BlendingViewport::drawScene() {
 void BlendingViewport::onImguiUpdate() {}
 
 void BlendingViewport::onEvent(libs::events::Event &event) {
-  libs::events::EventDispatcher dispatcher(event);
-  m_cameraController.onEvent(event);
+  if (isActive()) {
+    m_cameraController.onEvent(event);
+  }
 }
 
 void BlendingViewport::drawFloor() {

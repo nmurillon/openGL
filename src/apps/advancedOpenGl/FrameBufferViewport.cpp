@@ -59,7 +59,21 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void FrameBufferViewport::initState() {
+  glEnable(GL_DEPTH_TEST);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBufferViewport::resetState() {
+  glDisable(GL_DEPTH_TEST);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void FrameBufferViewport::onImguiUpdate() {
+  if (!isActive()) {
+    return;
+  }
+
   static std::vector<std::string> postProcessingEffects{
       "framebuffer", "grayscale", "inversion"};
   static std::string current_item = postProcessingEffects[0];
@@ -84,22 +98,21 @@ void FrameBufferViewport::onImguiUpdate() {
 }
 
 void FrameBufferViewport::onEvent(libs::events::Event &event) {
-  m_cameraController.onEvent(event);
+  if (isActive()) {
+    m_cameraController.onEvent(event);
+  }
 }
 
-bool FrameBufferViewport::onViewportResize(float newWidth, float newHeight) {
+void FrameBufferViewport::onViewportResize(float newWidth, float newHeight) {
   m_textureColorBuffer.setSize(newWidth, newHeight);
   m_camera->setViewportSize(newWidth, newHeight);
 
   glBindRenderbuffer(GL_RENDERBUFFER, m_renderBuffer);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, newWidth,
                         newHeight);
-
-  return false;
 }
 
 void FrameBufferViewport::drawScene() {
-  glDisable(GL_CULL_FACE);
   m_cameraController.update();
 
   glActiveTexture(GL_TEXTURE0);

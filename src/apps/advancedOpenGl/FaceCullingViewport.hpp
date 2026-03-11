@@ -23,6 +23,8 @@ public:
 
 protected:
   void drawScene() override;
+  void initState() override;
+  void resetState() override;
 
 private:
   std::filesystem::path m_assetsDir;

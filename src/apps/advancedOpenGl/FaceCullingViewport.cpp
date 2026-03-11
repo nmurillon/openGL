@@ -46,16 +46,21 @@ FaceCullingViewport::FaceCullingViewport(const std::string &name, float width,
 
   m_shaderManager.addShader("cube", std::format("{}/cube.vert", shaderDir),
                             std::format("{}/cube.frag", shaderDir));
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, m_metal.id());
-
-  glEnable(GL_CULL_FACE);
 }
 
 void FaceCullingViewport::onEvent(libs::events::Event &event) {
-  m_cameraController.onEvent(event);
+  if (isActive()) {
+    m_cameraController.onEvent(event);
+  }
 }
+
+void FaceCullingViewport::initState() {
+  glEnable(GL_CULL_FACE);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, m_metal.id());
+}
+
+void FaceCullingViewport::resetState() { glDisable(GL_CULL_FACE); }
 
 void FaceCullingViewport::onImguiUpdate() {
   if (!isActive()) {

@@ -1,6 +1,5 @@
 #include "DepthTestViewport.hpp"
 
-#include <libs/events/EventDispatcher.hpp>
 #include <libs/io/ProgramPath.hpp>
 #include <libs/renderer/PerspectiveCamera.hpp>
 
@@ -57,7 +56,9 @@ DepthTestViewport::DepthTestViewport(const std::string &name, float width,
 
   m_metal = {libs::renderer::TextureType::DIFFUSE,
              std::format("{}/metal.png", textureDir.string())};
+}
 
+void DepthTestViewport::initState() {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_metal.id());
 
@@ -65,6 +66,11 @@ DepthTestViewport::DepthTestViewport(const std::string &name, float width,
   glBindTexture(GL_TEXTURE_2D, m_marble.id());
 
   glEnable(GL_DEPTH_TEST);
+}
+
+void DepthTestViewport::resetState() {
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_STENCIL_TEST);
 }
 
 void DepthTestViewport::drawScene() {
@@ -133,8 +139,9 @@ void DepthTestViewport::onImguiUpdate() {
 }
 
 void DepthTestViewport::onEvent(libs::events::Event &event) {
-  libs::events::EventDispatcher dispatcher(event);
-  m_cameraController.onEvent(event);
+  if (isActive()) {
+    m_cameraController.onEvent(event);
+  }
 }
 
 void DepthTestViewport::drawFloor() {
