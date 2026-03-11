@@ -80,11 +80,16 @@ void Viewport::display() {
 
 void Viewport::onUpdate() {
   if (!isActive()) {
+    resetState();
     return;
   }
 
+  initState();
+
   prepareScene();
   drawScene();
+
+  resetState();
 }
 
 bool Viewport::isActive() { return m_isActive; }

@@ -22,16 +22,15 @@ public:
 
   virtual void onEvent(libs::events::Event &event) = 0;
   void onUpdate();
-  //   virtual void onUpdate() = 0;
-  virtual void onImguiUpdate(){};
+  virtual void onImguiUpdate() {};
 
   static void setWindowSize(float width, float height);
 
 protected:
   virtual void drawScene() = 0;
-  virtual bool onViewportResize(float newWidth, float newHeight) {
-    return false;
-  }
+  virtual void initState() = 0;
+  virtual void resetState() = 0;
+  virtual void onViewportResize(float newWidth, float newHeight) {}
 
 private:
   void prepareScene();
