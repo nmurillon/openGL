@@ -7,6 +7,14 @@
 #include <libs/logger/Logger.hpp>
 #include <libs/renderer/PerspectiveCamera.hpp>
 
+const std::map<std::string, std::vector<float>> FrameBufferViewport::s_kernels{
+    {"custom", {0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f}},
+    {"edgeDetection", {1.f, 1.f, 1.f, 1.f, -8.f, 1.f, 1.f, 1.f, 1.f}},
+    {"sharpen", {2.f, 2.f, 2.f, 2.f, -15.f, 2.f, 2.f, 2.f, 2.f}},
+    {"blur",
+     {1.f / 16.f, 2.f / 16.f, 1.f / 16.f, 2.f / 16.f, 4.f / 16.f, 2.f / 16.f,
+      1.f / 16.f, 2.f / 16.f, 1.f / 16.f}}};
+
 FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
                                          float height,
                                          const std::filesystem::path &assetsDir)
@@ -29,6 +37,9 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
   m_shaderManager.addShader("inversion",
                             m_assetsDir / "shaders/frameBuffer.vert",
                             m_assetsDir / "shaders/inversion.frag");
+
+  m_shaderManager.addShader("kernel", m_assetsDir / "shaders/frameBuffer.vert",
+                            m_assetsDir / "shaders/kernel.frag");
 
   m_wood = {libs::renderer::TextureType::DIFFUSE,
             std::format("{}/wood_container.png",
@@ -75,7 +86,7 @@ void FrameBufferViewport::onImguiUpdate() {
   }
 
   static std::vector<std::string> postProcessingEffects{
-      "framebuffer", "grayscale", "inversion"};
+      "framebuffer", "grayscale", "inversion", "kernel"};
   static std::string current_item = postProcessingEffects[0];
 
   ImGui::Begin("Frame Buffer Settings");
@@ -92,6 +103,27 @@ void FrameBufferViewport::onImguiUpdate() {
       }
     }
     ImGui::EndCombo();
+  }
+
+  static std::string kernelOption = "custom";
+
+  if (current_item == "kernel") {
+    if (ImGui::BeginCombo("Kernel", kernelOption.c_str())) {
+      for (const auto &[key, value] : s_kernels) {
+        bool is_selected = (current_item == key);
+        if (ImGui::Selectable(key.c_str(), is_selected)) {
+          if (kernelOption != key) {
+            m_kernel = value;
+          }
+
+          kernelOption = key;
+        }
+        if (is_selected) {
+          ImGui::SetItemDefaultFocus();
+        }
+      }
+      ImGui::EndCombo();
+    }
   }
 
   ImGui::End();
@@ -129,6 +161,13 @@ void FrameBufferViewport::drawScene() {
 
   glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer.id());
   screenShader->setInt("screenTexture", 0);
+
+  if (m_currentShader == "kernel") {
+    for (int i = 0; i < 9; ++i) {
+      screenShader->setFloat(std::format("kernel[{}]", i), m_kernel[i]);
+    }
+  }
+
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   m_quad.draw();
 }

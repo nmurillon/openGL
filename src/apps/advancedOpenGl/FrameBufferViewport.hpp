@@ -10,6 +10,10 @@
 #include <libs/renderer/ShaderManager.hpp>
 #include <libs/renderer/Texture.hpp>
 
+#include <map>
+#include <string>
+#include <vector>
+
 class FrameBufferViewport : public libs::core::Viewport {
 public:
   virtual ~FrameBufferViewport() = default;
@@ -117,4 +121,6 @@ private:
       {0, 1, 2, 0, 2, 3}};
 
   std::string m_currentShader{"framebuffer"};
+  const static std::map<std::string, std::vector<float>> s_kernels;
+  std::vector<float> m_kernel{s_kernels.at("custom")};
 };
