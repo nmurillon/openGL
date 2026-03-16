@@ -71,12 +71,12 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
 }
 
 void FrameBufferViewport::initState() {
-  glEnable(GL_DEPTH_TEST);
+  m_openglStateCache->setDepthTest(true);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FrameBufferViewport::resetState() {
-  glDisable(GL_DEPTH_TEST);
+  m_openglStateCache->setDepthTest(false);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -150,19 +150,20 @@ void FrameBufferViewport::onViewportResize(float newWidth, float newHeight) {
 void FrameBufferViewport::drawScene() {
   m_cameraController.update();
 
-  glActiveTexture(GL_TEXTURE0);
+  m_openglStateCache->setActiveTexture(GL_TEXTURE0);
   drawInFrameBuffer();
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-  glViewport(m_xBottomLeft, m_yBottomLeft, m_width, m_height);
-  glDisable(GL_DEPTH_TEST);
-  glClear(GL_COLOR_BUFFER_BIT);
+  m_openglStateCache->setClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  m_openglStateCache->setViewport(m_xBottomLeft, m_yBottomLeft, m_width,
+                                  m_height);
+  m_openglStateCache->setDepthTest(false);
+  m_openglStateCache->clear(GL_COLOR_BUFFER_BIT);
 
   auto screenShader = m_shaderManager.getShader(m_currentShader);
   screenShader->use();
 
-  glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer.id());
+  m_textureColorBuffer.bind();
   screenShader->setInt("screenTexture", 0);
 
   if (m_currentShader == "kernel") {
@@ -178,17 +179,16 @@ void FrameBufferViewport::drawScene() {
 void FrameBufferViewport::drawInFrameBuffer() {
   glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
   // We need to draw the scene considering the viewport full size
-  glViewport(0, 0, m_width, m_height);
+  m_openglStateCache->setViewport(0, 0, m_width, m_height);
 
-  glEnable(GL_DEPTH_TEST);
-  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  m_openglStateCache->setDepthTest(true);
+  m_openglStateCache->setClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  m_openglStateCache->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   auto shader = m_shaderManager.getShader("cube");
   shader->use();
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, m_wood.id());
+  m_wood.bind();
   shader->setMat4f("view", m_camera->getViewMatrix());
   shader->setMat4f("projection", m_camera->getProjection());
   shader->setInt("tex", 0);
