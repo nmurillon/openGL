@@ -2,6 +2,8 @@ set(CORE_HEADERS
     Application.hpp
     Layer.hpp
     LayerStack.hpp
+    opengl.h
+    OpenGlStateCache.hpp
     Viewport.hpp
     Window.hpp
 )
@@ -10,6 +12,7 @@ set(CORE_SRC
     Application.cpp
     Layer.cpp
     LayerStack.cpp
+    OpenGlStateCache.cpp
     Viewport.cpp
     Window.cpp
 )
