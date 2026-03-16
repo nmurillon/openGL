@@ -2,7 +2,7 @@
 
 #include <logl/core/export.h>
 
-#include <libs/core/opengl.h>
+#include <libs/openGl/opengl.h>
 
 #include <memory>
 

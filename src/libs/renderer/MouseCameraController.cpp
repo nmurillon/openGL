@@ -3,9 +3,7 @@
 #include <libs/events/EventDispatcher.hpp>
 #include <libs/renderer/PerspectiveCamera.hpp>
 
-#include <glad/glad.h>
-
-#include <GLFW/glfw3.h>
+#include <libs/openGl/opengl.h>
 
 namespace libs::renderer {
 MouseCameraController::MouseCameraController(std::shared_ptr<Camera> camera)

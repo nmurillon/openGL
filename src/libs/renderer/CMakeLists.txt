@@ -33,11 +33,10 @@ logl_add_library(logl_renderer
     PUBLIC_INCLUDES
         ${PROJECT_SOURCE_DIR}/src
     PUBLIC_LINKS
-        glad
+        logl_opengl
         glm
         assimp
     PRIVATE_LINKS
-        glfw
         logl_io
         stb_image
         logl_logger
