@@ -2,7 +2,6 @@ set(CORE_HEADERS
     Application.hpp
     Layer.hpp
     LayerStack.hpp
-    opengl.h
     OpenGlStateCache.hpp
     Viewport.hpp
     Window.hpp
@@ -25,8 +24,7 @@ logl_add_library(logl_core
     PUBLIC_INCLUDES
         ${PROJECT_SOURCE_DIR}/src
     PUBLIC_LINKS
-        glad
-        glfw
+        logl_opengl
         logl_events
     PRIVATE_LINKS
         imgui
