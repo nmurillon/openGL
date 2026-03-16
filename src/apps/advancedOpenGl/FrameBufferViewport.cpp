@@ -112,10 +112,7 @@ void FrameBufferViewport::onImguiUpdate() {
       for (const auto &[key, value] : s_kernels) {
         bool is_selected = (current_item == key);
         if (ImGui::Selectable(key.c_str(), is_selected)) {
-          if (kernelOption != key) {
-            m_kernel = value;
-          }
-
+          m_kernel = value;
           kernelOption = key;
         }
         if (is_selected) {
@@ -123,6 +120,12 @@ void FrameBufferViewport::onImguiUpdate() {
         }
       }
       ImGui::EndCombo();
+    }
+
+    int i = 0;
+    for (auto &factor : m_kernel) {
+      ImGui::SliderFloat(std::format("##kernel {}", i++).c_str(), &factor,
+                         -10.f, 10.f);
     }
   }
 
