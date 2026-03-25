@@ -52,6 +52,6 @@ void VertexArray::setIndexBuffer(const IndexBuffer &indexBuffer) {
 
 void VertexArray::bind() const { glBindVertexArray(m_id); }
 
-void VertexArray::unbind() const { glBindVertexArray(0); }
+void VertexArray::unbind() { glBindVertexArray(0); }
 
 } // namespace libs::renderer

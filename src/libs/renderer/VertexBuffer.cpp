@@ -12,7 +12,7 @@ VertexBuffer::VertexBuffer(BufferLayout &&bufferLayout)
 
 void VertexBuffer::bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_id); }
 
-void VertexBuffer::unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
+void VertexBuffer::unbind() { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
 void VertexBuffer::setLayout(BufferLayout &&layout) {
   m_layout = std::move(layout);

@@ -3,7 +3,6 @@
 #include <logl/renderer/export.h>
 
 #include <libs/openGl/opengl.h>
-#include <libs/renderer/Buffer.hpp>
 
 #include <cstddef>
 #include <vector>

@@ -1,5 +1,4 @@
 set(RENDERER_HEADERS
-    Buffer.hpp
     BufferLayout.hpp
     Camera.hpp
     Cube.hpp

@@ -2,12 +2,11 @@
 
 #include <logl/renderer/export.h>
 
-#include <libs/renderer/Buffer.hpp>
 #include <libs/renderer/IndexBuffer.hpp>
 #include <libs/renderer/VertexBuffer.hpp>
 
 namespace libs::renderer {
-class LOGL_RENDERER_EXPORT VertexArray : public Buffer {
+class LOGL_RENDERER_EXPORT VertexArray {
 public:
   VertexArray();
   VertexArray(VertexBuffer &&vertexBuffer);
@@ -19,10 +18,11 @@ public:
 
   void setIndexBuffer(const IndexBuffer &indexBuffer);
 
-  void bind() const override;
-  void unbind() const override;
+  void bind() const;
+  static void unbind();
 
 private:
+  GLuint m_id;
   // TODO: we might have mltiple buffers in the future
   VertexBuffer m_vertexBuffer;
   IndexBuffer m_indexBuffer;
