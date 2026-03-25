@@ -24,6 +24,9 @@ void VertexArray::setVertexBuffer(const VertexBuffer &vertexBuffer) {
                           element.isNormalized(), layout.getStride(),
                           reinterpret_cast<void *>(element.getOffset()));
   }
+
+  vertexBuffer.unbind();
+  unbind();
 }
 
 const VertexBuffer &VertexArray::getVertexBuffer() const {
@@ -37,11 +40,18 @@ void VertexArray::setData(const void *data, std::size_t size) {
   glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 }
 
+void VertexArray::setIndexBuffer(const IndexBuffer &indexBuffer) {
+  m_indexBuffer = indexBuffer;
+
+  bind();
+  m_indexBuffer.bind();
+
+  unbind();
+  m_indexBuffer.unbind();
+}
+
 void VertexArray::bind() const { glBindVertexArray(m_id); }
 
-void VertexArray::unbind() const {
-  m_vertexBuffer.unbind();
-  glBindVertexArray(0);
-}
+void VertexArray::unbind() const { glBindVertexArray(0); }
 
 } // namespace libs::renderer

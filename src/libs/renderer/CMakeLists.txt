@@ -4,6 +4,7 @@ set(RENDERER_HEADERS
     Camera.hpp
     Cube.hpp
     FlyCameraController.hpp
+    IndexBuffer.hpp
     Mesh.hpp
     Model.hpp
     MouseCameraController.hpp
@@ -21,6 +22,7 @@ set(RENDERER_SRC
     Camera.cpp
     Cube.cpp
     FlyCameraController.cpp
+    IndexBuffer.cpp
     Mesh.cpp
     Model.cpp
     MouseCameraController.cpp
