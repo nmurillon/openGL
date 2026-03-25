@@ -1,4 +1,6 @@
 set(RENDERER_HEADERS
+    Buffer.hpp
+    BufferLayout.hpp
     Camera.hpp
     Cube.hpp
     FlyCameraController.hpp
@@ -10,9 +12,12 @@ set(RENDERER_HEADERS
     ShaderManager.hpp
     Texture.hpp
     Vertex.hpp
+    VertexArray.hpp
+    VertexBuffer.hpp
 )
 
 set(RENDERER_SRC
+    BufferLayout.cpp
     Camera.cpp
     Cube.cpp
     FlyCameraController.cpp
@@ -23,6 +28,8 @@ set(RENDERER_SRC
     Shader.cpp
     ShaderManager.cpp
     Texture.cpp
+    VertexArray.cpp
+    VertexBuffer.cpp
 )
 
 logl_add_library(logl_renderer

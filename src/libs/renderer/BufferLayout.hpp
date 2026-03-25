@@ -1,39 +1,56 @@
 #pragma once
 
+#include <logl/renderer/export.h>
+
 #include <libs/openGl/opengl.h>
 #include <libs/renderer/Buffer.hpp>
 
-
+#include <cstddef>
 #include <vector>
 
 namespace libs::renderer {
 
-class BufferLayoutElement {
+class LOGL_RENDERER_EXPORT BufferLayoutElement {
 public:
-  BufferLayoutElement(int size, int type = GL_FLOAT, int normalized = GL_FALSE,
-                      int stride = 0, int offset = 0)
-      : m_size(size), m_type(type), m_normalized(normalized), m_stride(stride),
-        m_offset(offset) {}
+  BufferLayoutElement(std::size_t size, GLint count, GLenum type = GL_FLOAT,
+                      bool normalized = GL_FALSE)
+      : m_size(size), m_count(count), m_type(type),
+        m_normalized(normalized ? GL_TRUE : GL_FALSE) {}
+  ~BufferLayoutElement() = default;
+
   unsigned int getSize() const { return m_size; }
+  GLint getCount() const { return m_count; }
+  GLenum getType() const { return m_type; }
+  GLboolean isNormalized() const { return m_normalized; }
+  unsigned long getOffset() const { return m_offset; }
+  void setOffset(unsigned long offset) { m_offset = offset; }
 
 private:
-  int m_size;
-  int m_type;
-  int m_normalized;
-  int m_stride;
-  int m_offset;
+  std::size_t m_size{0};
+  GLint m_count{0};
+  GLenum m_type{GL_FLOAT};
+  GLboolean m_normalized{GL_FALSE};
+  unsigned long m_offset{0};
 };
 
-class BufferLayout {
+class LOGL_RENDERER_EXPORT BufferLayout {
 public:
-  BufferLayout(std::vector<BufferLayoutElement> elements)
-      : m_elements(elements) {}
-  virtual ~BufferLayout() = default;
+  using BufferLayoutElements = std::vector<BufferLayoutElement>;
 
-  virtual std::vector<unsigned int> getAttributeSizes() const = 0;
-  virtual unsigned int getStride() const = 0;
+  BufferLayout();
+  BufferLayout(std::initializer_list<BufferLayoutElement> elements);
+  BufferLayout(BufferLayout &&other) = default;
+  BufferLayout(const BufferLayout &other) = default;
+  BufferLayout &operator=(BufferLayout &&other) = default;
+  BufferLayout &operator=(const BufferLayout &other) = default;
+
+  ~BufferLayout() = default;
+
+  GLsizei getStride() const;
+  BufferLayoutElements getElements() const;
 
 private:
-  std::vector<BufferLayoutElement> m_elements;
+  GLsizei m_stride{};
+  BufferLayoutElements m_elements{};
 };
 } // namespace libs::renderer
