@@ -16,6 +16,25 @@ Model::Model(const std::string &path)
   load(path);
 }
 
+Model::Model(Model &&other) noexcept
+    : m_meshes(std::move(other.m_meshes)), m_name(std::move(other.m_name)),
+      m_directory(std::move(other.m_directory)), m_isValid(other.m_isValid) {
+  other.m_isValid = false;
+}
+
+Model &Model::operator=(Model &&other) {
+  if (this == &other) {
+    return *this;
+  }
+
+  m_meshes = std::move(other.m_meshes);
+  m_name = std::move(other.m_name);
+  m_directory = std::move(other.m_directory);
+  m_isValid = other.m_isValid;
+
+  return *this;
+}
+
 void Model::draw(Shader &shader) const {
   for (auto &mesh : m_meshes) {
     mesh.draw(shader);
@@ -95,7 +114,8 @@ void Model::processMesh(aiMesh *mesh, const aiScene *scene) {
                          TextureType::SPECULAR, textures);
   }
 
-  m_meshes.emplace_back(vertices, indices, textures);
+  m_meshes.emplace_back(std::move(vertices), std::move(indices),
+                        std::move(textures));
 }
 
 void Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,

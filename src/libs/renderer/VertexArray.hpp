@@ -10,13 +10,16 @@ class LOGL_RENDERER_EXPORT VertexArray {
 public:
   VertexArray();
   VertexArray(VertexBuffer &&vertexBuffer);
-  virtual ~VertexArray() = default;
 
-  void setVertexBuffer(const VertexBuffer &vertexBuffer);
-  const VertexBuffer &getVertexBuffer() const;
-  void setData(const void *data, std::size_t size);
+  VertexArray(const VertexArray &) = delete;
+  VertexArray(VertexArray &&other) noexcept;
+  VertexArray operator=(const VertexArray &) = delete;
+  VertexArray &operator=(VertexArray &&other) noexcept;
 
-  void setIndexBuffer(const IndexBuffer &indexBuffer);
+  ~VertexArray();
+
+  void setVertexBuffer(VertexBuffer &&vertexBuffer);
+  void setIndexBuffer(IndexBuffer &&indexBuffer);
 
   void bind() const;
   static void unbind();
@@ -26,5 +29,6 @@ private:
   // TODO: we might have mltiple buffers in the future
   VertexBuffer m_vertexBuffer;
   IndexBuffer m_indexBuffer;
+  int m_vertexCount{0};
 };
 } // namespace libs::renderer

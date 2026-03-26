@@ -6,11 +6,36 @@ namespace libs::renderer {
 VertexArray::VertexArray() { glGenVertexArrays(1, &m_id); }
 
 VertexArray::VertexArray(VertexBuffer &&vertexBuffer) : VertexArray() {
-  setVertexBuffer(vertexBuffer);
+  setVertexBuffer(std::move(vertexBuffer));
 }
 
-void VertexArray::setVertexBuffer(const VertexBuffer &vertexBuffer) {
-  m_vertexBuffer = vertexBuffer;
+VertexArray::VertexArray(VertexArray &&other) noexcept
+    : m_id(other.m_id), m_vertexBuffer(std::move(other.m_vertexBuffer)),
+      m_indexBuffer(std::move(other.m_indexBuffer)) {
+
+  other.m_id = 0;
+}
+
+VertexArray &VertexArray::operator=(VertexArray &&other) noexcept {
+  if (this == &other) {
+    return *this;
+  }
+
+  m_id = other.m_id;
+  m_vertexBuffer = std::move(other.m_vertexBuffer);
+  m_indexBuffer = std::move(other.m_indexBuffer);
+
+  return *this;
+}
+
+VertexArray::~VertexArray() {
+  if (m_id) {
+    glDeleteVertexArrays(1, &m_id);
+  }
+}
+
+void VertexArray::setVertexBuffer(VertexBuffer &&vertexBuffer) {
+  m_vertexBuffer = std::move(vertexBuffer);
   bind();
   vertexBuffer.bind();
 
@@ -29,19 +54,8 @@ void VertexArray::setVertexBuffer(const VertexBuffer &vertexBuffer) {
   unbind();
 }
 
-const VertexBuffer &VertexArray::getVertexBuffer() const {
-  return m_vertexBuffer;
-}
-
-void VertexArray::setData(const void *data, std::size_t size) {
-  m_vertexBuffer.setData(data, size);
-
-  bind();
-  glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-}
-
-void VertexArray::setIndexBuffer(const IndexBuffer &indexBuffer) {
-  m_indexBuffer = indexBuffer;
+void VertexArray::setIndexBuffer(IndexBuffer &&indexBuffer) {
+  m_indexBuffer = std::move(indexBuffer);
 
   bind();
   m_indexBuffer.bind();

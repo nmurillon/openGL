@@ -19,6 +19,11 @@ class LOGL_RENDERER_EXPORT Model {
 public:
   Model(const std::string &path);
 
+  Model(Model &&other) noexcept;
+  Model(const Model &) = delete;
+  Model &operator=(Model &&other);
+  Model &operator=(const Model &) = delete;
+
   void draw(Shader &shader) const;
   bool isValid() const;
 

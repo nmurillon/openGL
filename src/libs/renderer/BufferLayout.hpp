@@ -11,6 +11,7 @@ namespace libs::renderer {
 
 class LOGL_RENDERER_EXPORT BufferLayoutElement {
 public:
+  // TODO: in the future we might need to set the offset explicitly
   BufferLayoutElement(std::size_t size, GLint count, GLenum type = GL_FLOAT,
                       bool normalized = GL_FALSE)
       : m_size(size), m_count(count), m_type(type),

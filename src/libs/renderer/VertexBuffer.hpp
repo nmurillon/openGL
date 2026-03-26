@@ -12,8 +12,15 @@ class LOGL_RENDERER_EXPORT VertexBuffer {
 public:
   VertexBuffer();
   VertexBuffer(BufferLayout &&layout);
-  // TODO: see to create buffer with data in the constructor
-  virtual ~VertexBuffer() = default;
+  VertexBuffer(BufferLayout &&layout, const void *data, std::size_t size,
+               GLenum usage = GL_STATIC_DRAW);
+
+  VertexBuffer(const VertexBuffer &) = delete;
+  VertexBuffer(VertexBuffer &&other) noexcept;
+  VertexBuffer operator=(const VertexBuffer &) = delete;
+  VertexBuffer &operator=(VertexBuffer &&other) noexcept;
+
+  ~VertexBuffer();
 
   void bind() const;
   static void unbind();
