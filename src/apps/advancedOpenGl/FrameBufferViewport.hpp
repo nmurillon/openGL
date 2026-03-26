@@ -5,6 +5,7 @@
 #include <libs/core/OpenGlStateCache.hpp>
 #include <libs/core/Viewport.hpp>
 #include <libs/events/Event.hpp>
+#include <libs/renderer/BufferLayout.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Cube.hpp>
 #include <libs/renderer/MouseCameraController.hpp>
@@ -101,8 +102,14 @@ private:
     };
   // clang-format on
 
-  libs::renderer::Cube m_cube{libs::renderer::Cube::DataType::POSITION_TEXTURE,
-                              m_cubeVertices};
+  libs::renderer::Cube m_cube{
+      libs::renderer::BufferLayout{
+          libs::renderer::BufferLayoutElement(sizeof(float), 3, GL_FLOAT),
+          libs::renderer::BufferLayoutElement(sizeof(float), 2, GL_FLOAT),
+      }
+
+      ,
+      m_cubeVertices};
   libs::renderer::Texture m_wood{800, 600};
 
   // Everything related to the framebuffer, textures and renderbuffer
@@ -112,7 +119,10 @@ private:
   unsigned int m_renderBuffer{};
   libs::renderer::Texture m_textureColorBuffer{800, 600};
   libs::renderer::Cube m_quad{
-      libs::renderer::Cube::DataType::POSITION2D_TEXTURE,
+      libs::renderer::BufferLayout{
+          libs::renderer::BufferLayoutElement(sizeof(float), 2, GL_FLOAT),
+          libs::renderer::BufferLayoutElement(sizeof(float), 2, GL_FLOAT),
+      },
       {
           // clang-format off
         -1.f, -1.f, 0.f, 0.f,

@@ -1,4 +1,5 @@
 #include <libs/core/Viewport.hpp>
+#include <libs/renderer/BufferLayout.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Cube.hpp>
 #include <libs/renderer/Model.hpp>
@@ -112,14 +113,23 @@ private:
     };
   // clang-format on
 
-  libs::renderer::Cube m_cube{libs::renderer::Cube::DataType::POSITION_TEXTURE,
-                              m_cubeVertices};
+  libs::renderer::Cube m_cube{
+      libs::renderer::BufferLayout{
+          libs::renderer::BufferLayoutElement{sizeof(float), 3, GL_FLOAT},
+          libs::renderer::BufferLayoutElement{sizeof(float), 2, GL_FLOAT}},
+      m_cubeVertices};
 
-  libs::renderer::Cube m_floor{libs::renderer::Cube::DataType::POSITION_TEXTURE,
-                               m_planeVertices};
+  libs::renderer::Cube m_floor{
+      libs::renderer::BufferLayout{
+          libs::renderer::BufferLayoutElement{sizeof(float), 3, GL_FLOAT},
+          libs::renderer::BufferLayoutElement{sizeof(float), 2, GL_FLOAT}},
+      m_planeVertices};
 
   libs::renderer::Cube m_transparentCube{
-      libs::renderer::Cube::DataType::POSITION_TEXTURE, m_transparentVertices};
+      libs::renderer::BufferLayout{
+          libs::renderer::BufferLayoutElement{sizeof(float), 3, GL_FLOAT},
+          libs::renderer::BufferLayoutElement{sizeof(float), 2, GL_FLOAT}},
+      m_transparentVertices};
 
   std::vector<glm::vec3> m_positions{{-1.5f, -0.5f, -0.48f},
                                      {1.5f, -0.5f, 0.51f},

@@ -5,6 +5,7 @@
 #include <libs/renderer/PerspectiveCamera.hpp>
 
 #include <format>
+#include <utility>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -205,9 +206,9 @@ void ModelLoadingViewport::onEvent(libs::events::Event &event) {
 void ModelLoadingViewport::onPathDropped(libs::events::PathDropEvent &event) {
   for (const auto &path : event.getPaths()) {
     if (m_models.find(path) == m_models.end()) {
-      const auto model = libs::renderer::Model{path};
+      auto model = libs::renderer::Model{path};
       if (model.isValid()) {
-        m_models.insert({path, model}); // TODO: move semantics
+        m_models.insert(std::make_pair(path, std::move(model)));
       }
     }
   }

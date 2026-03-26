@@ -2,6 +2,7 @@
 
 #include <libs/core/Viewport.hpp>
 #include <libs/events/Event.hpp>
+#include <libs/renderer/BufferLayout.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Cube.hpp>
 #include <libs/renderer/MouseCameraController.hpp>
@@ -93,6 +94,8 @@ private:
     };
     //clang-format on
 
-    libs::renderer::Cube m_cube{libs::renderer::Cube::DataType::POSITION_TEXTURE,
+    libs::renderer::Cube m_cube{libs::renderer::BufferLayout{
+          libs::renderer::BufferLayoutElement{sizeof(float), 3, GL_FLOAT},
+          libs::renderer::BufferLayoutElement{sizeof(float), 2, GL_FLOAT}},
                               m_cubeVertices};
 };
