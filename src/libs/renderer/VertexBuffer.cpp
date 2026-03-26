@@ -19,10 +19,11 @@ VertexBuffer::VertexBuffer(BufferLayout &&layout, const void *data,
 
 VertexBuffer::VertexBuffer(VertexBuffer &&other) noexcept
     : m_id(other.m_id), m_layout(std::move(other.m_layout)),
-      m_data(other.m_data) {
+      m_data(other.m_data), m_size(other.m_size) {
 
   other.m_id = 0;
   other.m_data = nullptr;
+  other.m_size = 0;
 }
 
 VertexBuffer &VertexBuffer::operator=(VertexBuffer &&other) noexcept {
@@ -33,6 +34,10 @@ VertexBuffer &VertexBuffer::operator=(VertexBuffer &&other) noexcept {
   m_id = other.m_id;
   m_data = other.m_data;
   m_layout = std::move(other.m_layout);
+  m_size = other.m_size;
+
+  other.m_data = nullptr;
+  other.m_size = 0;
 
   return *this;
 }
@@ -55,8 +60,13 @@ const BufferLayout &VertexBuffer::getLayout() const { return m_layout; }
 
 void VertexBuffer::setData(const void *data, std::size_t size, GLenum usage) {
   m_data = data;
+  m_size = size;
   bind();
 
-  glBufferData(GL_ARRAY_BUFFER, size, m_data, usage);
+  glBufferData(GL_ARRAY_BUFFER, m_size, m_data, usage);
+}
+
+int VertexBuffer::getVertexCount() const {
+  return m_size / m_layout.getStride();
 }
 } // namespace libs::renderer

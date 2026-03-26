@@ -21,6 +21,8 @@ public:
   void setVertexBuffer(VertexBuffer &&vertexBuffer);
   void setIndexBuffer(IndexBuffer &&indexBuffer);
 
+  [[nodiscard]] const VertexBuffer &getVertexBuffer() const;
+
   void bind() const;
   static void unbind();
 

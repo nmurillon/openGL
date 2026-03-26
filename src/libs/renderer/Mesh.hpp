@@ -22,7 +22,6 @@ public:
   Mesh &operator=(const Mesh &) = delete;
   Mesh &operator=(Mesh &&other);
 
-  // TODO: make move
   void draw(Shader &shader) const;
 
 public:

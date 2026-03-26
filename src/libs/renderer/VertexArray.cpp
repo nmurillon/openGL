@@ -64,6 +64,10 @@ void VertexArray::setIndexBuffer(IndexBuffer &&indexBuffer) {
   m_indexBuffer.unbind();
 }
 
+const VertexBuffer &VertexArray::getVertexBuffer() const {
+  return m_vertexBuffer;
+}
+
 void VertexArray::bind() const { glBindVertexArray(m_id); }
 
 void VertexArray::unbind() { glBindVertexArray(0); }

@@ -30,9 +30,12 @@ public:
   void setData(const void *data, std::size_t size,
                GLenum usage = GL_STATIC_DRAW);
 
+  [[nodiscard]] int getVertexCount() const;
+
 private:
   GLuint m_id;
   BufferLayout m_layout;
   const void *m_data{nullptr};
+  std::size_t m_size{0};
 };
 } // namespace libs::renderer
