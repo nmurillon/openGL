@@ -1,5 +1,6 @@
 set(CORE_HEADERS
     Application.hpp
+    Color.hpp
     Layer.hpp
     LayerStack.hpp
     OpenGlStateCache.hpp

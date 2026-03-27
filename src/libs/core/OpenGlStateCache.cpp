@@ -21,6 +21,10 @@ void OpenGlStateCache::setClearColor(float r, float g, float b, float a) {
   glClearColor(r, g, b, a);
 }
 
+void OpenGlStateCache::setClearColor(const RgbaColor &color) {
+  glClearColor(color.red, color.green, color.blue, color.alpha);
+}
+
 void OpenGlStateCache::setDepthTest(bool enabled) {
   if (m_depthTestEnabled == enabled) {
     return;

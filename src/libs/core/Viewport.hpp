@@ -2,14 +2,18 @@
 
 #include <logl/core/export.h>
 
+#include <libs/core/Color.hpp>
+#include <libs/core/OpenGlStateCache.hpp>
 #include <libs/events/Event.hpp>
 
+#include <memory>
 #include <string>
 
 namespace libs::core {
 class LOGL_CORE_EXPORT Viewport {
 public:
-  Viewport(const std::string &name, float width = 800.f, float height = 600.f);
+  Viewport(const std::string &name, float width = 800.f, float height = 600.f,
+           const RgbaColor &backgroundColor = RgbaColor{0.1, 0.1, 0.1, 1.0});
   virtual ~Viewport() = default;
   void display();
   [[nodiscard]] bool isActive();
@@ -26,17 +30,19 @@ public:
 
   static void setWindowSize(float width, float height);
 
+  void setBackgroundColor(const RgbaColor &color);
+  void setBackgroundColor(float r, float g, float b, float a);
+
 protected:
   virtual void drawScene() = 0;
   virtual void initState() = 0;
   virtual void resetState() = 0;
   virtual void onViewportResize(float newWidth, float newHeight) {}
 
-private:
-  void prepareScene();
-
 protected:
   std::string m_name;
+  std::shared_ptr<libs::core::OpenGlStateCache> m_openglStateCache{
+      libs::core::OpenGlStateCache::getInstance()};
 
   float m_width;
   float m_height;
@@ -47,6 +53,9 @@ protected:
 
   static float s_windowWidth;
   static float s_windowHeight;
+
+  // Background color
+  RgbaColor m_backgroundColor{0.1, 0.1, 0.1, 1.0};
 
 private:
   bool m_isActive{true};

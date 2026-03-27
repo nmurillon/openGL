@@ -2,6 +2,7 @@
 
 #include <logl/core/export.h>
 
+#include <libs/core/Color.hpp>
 #include <libs/openGl/opengl.h>
 
 #include <memory>
@@ -23,6 +24,7 @@ public:
   void setViewport(int x, int y, int width, int height);
   void clear(GLbitfield mask);
   void setClearColor(float r, float g, float b, float a);
+  void setClearColor(const RgbaColor &color);
 
   void setDepthTest(bool enabled);
 
