@@ -44,35 +44,37 @@ BlendingViewport::BlendingViewport(const std::string &name, float width,
 }
 
 void BlendingViewport::initState() {
-  glActiveTexture(GL_TEXTURE0);
+  m_openglStateCache->setActiveTexture(0);
   m_metal.bind();
 
-  glActiveTexture(GL_TEXTURE1);
+  m_openglStateCache->setActiveTexture(1);
   m_marble.bind();
 
-  glActiveTexture(GL_TEXTURE2);
+  m_openglStateCache->setActiveTexture(2);
   m_transparent.bind();
 
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  m_openglStateCache->setDepthTest(true);
+  m_openglStateCache->setBlend(true);
+  m_openglStateCache->setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void BlendingViewport::resetState() {
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_BLEND);
-  
+  m_openglStateCache->setDepthTest(false);
+  m_openglStateCache->setBlend(false);
+
   // Unbind textures
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  m_openglStateCache->setActiveTexture(2);
+  m_transparent.unbind();
+
+  m_openglStateCache->setActiveTexture(1);
+  m_marble.unbind();
+
+  m_openglStateCache->setActiveTexture(0);
+  m_metal.unbind();
 }
 
 void BlendingViewport::drawScene() {
-  glClear(GL_COLOR_BUFFER_BIT);
+  m_openglStateCache->clear(GL_COLOR_BUFFER_BIT);
 
   ImGuiIO &io = ImGui::GetIO();
   const auto mousePos = io.MousePos;
@@ -90,8 +92,6 @@ void BlendingViewport::drawScene() {
 
   // grass
   drawTransparent();
-
-  glBindVertexArray(0);
 }
 
 void BlendingViewport::onImguiUpdate() {}

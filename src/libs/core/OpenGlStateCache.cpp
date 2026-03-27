@@ -38,6 +38,16 @@ void OpenGlStateCache::setDepthTest(bool enabled) {
   }
 }
 
+void OpenGlStateCache::setDepthFunc(GLenum func) {
+  if (func == m_depthFunc) {
+    return;
+  }
+
+  m_depthFunc = func;
+
+  glDepthFunc(m_depthFunc);
+}
+
 void OpenGlStateCache::setBlend(bool enabled) {
   if (m_blendEnabled == enabled) {
     return;
@@ -51,6 +61,26 @@ void OpenGlStateCache::setBlend(bool enabled) {
   }
 }
 
+void OpenGlStateCache::setBlendFunc(GLenum sfactor, GLenum dfactor) {
+  bool changed{false};
+
+  if (sfactor != m_blendSFactor) {
+    changed = true;
+    m_blendSFactor = sfactor;
+  }
+
+  if (dfactor != m_blendDFactor) {
+    changed = true;
+    m_blendDFactor = dfactor;
+  }
+
+  if (!changed) {
+    return;
+  }
+
+  glBlendFunc(m_blendSFactor, m_blendDFactor);
+}
+
 void OpenGlStateCache::setStencilTest(bool enabled) {
   if (m_stencilTestEnabled == enabled) {
     return;
@@ -62,6 +92,46 @@ void OpenGlStateCache::setStencilTest(bool enabled) {
   } else {
     glDisable(GL_STENCIL_TEST);
   }
+}
+
+void OpenGlStateCache::setStencilOp(GLenum sfail, GLenum dpfail,
+                                    GLenum dppass) {
+  bool changed{false};
+
+  if (m_stencilSFail != sfail) {
+    changed = true;
+    m_stencilSFail = sfail;
+  }
+
+  if (m_stencilDpFail != dpfail) {
+    changed = true;
+    m_stencilDpFail = dpfail;
+  }
+
+  if (m_stencilDpPass != dppass) {
+    changed = true;
+    m_stencilDpPass = dppass;
+  }
+
+  if (!changed) {
+    return;
+  }
+
+  glStencilOp(m_stencilSFail, m_stencilDpFail, m_stencilDpPass);
+}
+
+void OpenGlStateCache::setStencilMask(GLuint mask) {
+  if (mask == m_stencilMask) {
+    return;
+  }
+
+  m_stencilMask = mask;
+
+  glStencilMask(m_stencilMask);
+}
+
+void OpenGlStateCache::setStencilFunc(GLenum func, GLint ref, GLuint mask) {
+  glStencilFunc(func, ref, mask);
 }
 
 void OpenGlStateCache::setFaceCulling(bool enabled) {

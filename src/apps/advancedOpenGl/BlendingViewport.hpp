@@ -1,3 +1,5 @@
+#pragma once
+
 #include <libs/core/Viewport.hpp>
 #include <libs/renderer/BufferLayout.hpp>
 #include <libs/renderer/Camera.hpp>

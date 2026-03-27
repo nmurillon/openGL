@@ -55,14 +55,20 @@ void FaceCullingViewport::onEvent(libs::events::Event &event) {
 }
 
 void FaceCullingViewport::initState() {
-  glEnable(GL_CULL_FACE);
-  glActiveTexture(GL_TEXTURE0);
+  m_openglStateCache->setFaceCulling(true);
+  m_openglStateCache->setCullFace(m_cullFace);
+  m_openglStateCache->setFrontFaceWinding(m_cullWinding);
+
+  m_openglStateCache->setActiveTexture(0);
   m_metal.bind();
 }
 
 void FaceCullingViewport::resetState() {
+  m_openglStateCache->setActiveTexture(0);
   m_metal.unbind();
-  glDisable(GL_CULL_FACE);
+  m_openglStateCache->setCullFace(GL_BACK);
+  m_openglStateCache->setFrontFaceWinding(GL_CCW);
+  m_openglStateCache->setFaceCulling(false);
 }
 
 void FaceCullingViewport::onImguiUpdate() {
@@ -78,8 +84,7 @@ void FaceCullingViewport::onImguiUpdate() {
     for (const auto &item : cullModes) {
       bool is_selected = (current_item == item);
       if (ImGui::Selectable(item.c_str(), is_selected)) {
-        const auto cullMode = cullModeFromString(item);
-        glCullFace(cullMode);
+        m_cullFace = cullModeFromString(item);
         current_item = item;
       }
       if (is_selected) {
@@ -94,8 +99,7 @@ void FaceCullingViewport::onImguiUpdate() {
     for (const auto &item : frontFaceModes) {
       bool is_selected = (current_front_face_item == item);
       if (ImGui::Selectable(item.c_str(), is_selected)) {
-        const auto frontFace = frontFaceFromString(item);
-        glFrontFace(frontFace);
+        m_cullWinding = frontFaceFromString(item);
         current_front_face_item = item;
       }
       if (is_selected) {

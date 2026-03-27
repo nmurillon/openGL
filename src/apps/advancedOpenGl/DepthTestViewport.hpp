@@ -1,4 +1,5 @@
-#include <libs/core/OpenGlStateCache.hpp>
+#pragma once
+
 #include <libs/core/Viewport.hpp>
 #include <libs/renderer/BufferLayout.hpp>
 #include <libs/renderer/Camera.hpp>
@@ -50,9 +51,6 @@ protected:
 private:
   void drawFloor();
   void drawCube(const glm::vec3 &position);
-
-  std::shared_ptr<libs::core::OpenGlStateCache> m_openglStateCache{
-      libs::core::OpenGlStateCache::getInstance()};
 
   std::shared_ptr<libs::renderer::Camera> m_camera;
   libs::renderer::MouseCameraController m_cameraController;

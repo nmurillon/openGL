@@ -27,10 +27,15 @@ public:
   void setClearColor(const RgbaColor &color);
 
   void setDepthTest(bool enabled);
+  void setDepthFunc(GLenum func);
 
   void setBlend(bool enabled);
+  void setBlendFunc(GLenum sfactor, GLenum dfactor);
 
   void setStencilTest(bool enabled);
+  void setStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass);
+  void setStencilMask(GLuint mask);
+  void setStencilFunc(GLenum func, GLint ref, GLuint mask);
 
   void setFaceCulling(bool enabled);
   void setCullFace(GLenum face);
@@ -40,12 +45,23 @@ public:
   void setActiveTexture(int texture);
 
 private:
-  // Everyting related to opengl state
+  // Everyting related to depth test
   bool m_depthTestEnabled{false};
+  GLenum m_depthFunc{GL_LESS};
+
+  // Related to blending
   bool m_blendEnabled{false};
+  GLenum m_blendSFactor{GL_ONE};
+  GLenum m_blendDFactor{GL_ZERO};
 
   // Related to stencil
   bool m_stencilTestEnabled{false};
+  GLenum m_stencilSFail{GL_KEEP};
+  GLenum m_stencilDpFail{GL_KEEP};
+  GLenum m_stencilDpPass{GL_KEEP};
+  GLuint m_stencilMask{0xFF};
+
+  // TODO: store stencil func?
 
   // Related to face culling
   bool m_cullFaceEnabled{false};

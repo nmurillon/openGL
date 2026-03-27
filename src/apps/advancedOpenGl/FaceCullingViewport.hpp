@@ -35,6 +35,9 @@ private:
   libs::renderer::Texture m_metal{libs::renderer::TextureType::DIFFUSE,
                                   std::string{}};
 
+  GLenum m_cullFace{GL_BACK};
+  GLenum m_cullWinding{GL_CCW};
+
   // clang-format off
   const std::vector<float> m_cubeVertices{
         // positions                        // texture Coords

@@ -80,14 +80,15 @@ void DepthTestViewport::resetState() {
 }
 
 void DepthTestViewport::drawScene() {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-  glDepthFunc(m_depthFunc);
+  m_openglStateCache->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+                            GL_STENCIL_BUFFER_BIT);
+  m_openglStateCache->setDepthFunc(m_depthFunc);
 
   if (m_showOutline) {
     m_openglStateCache->setStencilTest(true);
   }
 
-  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+  m_openglStateCache->setStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
   ImGuiIO &io = ImGui::GetIO();
   const auto mousePos = io.MousePos;
@@ -103,8 +104,6 @@ void DepthTestViewport::drawScene() {
   // cubes
   drawCube(glm::vec3(-1.0f, 0.0f, -1.0f));
   drawCube(glm::vec3(2.0f, 0.0f, 0.0f));
-
-  glBindVertexArray(0);
 }
 
 void DepthTestViewport::onImguiUpdate() {
@@ -152,7 +151,7 @@ void DepthTestViewport::onEvent(libs::events::Event &event) {
 
 void DepthTestViewport::drawFloor() {
   // Don't update the stencil buffer
-  glStencilMask(0x00);
+  m_openglStateCache->setStencilMask(0x00);
   auto shader = m_shaderManager.getShader("model");
   shader->use();
 
@@ -162,8 +161,8 @@ void DepthTestViewport::drawFloor() {
 
 void DepthTestViewport::drawCube(const glm::vec3 &position) {
   // All fragments pass the stencil test + Enable writing to the stencil buffer
-  glStencilFunc(GL_ALWAYS, 1, 0xFF);
-  glStencilMask(0xFF);
+  m_openglStateCache->setStencilFunc(GL_ALWAYS, 1, 0xFF);
+  m_openglStateCache->setStencilMask(0xFF);
 
   auto shader = m_shaderManager.getShader("model");
   shader->use();
@@ -179,8 +178,8 @@ void DepthTestViewport::drawCube(const glm::vec3 &position) {
   shader->setInt("tex", 0);
   m_cube.draw();
 
-  glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-  glStencilMask(0x00);
+  m_openglStateCache->setStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+  m_openglStateCache->setStencilMask(0x00);
   m_openglStateCache->setDepthTest(false);
 
   if (m_showOutline) {
@@ -198,11 +197,11 @@ void DepthTestViewport::drawCube(const glm::vec3 &position) {
   }
 
   // TODO: does this need to be in the if block?
-  glStencilMask(0xFF);
-  glStencilFunc(GL_ALWAYS, 1, 0xFF);
-  glEnable(GL_DEPTH_TEST);
+  m_openglStateCache->setStencilMask(0xFF);
+  m_openglStateCache->setStencilFunc(GL_ALWAYS, 1, 0xFF);
+  m_openglStateCache->setDepthTest(true);
 
   if (!m_showGroupedOutline) {
-    glClear(GL_STENCIL_BUFFER_BIT);
+    m_openglStateCache->clear(GL_STENCIL_BUFFER_BIT);
   }
 }

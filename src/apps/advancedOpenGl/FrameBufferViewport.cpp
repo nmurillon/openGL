@@ -79,10 +79,10 @@ void FrameBufferViewport::initState() {
 void FrameBufferViewport::resetState() {
   m_openglStateCache->setDepthTest(false);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  
+
   // Unbind textures
   m_openglStateCache->setActiveTexture(0);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  m_textureColorBuffer.unbind();
 }
 
 void FrameBufferViewport::onImguiUpdate() {

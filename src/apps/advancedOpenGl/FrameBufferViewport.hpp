@@ -2,7 +2,6 @@
 
 #include <filesystem>
 
-#include <libs/core/OpenGlStateCache.hpp>
 #include <libs/core/Viewport.hpp>
 #include <libs/events/Event.hpp>
 #include <libs/renderer/BufferLayout.hpp>
@@ -31,8 +30,6 @@ private:
   std::shared_ptr<libs::renderer::Camera> m_camera;
   libs::renderer::MouseCameraController m_cameraController;
   libs::renderer::ShaderManager m_shaderManager{};
-  std::shared_ptr<libs::core::OpenGlStateCache> m_openglStateCache{
-      libs::core::OpenGlStateCache::getInstance()};
 
 protected:
   void drawScene() override;
