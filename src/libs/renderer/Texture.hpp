@@ -26,7 +26,9 @@ public:
   TextureType type() const;
   void setTextureWrap(GLint wrapS, GLint wrapT);
   void setSize(int width, int height);
-  void bind();
+  void bind(GLenum target = GL_TEXTURE_2D);
+
+  static void unbind(GLenum target = GL_TEXTURE_2D);
 
 private:
   struct Data {
