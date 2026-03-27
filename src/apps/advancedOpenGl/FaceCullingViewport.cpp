@@ -57,10 +57,13 @@ void FaceCullingViewport::onEvent(libs::events::Event &event) {
 void FaceCullingViewport::initState() {
   glEnable(GL_CULL_FACE);
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, m_metal.id());
+  m_metal.bind();
 }
 
-void FaceCullingViewport::resetState() { glDisable(GL_CULL_FACE); }
+void FaceCullingViewport::resetState() {
+  m_metal.unbind();
+  glDisable(GL_CULL_FACE);
+}
 
 void FaceCullingViewport::onImguiUpdate() {
   if (!isActive()) {

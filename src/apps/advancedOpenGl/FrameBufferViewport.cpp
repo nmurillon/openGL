@@ -71,13 +71,18 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
 }
 
 void FrameBufferViewport::initState() {
+  m_openglStateCache->setActiveTexture(0);
+  m_textureColorBuffer.bind();
   m_openglStateCache->setDepthTest(true);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FrameBufferViewport::resetState() {
   m_openglStateCache->setDepthTest(false);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  
+  // Unbind textures
+  m_openglStateCache->setActiveTexture(0);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void FrameBufferViewport::onImguiUpdate() {
@@ -150,7 +155,7 @@ void FrameBufferViewport::onViewportResize(float newWidth, float newHeight) {
 void FrameBufferViewport::drawScene() {
   m_cameraController.update();
 
-  m_openglStateCache->setActiveTexture(GL_TEXTURE0);
+  m_openglStateCache->setActiveTexture(0);
   drawInFrameBuffer();
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default

@@ -28,16 +28,22 @@ public:
 
   void setBlend(bool enabled);
 
+  void setStencilTest(bool enabled);
+
   void setFaceCulling(bool enabled);
   void setCullFace(GLenum face);
   void setFrontFaceWinding(GLenum winding);
 
   void setActiveTexture(GLenum texture);
+  void setActiveTexture(int texture);
 
 private:
   // Everyting related to opengl state
   bool m_depthTestEnabled{false};
   bool m_blendEnabled{false};
+
+  // Related to stencil
+  bool m_stencilTestEnabled{false};
 
   // Related to face culling
   bool m_cullFaceEnabled{false};

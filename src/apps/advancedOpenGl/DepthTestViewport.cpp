@@ -59,18 +59,24 @@ DepthTestViewport::DepthTestViewport(const std::string &name, float width,
 }
 
 void DepthTestViewport::initState() {
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, m_metal.id());
+  m_openglStateCache->setActiveTexture(0);
+  m_metal.bind();
 
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, m_marble.id());
+  m_openglStateCache->setActiveTexture(1);
+  m_marble.bind();
 
-  glEnable(GL_DEPTH_TEST);
+  m_openglStateCache->setDepthTest(true);
 }
 
 void DepthTestViewport::resetState() {
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_STENCIL_TEST);
+  m_openglStateCache->setDepthTest(false);
+  m_openglStateCache->setStencilTest(false);
+
+  // Unbind textures
+  m_openglStateCache->setActiveTexture(0);
+  m_metal.bind();
+  m_openglStateCache->setActiveTexture(1);
+  m_marble.unbind();
 }
 
 void DepthTestViewport::drawScene() {
@@ -78,7 +84,7 @@ void DepthTestViewport::drawScene() {
   glDepthFunc(m_depthFunc);
 
   if (m_showOutline) {
-    glEnable(GL_STENCIL_TEST);
+    m_openglStateCache->setStencilTest(true);
   }
 
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -175,7 +181,7 @@ void DepthTestViewport::drawCube(const glm::vec3 &position) {
 
   glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
   glStencilMask(0x00);
-  glDisable(GL_DEPTH_TEST);
+  m_openglStateCache->setDepthTest(false);
 
   if (m_showOutline) {
 

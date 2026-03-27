@@ -45,13 +45,13 @@ BlendingViewport::BlendingViewport(const std::string &name, float width,
 
 void BlendingViewport::initState() {
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, m_metal.id());
+  m_metal.bind();
 
   glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, m_marble.id());
+  m_marble.bind();
 
   glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, m_transparent.id());
+  m_transparent.bind();
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
@@ -61,6 +61,14 @@ void BlendingViewport::initState() {
 void BlendingViewport::resetState() {
   glDisable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
+  
+  // Unbind textures
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void BlendingViewport::drawScene() {

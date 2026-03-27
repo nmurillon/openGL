@@ -47,6 +47,19 @@ void OpenGlStateCache::setBlend(bool enabled) {
   }
 }
 
+void OpenGlStateCache::setStencilTest(bool enabled) {
+  if (m_stencilTestEnabled == enabled) {
+    return;
+  }
+
+  m_stencilTestEnabled = enabled;
+  if (enabled) {
+    glEnable(GL_STENCIL_TEST);
+  } else {
+    glDisable(GL_STENCIL_TEST);
+  }
+}
+
 void OpenGlStateCache::setFaceCulling(bool enabled) {
   if (m_cullFaceEnabled == enabled) {
     return;
@@ -81,5 +94,18 @@ void OpenGlStateCache::setActiveTexture(GLenum texture) {
 
   m_activeTexture = texture;
   glActiveTexture(texture);
+}
+
+void OpenGlStateCache::setActiveTexture(int texture) {
+  if (texture < 0 || GL_TEXTURE0 + texture > GL_TEXTURE31) {
+    return;
+  }
+
+  if (m_activeTexture == GL_TEXTURE0 + texture) {
+    return;
+  }
+
+  m_activeTexture = GL_TEXTURE0 + texture;
+  glActiveTexture(m_activeTexture);
 }
 } // namespace libs::core
