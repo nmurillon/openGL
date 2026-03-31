@@ -21,7 +21,7 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
     : Viewport(name, width, height), m_assetsDir(assetsDir),
       m_camera(std::make_shared<libs::renderer::PerspectiveCamera>(
           glm::vec3(0.f, 0.0f, 3.0f))),
-      m_cameraController(m_camera) {
+      m_cameraController(m_camera), m_frameBuffer(width, height) {
 
   m_shaderManager.addShader("cube", m_assetsDir / "shaders/cube.vert",
                             m_assetsDir / "shaders/cube.frag");
@@ -44,35 +44,11 @@ FrameBufferViewport::FrameBufferViewport(const std::string &name, float width,
   m_wood = {libs::renderer::TextureType::DIFFUSE,
             std::format("{}/wood_container.png",
                         (m_assetsDir / "textures").string())};
-
-  // TODO: move this to a FrameBuffer class
-  glGenFramebuffers(1, &m_frameBuffer);
-  glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
-
-  // Attach the texture to the framebuffer
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         m_textureColorBuffer.id(), 0);
-
-  // Create a renderbuffer object for depth and stencil attachment (we won't be
-  // sampling these)
-  glGenRenderbuffers(1, &m_renderBuffer);
-  glBindRenderbuffer(GL_RENDERBUFFER, m_renderBuffer);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                            GL_RENDERBUFFER, m_renderBuffer);
-
-  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-    Logger::logError("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
-  }
-
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FrameBufferViewport::initState() {
-  m_openglStateCache->setActiveTexture(0);
-  m_textureColorBuffer.bind();
+  // m_openglStateCache->setActiveTexture(0);
+  // m_textureColorBuffer.bind();
   m_openglStateCache->setDepthTest(true);
 }
 
@@ -81,8 +57,8 @@ void FrameBufferViewport::resetState() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   // Unbind textures
-  m_openglStateCache->setActiveTexture(0);
-  m_textureColorBuffer.unbind();
+  // m_openglStateCache->setActiveTexture(0);
+  // m_textureColorBuffer.unbind();
 }
 
 void FrameBufferViewport::onImguiUpdate() {
@@ -144,12 +120,8 @@ void FrameBufferViewport::onEvent(libs::events::Event &event) {
 }
 
 void FrameBufferViewport::onViewportResize(float newWidth, float newHeight) {
-  m_textureColorBuffer.setSize(newWidth, newHeight);
+  m_frameBuffer.setSize(newWidth, newHeight);
   m_camera->setViewportSize(newWidth, newHeight);
-
-  glBindRenderbuffer(GL_RENDERBUFFER, m_renderBuffer);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, newWidth,
-                        newHeight);
 }
 
 void FrameBufferViewport::drawScene() {
@@ -168,7 +140,7 @@ void FrameBufferViewport::drawScene() {
   auto screenShader = m_shaderManager.getShader(m_currentShader);
   screenShader->use();
 
-  m_textureColorBuffer.bind();
+  m_frameBuffer.getColorBuffer().bind();
   screenShader->setInt("screenTexture", 0);
 
   if (m_currentShader == "kernel") {
@@ -182,7 +154,7 @@ void FrameBufferViewport::drawScene() {
 }
 
 void FrameBufferViewport::drawInFrameBuffer() {
-  glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+  m_frameBuffer.bind();
   // We need to draw the scene considering the viewport full size
   m_openglStateCache->setViewport(0, 0, m_width, m_height);
 

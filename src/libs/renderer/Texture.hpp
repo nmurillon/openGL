@@ -17,7 +17,7 @@ std::string textureTypeToString(TextureType type);
 class LOGL_RENDERER_EXPORT Texture {
 public:
   // Constructor used for framebuffer textures --> Will probably need a rework
-  // in the future
+  // in the future (TODO: textures for stencil and depth)
   Texture(int width, int height);
   Texture(TextureType type, const std::string &path);
   Texture(TextureType type, const std::filesystem::path &path);
@@ -26,7 +26,7 @@ public:
   TextureType type() const;
   void setTextureWrap(GLint wrapS, GLint wrapT);
   void setSize(int width, int height);
-  void bind(GLenum target = GL_TEXTURE_2D);
+  void bind(GLenum target = GL_TEXTURE_2D) const;
 
   static void unbind(GLenum target = GL_TEXTURE_2D);
 

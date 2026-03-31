@@ -7,6 +7,7 @@
 #include <libs/renderer/BufferLayout.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Cube.hpp>
+#include <libs/renderer/FrameBuffer.hpp>
 #include <libs/renderer/MouseCameraController.hpp>
 #include <libs/renderer/ShaderManager.hpp>
 #include <libs/renderer/Texture.hpp>
@@ -112,9 +113,7 @@ private:
   // Everything related to the framebuffer, textures and renderbuffer
   // TODO: move this to a FrameBuffer class
 private:
-  unsigned int m_frameBuffer{};
-  unsigned int m_renderBuffer{};
-  libs::renderer::Texture m_textureColorBuffer{800, 600};
+  libs::renderer::FrameBuffer m_frameBuffer;
   libs::renderer::Cube m_quad{
       libs::renderer::BufferLayout{
           libs::renderer::BufferLayoutElement(sizeof(float), 2, GL_FLOAT),

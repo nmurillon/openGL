@@ -115,7 +115,7 @@ void Texture::setSize(int width, int height) {
                GL_UNSIGNED_BYTE, NULL);
 }
 
-void Texture::bind(GLenum target) { glBindTexture(target, m_data.id); }
+void Texture::bind(GLenum target) const { glBindTexture(target, m_data.id); }
 
 void Texture::unbind(GLenum target) { glBindTexture(target, 0); }
 
