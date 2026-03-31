@@ -39,6 +39,7 @@ protected:
 
 private:
   void drawInFrameBuffer();
+  void drawRearView();
   void onViewportResize(float newWidth, float newHeight) override;
 
   // clang-format off
@@ -110,8 +111,6 @@ private:
       m_cubeVertices};
   libs::renderer::Texture m_wood{800, 600};
 
-  // Everything related to the framebuffer, textures and renderbuffer
-  // TODO: move this to a FrameBuffer class
 private:
   libs::renderer::FrameBuffer m_frameBuffer;
   libs::renderer::Cube m_quad{
@@ -125,6 +124,21 @@ private:
         1.f, -1.f, 1.f, 0.f,
         1.f, 1.f, 1.f, 1.f,
         -1.f, 1.f, 0.f, 1.f,
+          // clang-format on
+      },
+      {0, 1, 2, 0, 2, 3}};
+
+  libs::renderer::Cube m_quadMirror{
+      libs::renderer::BufferLayout{
+          libs::renderer::BufferLayoutElement(sizeof(float), 2, GL_FLOAT),
+          libs::renderer::BufferLayoutElement(sizeof(float), 2, GL_FLOAT),
+      },
+      {
+          // clang-format off
+        -0.5f, 0.5f, 0.f, 0.f,
+        0.5f, 0.5f, 1.f, 0.f,
+        0.5, 1.f, 1.f, 1.f,
+        -0.5f, 1.f, 0.f, 1.f,
           // clang-format on
       },
       {0, 1, 2, 0, 2, 3}};

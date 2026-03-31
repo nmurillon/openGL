@@ -130,7 +130,6 @@ void FrameBufferViewport::drawScene() {
   m_openglStateCache->setActiveTexture(0);
   drawInFrameBuffer();
 
-  glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
   m_openglStateCache->setClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   m_openglStateCache->setViewport(m_xBottomLeft, m_yBottomLeft, m_width,
                                   m_height);
@@ -149,8 +148,20 @@ void FrameBufferViewport::drawScene() {
     }
   }
 
-  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   m_quad.draw();
+
+  m_openglStateCache->setActiveTexture(0);
+  drawRearView();
+
+  m_openglStateCache->setViewport(m_xBottomLeft, m_yBottomLeft, m_width,
+                                  m_height);
+  m_openglStateCache->setDepthTest(false);
+
+  screenShader->use();
+
+  m_frameBuffer.getColorBuffer().bind();
+  screenShader->setInt("screenTexture", 0);
+  m_quadMirror.draw();
 }
 
 void FrameBufferViewport::drawInFrameBuffer() {
@@ -178,4 +189,37 @@ void FrameBufferViewport::drawInFrameBuffer() {
   model = glm::translate({1.f}, glm::vec3(2.f, 0.f, 0.f));
   shader->setMat4f("model", model);
   m_cube.draw();
+
+  m_frameBuffer.unbind();
+}
+
+void FrameBufferViewport::drawRearView() {
+  m_frameBuffer.bind();
+  // We need to draw the scene considering the viewport full size
+  m_openglStateCache->setViewport(0, 0, m_width, m_height);
+
+  m_openglStateCache->setDepthTest(true);
+  m_openglStateCache->setClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  m_openglStateCache->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  auto shader = m_shaderManager.getShader("cube");
+  shader->use();
+
+  m_wood.bind();
+  m_camera->rotate(180.f, 0.f);
+  shader->setMat4f("view", m_camera->getViewMatrix());
+  shader->setMat4f("projection", m_camera->getProjection());
+  shader->setInt("tex", 0);
+
+  glm::mat4 model{1.f};
+  model = glm::translate(model, glm::vec3(-1.f, 0.f, -1.f));
+  shader->setMat4f("model", model);
+  m_cube.draw();
+
+  model = glm::translate({1.f}, glm::vec3(2.f, 0.f, 0.f));
+  shader->setMat4f("model", model);
+  m_cube.draw();
+
+  m_camera->rotate(-180.f, 0.f);
+  m_frameBuffer.unbind();
 }
