@@ -155,6 +155,9 @@ void DepthTestViewport::drawFloor() {
   auto shader = m_shaderManager.getShader("model");
   shader->use();
 
+  shader->setMat4f("model", glm::mat4(1.0f));
+  shader->setMat4f("projection", m_camera->getProjection());
+  shader->setMat4f("view", m_camera->getViewMatrix());
   shader->setInt("tex", 1);
   m_floor.draw();
 }
