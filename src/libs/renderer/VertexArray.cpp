@@ -21,9 +21,15 @@ VertexArray &VertexArray::operator=(VertexArray &&other) noexcept {
     return *this;
   }
 
+  if (m_id) {
+    glDeleteVertexArrays(1, &m_id);
+  }
+
   m_id = other.m_id;
   m_vertexBuffer = std::move(other.m_vertexBuffer);
   m_indexBuffer = std::move(other.m_indexBuffer);
+
+  other.m_id = 0;
 
   return *this;
 }

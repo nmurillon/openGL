@@ -48,6 +48,16 @@ void OpenGlStateCache::setDepthFunc(GLenum func) {
   glDepthFunc(m_depthFunc);
 }
 
+void OpenGlStateCache::setDepthMask(bool allowWrite) {
+  if (m_depthAllowWrite == allowWrite) {
+    return;
+  }
+
+  m_depthAllowWrite = allowWrite;
+
+  glDepthMask(m_depthAllowWrite ? GL_TRUE : GL_FALSE);
+}
+
 void OpenGlStateCache::setBlend(bool enabled) {
   if (m_blendEnabled == enabled) {
     return;
@@ -181,5 +191,12 @@ void OpenGlStateCache::setActiveTexture(int texture) {
 
   m_activeTexture = GL_TEXTURE0 + texture;
   glActiveTexture(m_activeTexture);
+}
+
+int OpenGlStateCache::getBoundTexture(GLenum target) const {
+  GLint whichID;
+  glGetIntegerv(target, &whichID);
+
+  return whichID;
 }
 } // namespace libs::core

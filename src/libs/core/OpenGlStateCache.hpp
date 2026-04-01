@@ -28,6 +28,7 @@ public:
 
   void setDepthTest(bool enabled);
   void setDepthFunc(GLenum func);
+  void setDepthMask(bool allowWrite);
 
   void setBlend(bool enabled);
   void setBlendFunc(GLenum sfactor, GLenum dfactor);
@@ -43,11 +44,13 @@ public:
 
   void setActiveTexture(GLenum texture);
   void setActiveTexture(int texture);
+  int getBoundTexture(GLenum target) const;
 
 private:
   // Everyting related to depth test
   bool m_depthTestEnabled{false};
   GLenum m_depthFunc{GL_LESS};
+  bool m_depthAllowWrite{true};
 
   // Related to blending
   bool m_blendEnabled{false};

@@ -2,6 +2,7 @@ set(RENDERER_HEADERS
     BufferLayout.hpp
     Camera.hpp
     Cube.hpp
+    Cubemap.hpp
     FlyCameraController.hpp
     FrameBuffer.hpp
     IndexBuffer.hpp
@@ -21,6 +22,7 @@ set(RENDERER_SRC
     BufferLayout.cpp
     Camera.cpp
     Cube.cpp
+    Cubemap.cpp
     FlyCameraController.cpp
     FrameBuffer.cpp
     IndexBuffer.cpp

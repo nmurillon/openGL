@@ -5,6 +5,8 @@ logl_add_executable(advancedOpenGl
         AdvancedOpenGlLayer.hpp
         BlendingViewport.cpp
         BlendingViewport.hpp
+        CubemapViewport.cpp
+        CubemapViewport.hpp
         DepthTestViewport.cpp
         DepthTestViewport.hpp
         FaceCullingViewport.cpp
@@ -24,6 +26,8 @@ logl_add_executable(advancedOpenGl
         assets/shaders/blendingDiscard.vert
         assets/shaders/cube.frag
         assets/shaders/cube.vert
+        assets/shaders/cubemap/cubemap.frag
+        assets/shaders/cubemap/cubemap.vert
         assets/shaders/depthTesting.frag
         assets/shaders/depthTesting.vert
         assets/shaders/frameBuffer.frag
@@ -36,5 +40,11 @@ logl_add_executable(advancedOpenGl
         assets/textures/grass.png
         assets/textures/marble.jpg
         assets/textures/metal.png
+        assets/textures/skybox/back.jpg
+        assets/textures/skybox/bottom.jpg
+        assets/textures/skybox/front.jpg
+        assets/textures/skybox/left.jpg
+        assets/textures/skybox/right.jpg
+        assets/textures/skybox/top.jpg
         assets/textures/wood_container.png
 )

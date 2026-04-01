@@ -22,6 +22,7 @@ public:
 
 private:
   std::vector<std::shared_ptr<libs::core::Viewport>> m_viewports{
-      std::make_shared<DepthTestViewport>("Depth Test"),
-      std::make_shared<BlendingViewport>("Blending")};
+      // std::make_shared<DepthTestViewport>("Depth Test"),
+      // std::make_shared<BlendingViewport>("Blending")};
+  };
 };
