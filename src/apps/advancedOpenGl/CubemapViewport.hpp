@@ -8,7 +8,6 @@
 #include <libs/renderer/Cubemap.hpp>
 #include <libs/renderer/MouseCameraController.hpp>
 #include <libs/renderer/ShaderManager.hpp>
-#include <libs/renderer/Texture.hpp>
 
 #include <filesystem>
 
@@ -40,70 +39,67 @@ private:
 
   // clang-format off
   const std::vector<float> m_cubeVertices{
-        // positions                        // texture Coords
+        // positions                        // normals
         // back face
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // bottom left
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top right
+        0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f, // bottom right
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f, // bottom left
+         0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f, // top right
 
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,// top left
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top right
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // bottom left
+         -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,// top left
+         0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f, // top right
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f, // bottom left
 
         // front face
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom left
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // bottom right
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // top right
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f, // bottom left
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f, // bottom right
+         0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f, // top right
 
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // top right
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // top left
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom left
+         0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f, // top right
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f, // top left
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f, // bottom left
 
         // left face
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top right
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top left
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom left
+        -0.5f,  0.5f,  0.5f,  -1.0f, 0.0f, 0.0f, // top right
+        -0.5f,  0.5f, -0.5f,  -1.0f, 0.0f, 0.0f, // top left
+        -0.5f, -0.5f, -0.5f,  -1.0f, 0.0f, 0.0f, // bottom left
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom left
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom right
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top right
+        -0.5f, -0.5f, -0.5f,  -1.0f, 0.0f, 0.0f, // bottom left
+        -0.5f, -0.5f,  0.5f,  -1.0f, 0.0f, 0.0f, // bottom right
+        -0.5f,0.5f, 0.5f,  -1.0f, 0.0f, 0.0f, // top right
 
         // right face
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top right
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top left
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom right
+        0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 0.0f, // top right
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, // top left
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, // bottom right
 
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom left
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom right
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top left
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, // bottom left
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, // bottom right
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, // top left
 
          // bottom face
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom left
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f, // bottom right
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // top right
+         -0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f, // bottom left
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f, // bottom right
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f, 0.0f, // top right
 
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // top right
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // top left
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom left
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f, 0.0f, // top right
+         -0.5f, -0.5f,  0.5f,  0.0f, -1.0f, 0.0f, // top left
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f, // bottom left
 
         // top face
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top right
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // top left
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // bottom right
+        0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, // top right
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, // top left
+         0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f, // bottom right
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // bottom right
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // top left
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f // bottom left
+         0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f, // bottom right
+         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, // top left
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f // bottom left
     };
   // clang-format on
 
   libs::renderer::Cube m_cube{
       libs::renderer::BufferLayout{
           libs::renderer::BufferLayoutElement(sizeof(float), 3, GL_FLOAT),
-          libs::renderer::BufferLayoutElement(sizeof(float), 2, GL_FLOAT),
-      }
-
-      ,
+          libs::renderer::BufferLayoutElement(sizeof(float), 3, GL_FLOAT),
+      },
       m_cubeVertices};
-  libs::renderer::Texture m_wood{800, 600};
 };

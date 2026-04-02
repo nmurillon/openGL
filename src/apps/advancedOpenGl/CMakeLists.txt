@@ -28,6 +28,8 @@ logl_add_executable(advancedOpenGl
         assets/shaders/cube.vert
         assets/shaders/cubemap/cubemap.frag
         assets/shaders/cubemap/cubemap.vert
+        assets/shaders/cubemap/cube.frag
+        assets/shaders/cubemap/cube.vert
         assets/shaders/depthTesting.frag
         assets/shaders/depthTesting.vert
         assets/shaders/frameBuffer.frag

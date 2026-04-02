@@ -18,16 +18,12 @@ CubemapViewport::CubemapViewport(const std::string &name, float width,
        cubemapDir / "top.jpg", cubemapDir / "bottom.jpg",
        cubemapDir / "front.jpg", cubemapDir / "back.jpg"}};
 
-  m_shaderManager.addShader("cube", m_assetsDir / "shaders/cube.vert",
-                            m_assetsDir / "shaders/cube.frag");
+  m_shaderManager.addShader("cube", m_assetsDir / "shaders/cubemap/cube.vert",
+                            m_assetsDir / "shaders/cubemap/cube.frag");
 
   m_shaderManager.addShader("cubemap",
                             m_assetsDir / "shaders/cubemap/cubemap.vert",
                             m_assetsDir / "shaders/cubemap/cubemap.frag");
-
-  m_wood = {libs::renderer::TextureType::DIFFUSE,
-            std::format("{}/wood_container.png",
-                        (m_assetsDir / "textures").string())};
 }
 
 void CubemapViewport::initState() {
@@ -56,6 +52,23 @@ void CubemapViewport::drawScene() {
   m_cameraController.update();
   m_openglStateCache->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  // Draw cube
+  auto cubeShader = m_shaderManager.getShader("cube");
+  cubeShader->use();
+
+  m_openglStateCache->setActiveTexture(0);
+  m_cubemap.bind();
+
+  glm::mat4 model{1.f};
+  model = glm::translate(model, glm::vec3(-1.f, 0.f, -1.f));
+
+  cubeShader->setMat4f("model", model);
+  cubeShader->setMat4f("view", m_camera->getViewMatrix());
+  cubeShader->setMat4f("projection", m_camera->getProjection());
+  cubeShader->setVec3f("camPos", m_camera->getPosition());
+  cubeShader->setInt("cubemap", 0);
+  m_cube.draw();
+
   // Draw cubemap
   auto cubemapShader = m_shaderManager.getShader("cubemap");
   cubemapShader->use();
@@ -65,24 +78,8 @@ void CubemapViewport::drawScene() {
   cubemapShader->setMat4f("projection", m_camera->getProjection());
   cubemapShader->setInt("cubemap", 0);
 
-  m_openglStateCache->setDepthMask(false);
+  m_openglStateCache->setDepthFunc(GL_LEQUAL);
   m_openglStateCache->setActiveTexture(0);
   m_cubemap.draw();
-  m_openglStateCache->setDepthMask(true);
-
-  // Draw cube
-  auto cubeShader = m_shaderManager.getShader("cube");
-  cubeShader->use();
-
-  m_openglStateCache->setActiveTexture(0);
-  m_wood.bind();
-
-  glm::mat4 model{1.f};
-  model = glm::translate(model, glm::vec3(-1.f, 0.f, -1.f));
-
-  cubeShader->setMat4f("model", model);
-  cubeShader->setMat4f("view", m_camera->getViewMatrix());
-  cubeShader->setMat4f("projection", m_camera->getProjection());
-  cubeShader->setInt("tex", 0);
-  m_cube.draw();
+  m_openglStateCache->setDepthFunc(GL_LESS);
 }
