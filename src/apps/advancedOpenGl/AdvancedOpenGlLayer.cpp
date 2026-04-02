@@ -10,10 +10,10 @@ AdvancedOpenGlLayer::AdvancedOpenGlLayer(const std::string &name)
   const auto assetsDir = (libs::io::ProgramPath::getInstance().getProgramDir() /
                           ADVANCEDOPENGL_RESOURCES_FOLDER / "assets");
 
-  // m_viewports.emplace_back(std::make_shared<FaceCullingViewport>(
-  //     "Face Culling", 800.f, 600.f, assetsDir));
-  // m_viewports.emplace_back(std::make_shared<FrameBufferViewport>(
-  //     "Frame Buffer", 800.f, 600.f, assetsDir));
+  m_viewports.emplace_back(std::make_shared<FaceCullingViewport>(
+      "Face Culling", 800.f, 600.f, assetsDir));
+  m_viewports.emplace_back(std::make_shared<FrameBufferViewport>(
+      "Frame Buffer", 800.f, 600.f, assetsDir));
   m_viewports.emplace_back(
       std::make_shared<CubemapViewport>("Cubemap", 800.f, 600.f, assetsDir));
 }

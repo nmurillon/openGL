@@ -70,6 +70,7 @@ void Cubemap::draw() const {
 void Cubemap::load(const std::string &face, int target) {
   int nChannels, width, height;
 
+  stbi_set_flip_vertically_on_load(false);
   unsigned char *data = stbi_load(face.c_str(), &width, &height, &nChannels, 0);
 
   if (data) {
