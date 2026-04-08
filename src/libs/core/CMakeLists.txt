@@ -1,7 +1,9 @@
 set(CORE_HEADERS
     Application.hpp
+    Color.hpp
     Layer.hpp
     LayerStack.hpp
+    OpenGlStateCache.hpp
     Viewport.hpp
     Window.hpp
 )
@@ -10,6 +12,7 @@ set(CORE_SRC
     Application.cpp
     Layer.cpp
     LayerStack.cpp
+    OpenGlStateCache.cpp
     Viewport.cpp
     Window.cpp
 )
@@ -22,8 +25,7 @@ logl_add_library(logl_core
     PUBLIC_INCLUDES
         ${PROJECT_SOURCE_DIR}/src
     PUBLIC_LINKS
-        glad
-        glfw
+        logl_opengl
         logl_events
     PRIVATE_LINKS
         imgui

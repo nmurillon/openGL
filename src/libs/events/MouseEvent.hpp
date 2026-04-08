@@ -43,17 +43,20 @@ private:
 
 class MouseButtonEvent : public Event {
 public:
-  MouseButtonEvent(int mouseButton) : m_mouseButton(mouseButton){};
+  MouseButtonEvent(int mouseButton, int mods) : m_mouseButton(mouseButton){};
   ~MouseButtonEvent() = default;
   double getMouseButton() const { return m_mouseButton; }
+  int getMods() const { return m_mods; }
 
 protected:
   int m_mouseButton;
+  int m_mods;
 };
 
 class MouseButtonPressedEvent : public MouseButtonEvent {
 public:
-  MouseButtonPressedEvent(int mouseButton) : MouseButtonEvent(mouseButton){};
+  MouseButtonPressedEvent(int mouseButton, int mods)
+      : MouseButtonEvent(mouseButton, mods){};
   ~MouseButtonPressedEvent() = default;
 
   virtual const std::string toString() const override {
@@ -65,7 +68,8 @@ public:
 
 class MouseButtonReleasedEvent : public MouseButtonEvent {
 public:
-  MouseButtonReleasedEvent(int mouseButton) : MouseButtonEvent(mouseButton){};
+  MouseButtonReleasedEvent(int mouseButton, int mods)
+      : MouseButtonEvent(mouseButton, mods){};
   ~MouseButtonReleasedEvent() = default;
 
   virtual const std::string toString() const override {

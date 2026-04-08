@@ -73,6 +73,26 @@ Window::Window(float width, float height, const std::string &title)
         callback(event);
       });
 
+  glfwSetMouseButtonCallback(
+      m_window, [](GLFWwindow *window, int button, int action, int mods) {
+        auto callback =
+            *static_cast<EventCallbackFn *>(glfwGetWindowUserPointer(window));
+        switch (action) {
+        case GLFW_PRESS: {
+          libs::events::MouseButtonPressedEvent event{button, mods};
+          callback(event);
+          break;
+        }
+        case GLFW_RELEASE: {
+          libs::events::MouseButtonReleasedEvent event{button, mods};
+          callback(event);
+          break;
+        }
+        default:
+          break;
+        }
+      });
+
   glfwSetScrollCallback(
       m_window, [](GLFWwindow *window, double xoffset, double yoffset) {
         auto callback =

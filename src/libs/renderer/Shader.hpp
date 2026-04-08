@@ -2,10 +2,11 @@
 
 #include <logl/renderer/export.h>
 
+#include <libs/openGl/opengl.h>
+
 #include <string>
 #include <vector>
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 namespace libs::renderer {

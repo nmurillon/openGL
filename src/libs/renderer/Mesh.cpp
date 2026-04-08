@@ -1,18 +1,35 @@
 #include <libs/renderer/Mesh.hpp>
 
-#include <glad/glad.h>
-
-#include <GLFW/glfw3.h>
+#include <libs/openGl/opengl.h>
+#include <libs/renderer/IndexBuffer.hpp>
+#include <libs/renderer/VertexBuffer.hpp>
 
 #include <format>
 #include <string>
 
 namespace libs::renderer {
-Mesh::Mesh(const std::vector<Vertex> &vertices,
-           const std::vector<unsigned int> &indices,
-           const std::vector<Texture> &textures)
-    : vertices(vertices), indices(indices), textures(textures) {
+Mesh::Mesh(std::vector<Vertex> &&vertices, std::vector<unsigned int> &&indices,
+           std::vector<Texture> &&textures)
+    : vertices(std::move(vertices)), indices(std::move(indices)),
+      textures(std::move(textures)) {
   init();
+}
+
+Mesh::Mesh(Mesh &&other) noexcept
+    : vertices(std::move(other.vertices)), indices(std::move(other.indices)),
+      textures(std::move(other.textures)), m_vao(std::move(other.m_vao)) {}
+
+Mesh &Mesh::operator=(Mesh &&other) {
+  if (this == &other) {
+    return *this;
+  }
+
+  vertices = std::move(other.vertices);
+  indices = std::move(other.indices);
+  textures = std::move(other.textures);
+  m_vao = std::move(other.m_vao);
+
+  return *this;
 }
 
 void Mesh::draw(Shader &shader) const {
@@ -39,47 +56,27 @@ void Mesh::draw(Shader &shader) const {
   shader.setFloat("material.shininess", 16.f);
   glActiveTexture(GL_TEXTURE0);
 
-  glBindVertexArray(m_vao);
+  m_vao.bind();
 
   glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
                  GL_UNSIGNED_INT, 0);
 
-  glBindVertexArray(0);
+  m_vao.unbind();
 }
 
 void Mesh::init() {
-  glGenVertexArrays(1, &m_vao);
-  glGenBuffers(1, &m_vbo);
-  glGenBuffers(1, &m_ebo);
+  VertexBuffer vbo{BufferLayout{
+                       BufferLayoutElement(sizeof(float), 3, GL_FLOAT),
+                       BufferLayoutElement(sizeof(float), 3, GL_FLOAT),
+                       BufferLayoutElement(sizeof(float), 2, GL_FLOAT),
+                   },
+                   vertices.data(), vertices.size() * sizeof(Vertex),
+                   GL_STATIC_DRAW};
 
-  glBindVertexArray(m_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+  IndexBuffer indexBuffer{indices.data(), indices.size() * sizeof(unsigned int),
+                          GL_STATIC_DRAW};
 
-  glBufferData(GL_ARRAY_BUFFER,
-               static_cast<GLsizeiptr>(vertices.size() * sizeof(Vertex)),
-               vertices.data(), GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               static_cast<GLsizeiptr>(indices.size() * sizeof(unsigned int)),
-               indices.data(), GL_STATIC_DRAW);
-
-  const auto stride = sizeof(Vertex);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
-                        reinterpret_cast<void *>(0));
-
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
-                        reinterpret_cast<void *>(offsetof(Vertex, normal)));
-
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
-                        reinterpret_cast<void *>(offsetof(Vertex, texCoord)));
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  m_vao.setVertexBuffer(std::forward<VertexBuffer>(vbo));
+  m_vao.setIndexBuffer(std::forward<IndexBuffer>(indexBuffer));
 }
 } // namespace libs::renderer

@@ -50,3 +50,12 @@ With the cmake extension installed for vscode: Open the Command Palette (Ctrl+Sh
 - Make a scene/viewport to have only one app by chapter
 - Handle events only if a viewport is active/hovered
 - Rework camera movement to use mouse but only when clicked
+
+- Find a way to reset the state of a viewport.
+  - First idea: restore at the beginning and at the end of the render loop --> This is probably the easiest solution but not the most efficient one
+  - Second idea: create an event to tell that the viewport is not active anymore and restore the state at this moment
+  - Third idea: get openGL context at the beginning of the render loop, and reset it at the end
+
+- Class for buffers
+- Rework Texture class
+- Class for post processing

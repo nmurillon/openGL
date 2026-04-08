@@ -56,6 +56,8 @@ public:
 
 protected:
   virtual void drawScene() override;
+  virtual void initState() override{};
+  virtual void resetState() override{};
 
 private:
   // bool onWindowResized(libs::events::WindowResizeEvent &event);

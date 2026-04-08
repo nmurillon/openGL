@@ -12,15 +12,10 @@ namespace libs::core {
 float Viewport::s_windowWidth = 800.f;
 float Viewport::s_windowHeight = 600.f;
 
-Viewport::Viewport(const std::string &name, float width, float height)
-    : m_name(name), m_width(width), m_height(height) {}
-
-void Viewport::prepareScene() {
-  glViewport(m_xBottomLeft, m_yBottomLeft, m_width, m_height);
-  // TODO: use custom background color
-  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
+Viewport::Viewport(const std::string &name, float width, float height,
+                   const RgbaColor &backgroundColor)
+    : m_name(name), m_width(width), m_height(height),
+      m_backgroundColor(backgroundColor) {}
 
 void Viewport::display() {
 
@@ -55,8 +50,13 @@ void Viewport::display() {
 
   m_xBottomLeft = vMin.x;
   m_yBottomLeft = mainViewPort.y - vMax.y;
-  m_width = vMax.x - vMin.x;
-  m_height = vMax.y - vMin.y;
+
+  if (m_width != vMax.x - vMin.x || m_height != vMax.y - vMin.y) {
+    m_width = vMax.x - vMin.x;
+    m_height = vMax.y - vMin.y;
+
+    onViewportResize(m_width, m_height);
+  }
 
   // Debug info
   //   ImGui::GetForegroundDrawList()->AddRect(vMin, vMax,
@@ -74,12 +74,22 @@ void Viewport::display() {
 }
 
 void Viewport::onUpdate() {
+  // Should each viewport be responsible for checking if it should render?
   if (!isActive()) {
+    resetState();
     return;
   }
 
-  prepareScene();
+  m_openglStateCache->setViewport(m_xBottomLeft, m_yBottomLeft, m_width,
+                                  m_height);
+  m_openglStateCache->setClearColor(m_backgroundColor);
+  m_openglStateCache->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  initState();
+
   drawScene();
+
+  resetState();
 }
 
 bool Viewport::isActive() { return m_isActive; }
@@ -92,6 +102,14 @@ bool Viewport::isInViewport(float x, float y) {
 void Viewport::setWindowSize(float width, float height) {
   s_windowWidth = width;
   s_windowHeight = height;
+}
+
+void Viewport::setBackgroundColor(const RgbaColor &color) {
+  m_backgroundColor = color;
+}
+
+void Viewport::setBackgroundColor(float r, float g, float b, float a) {
+  m_backgroundColor = RgbaColor{r, g, b, a};
 }
 
 } // namespace libs::core

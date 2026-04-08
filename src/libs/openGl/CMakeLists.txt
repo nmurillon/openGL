@@ -1,0 +1,11 @@
+logl_add_library(logl_opengl
+    SOURCES
+    HEADERS
+        opengl.h
+    PUBLIC_INCLUDES
+        ${PROJECT_SOURCE_DIR}/src
+    PUBLIC_LINKS
+        glad
+        glfw
+    PRIVATE_LINKS
+)

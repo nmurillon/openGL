@@ -1,24 +1,40 @@
 set(RENDERER_HEADERS
+    BufferLayout.hpp
     Camera.hpp
+    Cube.hpp
+    Cubemap.hpp
     FlyCameraController.hpp
+    FrameBuffer.hpp
+    IndexBuffer.hpp
     Mesh.hpp
     Model.hpp
+    MouseCameraController.hpp
     PerspectiveCamera.hpp
     Shader.hpp
     ShaderManager.hpp
     Texture.hpp
     Vertex.hpp
+    VertexArray.hpp
+    VertexBuffer.hpp
 )
 
 set(RENDERER_SRC
+    BufferLayout.cpp
     Camera.cpp
+    Cube.cpp
+    Cubemap.cpp
     FlyCameraController.cpp
+    FrameBuffer.cpp
+    IndexBuffer.cpp
     Mesh.cpp
     Model.cpp
+    MouseCameraController.cpp
     PerspectiveCamera.cpp
     Shader.cpp
     ShaderManager.cpp
     Texture.cpp
+    VertexArray.cpp
+    VertexBuffer.cpp
 )
 
 logl_add_library(logl_renderer
@@ -29,11 +45,10 @@ logl_add_library(logl_renderer
     PUBLIC_INCLUDES
         ${PROJECT_SOURCE_DIR}/src
     PUBLIC_LINKS
-        glad
+        logl_opengl
         glm
         assimp
     PRIVATE_LINKS
-        glfw
         logl_io
         stb_image
         logl_logger
