@@ -27,7 +27,7 @@ ProgramPath::ProgramPath() {
   GetModuleFileNameW(nullptr, path, FILENAME_MAX);
   m_programPath = std::filesystem::path(path);
 #else
-  char path[FILENAME_MAX];
+  char path[FILENAME_MAX] = {0};
   ssize_t count = readlink("/proc/self/exe", path, FILENAME_MAX);
   if (count < 0) {
     throw std::runtime_error("Error when retrieving program location");
