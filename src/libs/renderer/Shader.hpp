@@ -15,6 +15,8 @@ public:
   Shader(const std::string &vertexSrcFile, const std::string &fragmentSrcFile);
   void use() const;
 
+  void setBindingPoint(const std::string &name, int point) const;
+
   // Utility functions to help set uniform values;
   void setBool(const std::string &name, bool value) const;
   void setInt(const std::string &name, int value) const;

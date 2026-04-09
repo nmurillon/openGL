@@ -45,6 +45,11 @@ Shader::Shader(const std::string &vertexSrcFile,
 
 void Shader::use() const { glUseProgram(m_shaderId); }
 
+void Shader::setBindingPoint(const std::string &name, int point) const {
+  const auto idx = glGetUniformBlockIndex(m_shaderId, name.c_str());
+  glUniformBlockBinding(m_shaderId, idx, point);
+}
+
 void Shader::setBool(const std::string &name, bool value) const {
   glUniform1i(getLocation(name), static_cast<int>(value));
 }

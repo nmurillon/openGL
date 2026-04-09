@@ -1,0 +1,20 @@
+logl_add_executable(uniformBuffer
+    SOURCES
+        main.cpp
+        UniformBufferLayer.cpp
+        UniformBufferLayer.hpp
+        UniformBufferViewport.cpp
+        UniformBufferViewport.hpp
+    LINKS
+        logl_core
+        logl_io
+        logl_events
+        logl_renderer
+        glm
+    RESOURCES
+        assets/blue.frag
+        assets/cube.vert
+        assets/green.frag
+        assets/red.frag
+        assets/yellow.frag
+)

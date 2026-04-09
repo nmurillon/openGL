@@ -13,6 +13,7 @@ set(RENDERER_HEADERS
     Shader.hpp
     ShaderManager.hpp
     Texture.hpp
+    UniformBuffer.hpp
     Vertex.hpp
     VertexArray.hpp
     VertexBuffer.hpp
@@ -33,6 +34,7 @@ set(RENDERER_SRC
     Shader.cpp
     ShaderManager.cpp
     Texture.cpp
+    UniformBuffer.cpp
     VertexArray.cpp
     VertexBuffer.cpp
 )
