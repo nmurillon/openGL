@@ -1,0 +1,18 @@
+logl_add_executable(geometryShader
+    SOURCES
+        main.cpp
+        GeometryShaderLayer.cpp
+        GeometryShaderLayer.hpp
+        HousesViewport.cpp
+        HousesViewport.hpp
+    LINKS
+        logl_core
+        logl_io
+        logl_events
+        logl_renderer
+        glm
+    RESOURCES
+        assets/house.frag
+        assets/house.geom
+        assets/house.vert
+)
