@@ -6,6 +6,7 @@
 
 #include <filesystem>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -18,10 +19,12 @@ public:
   std::shared_ptr<Shader> getShader(const std::string &name) const;
   void addShader(const std::string &name, std::shared_ptr<Shader> shader);
   void addShader(const std::string &name, const std::string &vertexSrcFile,
-                 const std::string &fragmentSrcFile);
-  void addShader(const std::string &name,
-                 const std::filesystem::path &vertexSrcFile,
-                 const std::filesystem::path &fragmentSrcFile);
+                 const std::string &fragmentSrcFile,
+                 std::optional<std::string> geometrySrcFile = std::nullopt);
+  void addShader(
+      const std::string &name, const std::filesystem::path &vertexSrcFile,
+      const std::filesystem::path &fragmentSrcFile,
+      std::optional<std::filesystem::path> geometrySrcFile = std::nullopt);
 
   std::filesystem::path getCommonShaderDirectory() const;
 

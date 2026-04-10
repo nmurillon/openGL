@@ -38,25 +38,34 @@ void ShaderManager::addShader(const std::string &name,
 
 void ShaderManager::addShader(const std::string &name,
                               const std::string &vertexSrcFile,
-                              const std::string &fragmentSrcFile) {
+                              const std::string &fragmentSrcFile,
+                              std::optional<std::string> geometrySrcFile) {
   if (m_shaders.contains(name)) {
     throw std::runtime_error(
         std::format("A shader with name {} already exists", name));
   }
 
-  m_shaders[name] = std::make_shared<Shader>(vertexSrcFile, fragmentSrcFile);
+  m_shaders[name] =
+      std::make_shared<Shader>(vertexSrcFile, fragmentSrcFile, geometrySrcFile);
 }
 
-void ShaderManager::addShader(const std::string &name,
-                              const std::filesystem::path &vertexSrcFile,
-                              const std::filesystem::path &fragmentSrcFile) {
+void ShaderManager::addShader(
+    const std::string &name, const std::filesystem::path &vertexSrcFile,
+    const std::filesystem::path &fragmentSrcFile,
+    std::optional<std::filesystem::path> geometrySrcFile) {
   if (m_shaders.contains(name)) {
     throw std::runtime_error(
         std::format("A shader with name {} already exists", name));
   }
 
-  m_shaders[name] = std::make_shared<Shader>(vertexSrcFile.string(),
-                                             fragmentSrcFile.string());
+  std::optional<std::string> geometry;
+  if (geometrySrcFile) {
+    geometry = geometrySrcFile->string();
+  }
+
+  m_shaders[name] =
+      std::make_shared<Shader>(vertexSrcFile.string(), fragmentSrcFile.string(),
+                               geometrySrcFile->string());
 }
 
 std::filesystem::path ShaderManager::getCommonShaderDirectory() const {

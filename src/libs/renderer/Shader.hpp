@@ -4,6 +4,7 @@
 
 #include <libs/openGl/opengl.h>
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -12,7 +13,8 @@
 namespace libs::renderer {
 class LOGL_RENDERER_EXPORT Shader {
 public:
-  Shader(const std::string &vertexSrcFile, const std::string &fragmentSrcFile);
+  Shader(const std::string &vertexSrcFile, const std::string &fragmentSrcFile,
+         std::optional<std::string> geometrySrcFile = std::nullopt);
   void use() const;
 
   void setBindingPoint(const std::string &name, int point) const;

@@ -12,17 +12,29 @@
 
 namespace libs::renderer {
 Shader::Shader(const std::string &vertexSrcFile,
-               const std::string &fragmentSrcFile) {
+               const std::string &fragmentSrcFile,
+               std::optional<std::string> geometrySrcFile) {
 
   const unsigned int vertexShader =
       readShaderFile(vertexSrcFile, GL_VERTEX_SHADER);
   const unsigned int fragmentShader =
       readShaderFile(fragmentSrcFile, GL_FRAGMENT_SHADER);
 
+  unsigned int geometryShader{0};
+  if (geometrySrcFile) {
+    geometryShader =
+        readShaderFile(geometrySrcFile.value(), GL_GEOMETRY_SHADER);
+  }
+
   m_shaderId = glCreateProgram();
 
   // Beware to the order
   glAttachShader(m_shaderId, vertexShader);
+
+  if (geometryShader) {
+    glAttachShader(m_shaderId, geometryShader);
+  }
+
   glAttachShader(m_shaderId, fragmentShader);
 
   glLinkProgram(m_shaderId);
