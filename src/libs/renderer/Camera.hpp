@@ -23,20 +23,23 @@ public:
          float viewportHeight = 600.0f)
       : m_position(position), m_front(front), m_up(m_worldUp), m_yaw(yaw),
         m_pitch(pitch), m_viewportWidth(viewportWidth),
-        m_viewportHeight(viewportHeight){};
+        m_viewportHeight(viewportHeight) {};
 
   virtual ~Camera() = default;
 
   void translate(const glm::vec3 &offset);
   void translate(CameraMovement direction, float velocity);
   void rotate(float xOffset, float yOffset);
+  void lookAt(const glm::vec3 &target);
   void setViewportSize(float width, float height);
-  virtual void setZoom(float zoom){};
-  virtual void adjustZoom(float delta){};
+  virtual void setZoom(float zoom) {};
+  virtual void adjustZoom(float delta) {};
 
   [[nodiscard]] const glm::vec3 &getPosition() const { return m_position; };
   [[nodiscard]] const glm::mat4 &getViewMatrix() const { return m_view; };
   [[nodiscard]] const glm::mat4 &getProjection() const { return m_projection; };
+
+  void setPosition(const glm::vec3 &positon);
 
 protected:
   virtual void update();

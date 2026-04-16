@@ -1,6 +1,8 @@
 logl_add_executable(geometryShader
     SOURCES
         main.cpp
+        ExploadingModelViewport.cpp
+        ExploadingModelViewport.hpp
         GeometryShaderLayer.cpp
         GeometryShaderLayer.hpp
         HousesViewport.cpp
@@ -12,6 +14,9 @@ logl_add_executable(geometryShader
         logl_renderer
         glm
     RESOURCES
+        assets/expload.frag
+        assets/expload.geom
+        assets/expload.vert
         assets/house.frag
         assets/house.geom
         assets/house.vert

@@ -46,10 +46,26 @@ void Camera::rotate(float xOffset, float yOffset) {
   updateView();
 }
 
+void Camera::lookAt(const glm::vec3 &target) {
+  m_front = glm::normalize(target - m_position);
+  m_right = glm::normalize(glm::cross(m_front, m_worldUp));
+  m_up = glm::normalize(glm::cross(m_right, m_front));
+
+  m_yaw = glm::degrees(atan2(m_front.z, m_front.x));
+  m_pitch = glm::degrees(asin(m_front.y));
+
+  m_view = glm::lookAt(m_position, m_position + m_front, m_up);
+}
+
 void Camera::setViewportSize(float width, float height) {
   m_viewportWidth = width;
   m_viewportHeight = height;
   updateProjection();
+}
+
+void Camera::setPosition(const glm::vec3 &position) {
+  m_position = position;
+  update();
 }
 
 void Camera::update() {
