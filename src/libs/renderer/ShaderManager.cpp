@@ -63,9 +63,8 @@ void ShaderManager::addShader(
     geometry = geometrySrcFile->string();
   }
 
-  m_shaders[name] =
-      std::make_shared<Shader>(vertexSrcFile.string(), fragmentSrcFile.string(),
-                               geometrySrcFile->string());
+  m_shaders[name] = std::make_shared<Shader>(
+      vertexSrcFile.string(), fragmentSrcFile.string(), geometry);
 }
 
 std::filesystem::path ShaderManager::getCommonShaderDirectory() const {

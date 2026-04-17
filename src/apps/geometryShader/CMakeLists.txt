@@ -7,6 +7,8 @@ logl_add_executable(geometryShader
         GeometryShaderLayer.hpp
         HousesViewport.cpp
         HousesViewport.hpp
+        NormalVisualizationViewport.cpp
+        NormalVisualizationViewport.hpp
     LINKS
         logl_core
         logl_io
@@ -20,4 +22,9 @@ logl_add_executable(geometryShader
         assets/house.frag
         assets/house.geom
         assets/house.vert
+        assets/model.frag
+        assets/model.vert
+        assets/normalVis.frag
+        assets/normalVis.geom
+        assets/normalVis.vert
 )

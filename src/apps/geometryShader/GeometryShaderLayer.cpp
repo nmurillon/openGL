@@ -2,6 +2,7 @@
 
 #include "ExploadingModelViewport.hpp"
 #include "HousesViewport.hpp"
+#include "NormalVisualizationViewport.hpp"
 
 #include <libs/io/ProgramPath.hpp>
 
@@ -15,6 +16,9 @@ GeometryShaderLayer::GeometryShaderLayer(const std::string &name)
 
   m_viewports.emplace_back(std::make_shared<ExploadingModelViewport>(
       "Exploading model", 800.f, 600.f, assetsDir));
+
+  m_viewports.emplace_back(std::make_shared<NormalVisualizationViewport>(
+      "Normal visualization model", 800.f, 600.f, assetsDir));
 }
 
 void GeometryShaderLayer::onUpdate() {
