@@ -4,6 +4,9 @@
 #include <libs/renderer/PerspectiveCamera.hpp>
 
 #include <glm/gtc/type_ptr.hpp>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 NormalVisualizationViewport::NormalVisualizationViewport(
     const std::string &name, float width, float height,
@@ -30,7 +33,16 @@ void NormalVisualizationViewport::onEvent(libs::events::Event &event) {
       LOGL_BIND_EVENT_FN(NormalVisualizationViewport::onPathDropped));
 }
 
-void NormalVisualizationViewport::onImguiUpdate() {}
+void NormalVisualizationViewport::onImguiUpdate() {
+  if (!isActive()) {
+    return;
+  }
+
+  ImGui::Begin("Normal visualization settings");
+  ImGui::SliderFloat("Magnitude", &m_magnitude, 0.1f, 1.f);
+  ImGui::ColorPicker4("Color", glm::value_ptr(m_color));
+  ImGui::End();
+}
 
 void NormalVisualizationViewport::onPathDropped(
     libs::events::PathDropEvent &event) {
@@ -48,6 +60,11 @@ void NormalVisualizationViewport::initState() {
 
 void NormalVisualizationViewport::resetState() {
   m_openglStateCache->setDepthTest(false);
+}
+
+void NormalVisualizationViewport::onViewportResize(float newWidth,
+                                                   float newHeight) {
+  m_camera->setViewportSize(newWidth, newHeight);
 }
 
 void NormalVisualizationViewport::drawScene() {
@@ -80,6 +97,8 @@ void NormalVisualizationViewport::drawScene() {
   // Draw the normals
   const auto normShader = m_shaderManager.getShader("normal");
   normShader->use();
+  normShader->setFloat("magnitude", m_magnitude);
+  normShader->setVec4f("color", m_color);
   m_model->draw(*normShader);
   const auto b = glGetError();
 }

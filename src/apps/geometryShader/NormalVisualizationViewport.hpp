@@ -35,4 +35,9 @@ protected:
   void drawScene() override;
   void initState() override;
   void resetState() override;
+  void onViewportResize(float newWidth, float newHeight) override;
+
+private:
+  float m_magnitude{0.4f};
+  glm::vec4 m_color{1.0, 1.0, 0.0, 1.0};
 };

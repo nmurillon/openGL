@@ -11,14 +11,14 @@ layout(std140) uniform Matrices {
   mat4 projection;
 };
 
-const float MAGNITUDE = 0.4;
+uniform float magnitude;
 
 void line(int index) {
   gl_Position = projection * gl_in[index].gl_Position;
   EmitVertex();
 
   gl_Position = projection * (gl_in[index].gl_Position +
-                              vec4(normal[index], 0.0) * MAGNITUDE);
+                              vec4(normal[index], 0.0) * magnitude);
   EmitVertex();
   EndPrimitive();
 }

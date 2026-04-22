@@ -15,6 +15,7 @@ logl_add_executable(geometryShader
         logl_events
         logl_renderer
         glm
+        imgui
     RESOURCES
         assets/expload.frag
         assets/expload.geom
