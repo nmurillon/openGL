@@ -17,13 +17,8 @@ NormalVisualizationViewport::NormalVisualizationViewport(
   m_shaderManager.addShader("model", m_assetsDir / "model.vert",
                             m_assetsDir / "model.frag");
 
-  m_shaderManager.addShader("normal", m_assetsDir / "normalVis.vert",
-                            m_assetsDir / "normalVis.frag",
-                            m_assetsDir / "normalVis.geom");
-
   m_uniformBuffer.setBindingPoint(0);
   m_shaderManager.getShader("model")->setBindingPoint("Matrices", 0);
-  m_shaderManager.getShader("normal")->setBindingPoint("Matrices", 0);
 }
 
 void NormalVisualizationViewport::onEvent(libs::events::Event &event) {
@@ -38,10 +33,7 @@ void NormalVisualizationViewport::onImguiUpdate() {
     return;
   }
 
-  ImGui::Begin("Normal visualization settings");
-  ImGui::SliderFloat("Magnitude", &m_magnitude, 0.1f, 1.f);
-  ImGui::ColorPicker4("Color", glm::value_ptr(m_color));
-  ImGui::End();
+  m_normalVisualizer.drawSettingsWindow();
 }
 
 void NormalVisualizationViewport::onPathDropped(
@@ -92,13 +84,7 @@ void NormalVisualizationViewport::drawScene() {
   shader->use();
 
   m_model->draw(*shader);
-  const auto a = glGetError();
 
   // Draw the normals
-  const auto normShader = m_shaderManager.getShader("normal");
-  normShader->use();
-  normShader->setFloat("magnitude", m_magnitude);
-  normShader->setVec4f("color", m_color);
-  m_model->draw(*normShader);
-  const auto b = glGetError();
+  m_normalVisualizer.draw(*m_model);
 }

@@ -9,6 +9,7 @@ set(RENDERER_HEADERS
     Mesh.hpp
     Model.hpp
     MouseCameraController.hpp
+    NormalVisualizer.hpp
     PerspectiveCamera.hpp
     Shader.hpp
     ShaderManager.hpp
@@ -30,6 +31,7 @@ set(RENDERER_SRC
     Mesh.cpp
     Model.cpp
     MouseCameraController.cpp
+    NormalVisualizer.cpp
     PerspectiveCamera.cpp
     Shader.cpp
     ShaderManager.cpp
@@ -54,7 +56,11 @@ logl_add_library(logl_renderer
         logl_io
         stb_image
         logl_logger
+        imgui
     RESOURCES
         shaders/basicShader.frag
         shaders/basicShader.vert
+        shaders/normalVis.frag
+        shaders/normalVis.geom
+        shaders/normalVis.vert
 )

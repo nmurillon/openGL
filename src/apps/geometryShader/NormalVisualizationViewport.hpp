@@ -4,6 +4,7 @@
 #include <libs/events/WindowEvent.hpp>
 #include <libs/renderer/Camera.hpp>
 #include <libs/renderer/Model.hpp>
+#include <libs/renderer/NormalVisualizer.hpp>
 #include <libs/renderer/ShaderManager.hpp>
 #include <libs/renderer/UniformBuffer.hpp>
 
@@ -38,6 +39,5 @@ protected:
   void onViewportResize(float newWidth, float newHeight) override;
 
 private:
-  float m_magnitude{0.4f};
-  glm::vec4 m_color{1.0, 1.0, 0.0, 1.0};
+  libs::renderer::NormalVisualizer m_normalVisualizer;
 };
