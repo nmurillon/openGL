@@ -1,6 +1,7 @@
 add_subdirectory(advancedOpenGl)
 add_subdirectory(basicWindow)
 add_subdirectory(geometryShader)
+add_subdirectory(instancing)
 add_subdirectory(lighting)
 add_subdirectory(modelLoading)
 add_subdirectory(uniformBuffer)
