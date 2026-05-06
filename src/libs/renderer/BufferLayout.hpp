@@ -13,9 +13,11 @@ class LOGL_RENDERER_EXPORT BufferLayoutElement {
 public:
   // TODO: in the future we might need to set the offset explicitly
   BufferLayoutElement(std::size_t size, GLint count, GLenum type = GL_FLOAT,
-                      bool normalized = GL_FALSE)
+                      bool normalized = GL_FALSE,
+                      unsigned int attribDivisor = 0)
       : m_size(size), m_count(count), m_type(type),
-        m_normalized(normalized ? GL_TRUE : GL_FALSE) {}
+        m_normalized(normalized ? GL_TRUE : GL_FALSE),
+        m_attribDivisor(attribDivisor) {}
   ~BufferLayoutElement() = default;
 
   unsigned int getSize() const { return m_size; }
@@ -24,6 +26,7 @@ public:
   GLboolean isNormalized() const { return m_normalized; }
   unsigned long getOffset() const { return m_offset; }
   void setOffset(unsigned long offset) { m_offset = offset; }
+  unsigned int getAttribDivisor() const { return m_attribDivisor; }
 
 private:
   std::size_t m_size{0};
@@ -31,6 +34,7 @@ private:
   GLenum m_type{GL_FLOAT};
   GLboolean m_normalized{GL_FALSE};
   unsigned long m_offset{0};
+  unsigned int m_attribDivisor{0};
 };
 
 class LOGL_RENDERER_EXPORT BufferLayout {

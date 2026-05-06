@@ -23,8 +23,21 @@ Cube::Cube(BufferLayout &&layout, const std::vector<float> &vertices,
   }
 }
 
-void Cube::draw() const {
+void Cube::draw(bool useInstance, int instanceCount) const {
   m_vertexArray.bind();
+
+  if (useInstance) {
+    if (!m_indices.empty()) {
+      glDrawElementsInstanced(GL_TRIANGLES,
+                              static_cast<GLsizei>(m_indices.size()),
+                              GL_UNSIGNED_INT, 0, instanceCount);
+    } else {
+      const auto count = m_vertexArray.getVertexCount();
+      glDrawArraysInstanced(GL_TRIANGLES, 0, static_cast<GLsizei>(count),
+                            instanceCount);
+    }
+  }
+
   if (!m_indices.empty()) {
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
                    GL_UNSIGNED_INT, 0);

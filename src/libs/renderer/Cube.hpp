@@ -13,7 +13,7 @@ public:
   Cube(BufferLayout &&layout, const std::vector<float> &vertices,
        const std::vector<unsigned int> &indices = {});
 
-  void draw() const;
+  void draw(bool useInstance = false, int instanceCount = 0) const;
   void addVertexBuffer(VertexBuffer &&vertexBuffer);
 
 private:
