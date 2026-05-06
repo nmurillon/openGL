@@ -76,7 +76,7 @@ void Mesh::init() {
   IndexBuffer indexBuffer{indices.data(), indices.size() * sizeof(unsigned int),
                           GL_STATIC_DRAW};
 
-  m_vao.setVertexBuffer(std::forward<VertexBuffer>(vbo));
+  m_vao.addVertexBuffer(std::forward<VertexBuffer>(vbo));
   m_vao.setIndexBuffer(std::forward<IndexBuffer>(indexBuffer));
 }
 } // namespace libs::renderer

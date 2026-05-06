@@ -13,7 +13,7 @@ Cubemap::Cubemap(const std::vector<std::string> &faces) {
                      faces.size());
   }
 
-  m_vao.setVertexBuffer(
+  m_vao.addVertexBuffer(
       VertexBuffer{BufferLayout{BufferLayoutElement{sizeof(float), 3}},
                    m_vertices.data(), m_vertices.size() * sizeof(float)});
 

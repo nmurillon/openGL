@@ -17,7 +17,7 @@ HousesViewport::HousesViewport(const std::string &name, float width,
   };
   // clang-format on
 
-  m_vao.setVertexBuffer(libs::renderer::VertexBuffer{
+  m_vao.addVertexBuffer(libs::renderer::VertexBuffer{
       libs::renderer::BufferLayout{
           libs::renderer::BufferLayoutElement{sizeof(float), 3},
           libs::renderer::BufferLayoutElement{sizeof(float), 3},

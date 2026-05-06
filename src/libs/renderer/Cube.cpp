@@ -10,10 +10,11 @@ Cube::Cube(BufferLayout &&layout, const std::vector<float> &vertices,
            const std::vector<unsigned int> &indices)
     : m_vertices(vertices), m_indices(indices) {
 
-  VertexBuffer vertexBuffer{std::move(layout), vertices.data(),
-                            vertices.size() * sizeof(float)};
+  // VertexBuffer vertexBuffer{std::move(layout), vertices.data(),
+  //                           vertices.size() * sizeof(float)};
 
-  m_vertexArray.setVertexBuffer(std::forward<VertexBuffer>(vertexBuffer));
+  m_vertexArray.addVertexBuffer(
+      {std::move(layout), vertices.data(), vertices.size() * sizeof(float)});
 
   if (m_indices.size()) {
     IndexBuffer indexBuffer{m_indices.data(),
@@ -28,10 +29,14 @@ void Cube::draw() const {
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
                    GL_UNSIGNED_INT, 0);
   } else {
-    const auto count = m_vertexArray.getVertexBuffer().getVertexCount();
+    const auto count = m_vertexArray.getVertexCount();
     glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(count));
   }
   m_vertexArray.unbind();
+}
+
+void Cube::addVertexBuffer(VertexBuffer &&vertexBuffer) {
+  m_vertexArray.addVertexBuffer(std::move(vertexBuffer));
 }
 
 }; // namespace libs::renderer

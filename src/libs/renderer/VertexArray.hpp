@@ -5,6 +5,8 @@
 #include <libs/renderer/IndexBuffer.hpp>
 #include <libs/renderer/VertexBuffer.hpp>
 
+#include <vector>
+
 namespace libs::renderer {
 class LOGL_RENDERER_EXPORT VertexArray {
 public:
@@ -18,19 +20,21 @@ public:
 
   ~VertexArray();
 
-  void setVertexBuffer(VertexBuffer &&vertexBuffer);
   void setIndexBuffer(IndexBuffer &&indexBuffer);
 
-  [[nodiscard]] const VertexBuffer &getVertexBuffer() const;
+  void addVertexBuffer(VertexBuffer &&vertexBuffer);
+
+  int getVertexCount() const;
 
   void bind() const;
   static void unbind();
 
 private:
   GLuint m_id;
-  // TODO: we might have mltiple buffers in the future
-  VertexBuffer m_vertexBuffer;
+  // Assume that the first buffer contains vertex data
+  std::vector<VertexBuffer> m_buffers;
   IndexBuffer m_indexBuffer;
-  int m_vertexCount{0};
+
+  unsigned int m_attributeOffset{0};
 };
 } // namespace libs::renderer

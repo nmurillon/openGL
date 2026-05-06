@@ -14,6 +14,7 @@ public:
        const std::vector<unsigned int> &indices = {});
 
   void draw() const;
+  void addVertexBuffer(VertexBuffer &&vertexBuffer);
 
 private:
   VertexArray m_vertexArray;
