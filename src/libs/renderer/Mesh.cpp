@@ -64,6 +64,46 @@ void Mesh::draw(Shader &shader) const {
   m_vao.unbind();
 }
 
+void Mesh::drawInstanced(Shader &shader, int instanceCount) const {
+  unsigned int diffuseNr = 1;
+  unsigned int specularNr = 1;
+  for (unsigned int i = 0; i < textures.size(); i++) {
+    glActiveTexture(GL_TEXTURE0 +
+                    i); // activate proper texture unit before binding
+    // retrieve texture number (the N in diffuse_textureN)
+    const auto type = textures[i].type();
+    unsigned int number;
+    if (type == TextureType::DIFFUSE) {
+      number = diffuseNr++;
+    } else if (type == TextureType::SPECULAR) {
+      number = specularNr++;
+    }
+
+    textureTypeToString(textures[i].type());
+    shader.setInt(
+        std::format("material.{}{}", textureTypeToString(type), number).c_str(),
+        i);
+    glBindTexture(GL_TEXTURE_2D, textures[i].id());
+  }
+  shader.setFloat("material.shininess", 16.f);
+  glActiveTexture(GL_TEXTURE0);
+
+  m_vao.bind();
+
+  // glDrawArraysInstanced(GL_TRIANGLES, 0,
+  // static_cast<GLsizei>(vertices.size()),
+  //                       instanceCount);
+
+  glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
+                          GL_UNSIGNED_INT, 0, instanceCount);
+
+  m_vao.unbind();
+}
+
+const VertexArray &Mesh::getVertexArray() const { return m_vao; }
+
+VertexArray &Mesh::getVertexArray() { return m_vao; }
+
 void Mesh::init() {
   VertexBuffer vbo{BufferLayout{
                        BufferLayoutElement(sizeof(float), 3, GL_FLOAT),

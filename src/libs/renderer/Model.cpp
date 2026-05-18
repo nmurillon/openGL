@@ -41,7 +41,17 @@ void Model::draw(Shader &shader) const {
   }
 }
 
+void Model::drawInstanced(Shader &shader, int instanceCount) const {
+  for (auto &mesh : m_meshes) {
+    mesh.drawInstanced(shader, instanceCount);
+  }
+}
+
 bool Model::isValid() const { return m_isValid; }
+
+const std::vector<Mesh> &Model::getMeshes() const { return m_meshes; }
+
+std::vector<Mesh> &Model::getMeshes() { return m_meshes; }
 
 void Model::load(const std::string &path) {
   Assimp::Importer importer;

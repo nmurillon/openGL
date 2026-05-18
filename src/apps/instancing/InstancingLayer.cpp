@@ -1,5 +1,6 @@
 #include "InstancingLayer.hpp"
 
+#include "AsteroidViewport.hpp"
 #include "QuadViewport.hpp"
 
 #include <libs/io/ProgramPath.hpp>
@@ -10,6 +11,8 @@ InstancingLayer::InstancingLayer(const std::string &name) : Layer(name) {
 
   m_viewports.emplace_back(std::make_shared<QuadViewport>(
       "Quad instancing", 800.f, 600.f, assetsDir));
+  m_viewports.emplace_back(std::make_shared<AsteroidViewport>(
+      "Asteroid instancing", 800.f, 600.f, assetsDir));
 }
 
 void InstancingLayer::onUpdate() {

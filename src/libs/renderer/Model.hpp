@@ -25,7 +25,10 @@ public:
   Model &operator=(const Model &) = delete;
 
   void draw(Shader &shader) const;
+  void drawInstanced(Shader &shader, int instanceCount) const;
   bool isValid() const;
+  const std::vector<Mesh> &getMeshes() const;
+  std::vector<Mesh> &getMeshes();
 
 private:
   void load(const std::string &path);

@@ -26,7 +26,8 @@ QuadViewport::QuadViewport(const std::string &name, float width, float height,
   }
 
   m_quad.addVertexBuffer(
-      {libs::renderer::BufferLayout{{sizeof(float), 2, GL_FLOAT, GL_FALSE, 1}},
+      {libs::renderer::BufferLayout{
+           {.m_size = sizeof(float), .m_count = 2, .m_attribDivisor = 1}},
        offsets.data(), offsets.size() * sizeof(glm::vec2)});
 }
 

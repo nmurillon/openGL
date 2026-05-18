@@ -23,6 +23,9 @@ public:
   Mesh &operator=(Mesh &&other);
 
   void draw(Shader &shader) const;
+  void drawInstanced(Shader &shader, int instanceCount) const;
+  const VertexArray &getVertexArray() const;
+  VertexArray &getVertexArray();
 
 public:
   std::vector<Vertex> vertices;

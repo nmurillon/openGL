@@ -3,6 +3,8 @@ logl_add_executable(instancing
         main.cpp
         InstancingLayer.cpp
         InstancingLayer.hpp
+        AsteroidViewport.cpp
+        AsteroidViewport.hpp
         QuadViewport.cpp
         QuadViewport.hpp
     LINKS
@@ -11,13 +13,17 @@ logl_add_executable(instancing
         logl_renderer
         glm
     RESOURCES
+        assets/shaders/asteroid.frag
+        assets/shaders/asteroid.vert
+        assets/shaders/planet.frag
+        assets/shaders/planet.vert
         assets/shaders/quad.frag
         assets/shaders/quad.vert
-        # assets/textures/planet/mars.png
-        # assets/textures/planet/planet.mtl
-        # assets/textures/planet/planet.obj
-        # assets/textures/planet/source.txt
-        # assets/textures/rock/rock.png
-        # assets/textures/rock/rock.mtl
-        # assets/textures/rock/rock.obj
+        assets/textures/planet/mars.png
+        assets/textures/planet/planet.mtl
+        assets/textures/planet/planet.obj
+        assets/textures/planet/source.txt
+        assets/textures/rock/rock.png
+        assets/textures/rock/rock.mtl
+        assets/textures/rock/rock.obj
 )
