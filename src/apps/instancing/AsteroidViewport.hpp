@@ -16,9 +16,9 @@ public:
                    float height = 600.f, std::filesystem::path assetsDir = {});
   virtual ~AsteroidViewport() = default;
 
-  virtual void onEvent(libs::events::Event &event) override {
-    m_cameraController.onEvent(event);
-  };
+  virtual void onEvent(libs::events::Event &event) override;
+
+  virtual void onImguiUpdate() override;
 
 protected:
   void drawScene() override;
@@ -37,4 +37,6 @@ private:
 
   std::shared_ptr<libs::renderer::Model> m_planet{nullptr};
   std::shared_ptr<libs::renderer::Model> m_asteroid{nullptr};
+  int m_maxAsteroidCount{1000000};
+  int m_asteroidCount{1000};
 };

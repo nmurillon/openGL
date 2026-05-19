@@ -12,6 +12,7 @@ logl_add_executable(instancing
         logl_io
         logl_renderer
         glm
+        imgui
     RESOURCES
         assets/shaders/asteroid.frag
         assets/shaders/asteroid.vert
